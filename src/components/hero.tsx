@@ -59,7 +59,8 @@ export default function Hero() {
           zIndex: 1,
         });
         gsap.set(`#hero-item-${currentVideoIndex}-content`, {
-          clipPath: "polygon(40% 36.5%, 60% 36.5%, 60% 63.5%, 40% 63.5%)",
+          clipPath:
+            "polygon(calc(50% - clamp(100px, 10vw, 200px)) calc(50% - clamp(100px, 10vw, 200px)), calc(50% + clamp(100px, 10vw, 200px)) calc(50% - clamp(100px, 10vw, 200px)), calc(50% + clamp(100px, 10vw, 200px)) calc(50% + clamp(100px, 10vw, 200px)), calc(50% - clamp(100px, 10vw, 200px)) calc(50% + clamp(100px, 10vw, 200px)))",
         });
 
         gsap.set(`#hero-item-${videoIndexPlusOne}`, {
@@ -67,11 +68,13 @@ export default function Hero() {
           zIndex: 2,
         });
         gsap.set(`#hero-item-${videoIndexPlusOne}-content`, {
-          clipPath: "polygon(40% 36.5%, 60% 36.5%, 60% 63.5%, 40% 63.5%)",
+          clipPath:
+            "polygon(calc(50% - clamp(100px, 10vw, 200px)) calc(50% - clamp(100px, 10vw, 200px)), calc(50% + clamp(100px, 10vw, 200px)) calc(50% - clamp(100px, 10vw, 200px)), calc(50% + clamp(100px, 10vw, 200px)) calc(50% + clamp(100px, 10vw, 200px)), calc(50% - clamp(100px, 10vw, 200px)) calc(50% + clamp(100px, 10vw, 200px)))",
         });
 
         gsap.to(`#hero-item-${currentVideoIndex}-content`, {
-          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+          clipPath:
+            "polygon(calc(0% - 0%) calc(0% - 0%), calc(100% + 0%) calc(0% - 0%), calc(100% + 0%) calc(100% + 0%), calc(0% - 0%) calc(100% + 0%))",
           duration: 1,
           ease: "power1.inOut",
           onStart: () => {
@@ -94,7 +97,8 @@ export default function Hero() {
               display: "none",
             });
             gsap.set(`#hero-item-${videoIndexMinusOne}-content`, {
-              clipPath: "polygon(40% 36.5%, 60% 36.5%, 60% 63.5%, 40% 63.5%)",
+              clipPath:
+                "polygon(calc(50% - clamp(100px, 10vw, 200px)) calc(50% - clamp(100px, 10vw, 200px)), calc(50% + clamp(100px, 10vw, 200px)) calc(50% - clamp(100px, 10vw, 200px)), calc(50% + clamp(100px, 10vw, 200px)) calc(50% + clamp(100px, 10vw, 200px)), calc(50% - clamp(100px, 10vw, 200px)) calc(50% + clamp(100px, 10vw, 200px)))",
             });
             const video = {
               1: videoRef1,
@@ -147,56 +151,103 @@ export default function Hero() {
     });
   });
 
-  const [isMouseOverHitArea, setIsMouseOverHitArea] = useState(false);
-  const [isMouseMoving, setIsMouseMoving] = useState(false);
-  const movementTimeout = 200; // Time (ms) to detect if the mouse stopped moving
-  let timeoutId: ReturnType<typeof setTimeout>;
+  // const [isMouseOverHitArea, setIsMouseOverHitArea] = useState(false);
+  // const [isMouseMoving, setIsMouseMoving] = useState(false);
+  // const movementTimeout = 200; // Time (ms) to detect if the mouse stopped moving
+  // let timeoutId: ReturnType<typeof setTimeout>;
 
-  function handleMouseMove() {
-    // Clear the existing timeout to reset the stop detection
-    clearTimeout(timeoutId);
+  // const tl = useRef();
 
-    // Indicate the mouse is moving
-    setIsMouseMoving(true);
+  // const { contextSafe } = useGSAP(
+  //   () => {
+  //     tl.current = gsap
+  //       .timeline()
+  //       .to(`#hero-item-${videoIndexPlusOne}-content`, {
+  //         clipPath: "polygon(40% 36.5%, 60% 36.5%, 60% 63.5%, 40% 63.5%)",
+  //       })
+  //       .to(`#hero-item-${videoIndexPlusOne}-content`, {
+  //         clipPath: "polygon(37% 34%, 63% 34%, 63% 66%, 37% 66%)",
+  //       });
+  //   },
+  //   { scope: heroSectionRef },
+  // );
 
-    // Set a timeout to detect when the mouse stops moving
-    timeoutId = setTimeout(() => {
-      setIsMouseMoving(false);
-    }, movementTimeout);
-  }
+  // const toggleTimeline = contextSafe(() => {
+  //   tl.current.reversed(!tl.current.reversed());
+  // });
 
-  useEffect(() => {
-    if (!heroSectionRef.current) return;
+  // function handleMouseMove() {
+  //   // Clear the existing timeout to reset the stop detection
+  //   clearTimeout(timeoutId);
 
-    heroSectionRef.current.addEventListener("mousemove", handleMouseMove);
+  //   // Indicate the mouse is moving
+  //   setIsMouseMoving(true);
 
-    return () => {
-      if (!heroSectionRef.current) return;
-      heroSectionRef.current.removeEventListener("mousemove", handleMouseMove);
-    };
-  }, []);
+  //   // Set a timeout to detect when the mouse stops moving
+  //   timeoutId = setTimeout(() => {
+  //     setIsMouseMoving(false);
+  //   }, movementTimeout);
+  // }
 
-  useGSAP(
-    () => {
-      if (isMouseMoving) {
-        gsap.to(`#hero-item-${videoIndexPlusOne}-content`, {
-          clipPath: "polygon(40% 36.5%, 60% 36.5%, 60% 63.5%, 40% 63.5%)",
-          duration: 0.5,
-          ease: "power1.inOut",
-        });
-      } else {
-        if (isMouseOverHitArea) return;
-        gsap.to(`#hero-item-${videoIndexPlusOne}-content`, {
-          clipPath: "polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%)",
-          duration: 0.5,
-          ease: "power1.inOut",
-        });
-      }
-    },
-    {
-      dependencies: [isMouseMoving],
-    },
-  );
+  // useEffect(() => {
+  //   if (!heroSectionRef.current) return;
+
+  //   heroSectionRef.current.addEventListener("mousemove", handleMouseMove);
+
+  //   return () => {
+  //     if (!heroSectionRef.current) return;
+  //     heroSectionRef.current.removeEventListener("mousemove", handleMouseMove);
+  //   };
+  // }, []);
+
+  // const tl = useRef();
+
+  // const { contextSafe } = useGSAP(
+  //   () => {
+  //     tl.current = gsap
+  //       .timeline({ paused: true }) // Pause by default, to control manually
+  //       .to(
+  //         `#hero-item-${videoIndexPlusOne}-content`,
+  //         {
+  //           clipPath: "polygon(40% 36.5%, 60% 36.5%, 60% 63.5%, 40% 63.5%)",
+  //           duration: 1,
+  //           repeat: -1,
+  //           yoyo: true,
+  //           ease: "power1.inOut",
+  //         },
+  //         "+=0.5",
+  //       );
+  //   },
+  //   { scope: heroSectionRef },
+  // );
+
+  // const handlePlay = contextSafe(() => {
+  //   tl.current.play();
+  // });
+
+  // useGSAP(
+  //   () => {
+  //     if (isMouseMoving) {
+  //       gsap.to(`#hero-item-${videoIndexPlusOne}-content`, {
+  //         clipPath: "polygon(37% 34%, 63% 34%, 63% 66%, 37% 66%)",
+  //         duration: 0.5,
+  //         ease: "power1.inOut",
+  //       });
+  //       handlePlay();
+  //     }
+  //     // else {
+  //     //   if (isMouseOverHitArea) return;
+  //     //   gsap.to(`#hero-item-${videoIndexPlusOne}-content`, {
+  //     //     clipPath: "polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%)",
+  //     //     duration: 0.5,
+  //     //     ease: "power1.inOut",
+  //     //   });
+  //     // }
+  //   },
+  //   {
+  //     dependencies: [isMouseMoving],
+  //   },
+  // );
 
   return (
     <section
@@ -206,8 +257,8 @@ export default function Hero() {
       <div id="hero-slides" className="absolute left-0 top-0 z-[1] size-full">
         <div
           id="hero-hit-area"
-          onMouseEnter={() => setIsMouseOverHitArea(true)}
-          onMouseLeave={() => setIsMouseOverHitArea(false)}
+          // onMouseEnter={() => setIsMouseOverHitArea(true)}
+          // onMouseLeave={() => setIsMouseOverHitArea(false)}
           onClick={handleHitAreaClicked}
           className="absolute left-1/2 top-1/2 z-[100] aspect-square w-1/5 -translate-x-1/2 -translate-y-1/2 cursor-pointer"
         ></div>
@@ -241,19 +292,20 @@ export default function Hero() {
 
         <div
           id="hero-item-2"
-          className="absolute left-0 top-0 size-full"
+          className="absolute left-0 top-0 size-full overflow-hidden"
           style={{ zIndex: 2 }}
         >
           <div
             id="hero-item-2-content"
-            className="absolute left-0 top-0 z-[1] size-full bg-violet-300"
+            className="absolute left-0 top-0 z-[1] size-full"
             style={{
-              clipPath: "polygon(40% 36.5%, 60% 36.5%, 60% 63.5%, 40% 63.5%)",
+              clipPath:
+                "polygon(calc(50% - clamp(100px, 10vw, 200px)) calc(50% - clamp(100px, 10vw, 200px)), calc(50% + clamp(100px, 10vw, 200px)) calc(50% - clamp(100px, 10vw, 200px)), calc(50% + clamp(100px, 10vw, 200px)) calc(50% + clamp(100px, 10vw, 200px)), calc(50% - clamp(100px, 10vw, 200px)) calc(50% + clamp(100px, 10vw, 200px)))",
             }}
           >
             <div
               id="hero-item-2-inner"
-              className="visible absolute left-0 top-0 size-full opacity-100"
+              className="visible absolute left-0 top-0 size-full bg-violet-300"
             >
               <video
                 ref={videoRef2}
@@ -276,9 +328,6 @@ export default function Hero() {
           <div
             id="hero-item-3-content"
             className="absolute left-0 top-0 z-[1] size-full bg-violet-300"
-            style={{
-              clipPath: "polygon(40% 36.5%, 60% 36.5%, 60% 63.5%, 40% 63.5%)",
-            }}
           >
             <div
               id="hero-item-3-inner"
@@ -305,9 +354,6 @@ export default function Hero() {
           <div
             id="hero-item-4-content"
             className="absolute left-0 top-0 z-[1] size-full bg-violet-300"
-            style={{
-              clipPath: "polygon(40% 36.5%, 60% 36.5%, 60% 63.5%, 40% 63.5%)",
-            }}
           >
             <div
               id="hero-item-4-inner"
