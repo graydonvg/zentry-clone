@@ -6,109 +6,135 @@ import { Button } from "./button";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import gsap from "gsap";
+import useWindowDimensions from "@/hooks/use-window-dimensions";
+import { getCurrentVideoClipPath, getNextVideoClipPath } from "@/lib/utils";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
 }
 
-const totalVideos = 4;
+const heroVideos = [
+  {
+    initialZIndex: 1,
+    autoPlay: false,
+  },
+  {
+    initialZIndex: 2,
+  },
+  {
+    initialZIndex: 0,
+    initialDisplay: "none",
+  },
+  {
+    initialZIndex: 0,
+    initialDisplay: "none",
+  },
+];
+
+const totalVideos = heroVideos.length;
+const minSqaureSideLength = 100;
+const maxSquareSideLength = 300;
 
 export default function Hero() {
-  const [currentVideoIndex, setCurrentVideoIndex] = useState(1);
+  const [currentVideoNumber, setCurrentVideoNumber] = useState(1);
   const [hasClickedHitArea, setHasClickedHitArea] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const heroSectionRef = useRef<HTMLElement>(null);
-  const videoRef1 = useRef<HTMLVideoElement>(null);
-  const videoRef2 = useRef<HTMLVideoElement>(null);
-  const videoRef3 = useRef<HTMLVideoElement>(null);
-  const videoRef4 = useRef<HTMLVideoElement>(null);
+  const windowDimensions = useWindowDimensions();
+  const [nextVideoClipPath, setNextVideoClipPath] = useState("");
+  const [currentVideoClipPath, setCurrentVideoClipPath] = useState("");
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+
+  useEffect(() => {
+    setNextVideoClipPath(
+      getNextVideoClipPath(
+        minSqaureSideLength,
+        maxSquareSideLength,
+        windowDimensions,
+      ),
+    );
+
+    setCurrentVideoClipPath(getCurrentVideoClipPath(windowDimensions));
+  }, [windowDimensions]);
 
   function handleHitAreaClicked() {
     if (isTransitioning) return;
     setIsTransitioning(true);
     setHasClickedHitArea(true);
-    setCurrentVideoIndex((prevIndex) => (prevIndex % totalVideos) + 1);
+    setCurrentVideoNumber((prevIndex) => (prevIndex % totalVideos) + 1);
   }
-
-  const videoIndexMinusTwo =
-    ((currentVideoIndex - 2 + totalVideos - 1) % totalVideos) + 1;
-
-  const videoIndexMinusOne =
-    ((currentVideoIndex - 1 + totalVideos - 1) % totalVideos) + 1;
-
-  const videoIndexPlusOne = (currentVideoIndex % totalVideos) + 1;
 
   useGSAP(
     () => {
       if (hasClickedHitArea) {
-        gsap.set(`#hero-item-${videoIndexMinusTwo}`, {
+        const currentVideoNumberMinusTwo =
+          ((currentVideoNumber - 2 + totalVideos - 1) % totalVideos) + 1;
+        const previousVideoNumber =
+          ((currentVideoNumber - 1 + totalVideos - 1) % totalVideos) + 1;
+        const nextVideoNumber = (currentVideoNumber % totalVideos) + 1;
+
+        // Keep past videos hidden
+        gsap.set(`#video-item-${currentVideoNumberMinusTwo}`, {
           display: "none",
           zIndex: 0,
         });
 
-        gsap.set(`#hero-item-${videoIndexMinusOne}`, {
+        // Keep the previous video visible during transition
+        gsap.set(`#video-item-${previousVideoNumber}`, {
           display: "block",
           zIndex: 0,
         });
-        gsap.set(`#hero-item-${videoIndexMinusOne}-content`, {
-          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+        gsap.set(`#video-item-${previousVideoNumber}-content`, {
+          clipPath: `path("${currentVideoClipPath}")`,
         });
 
-        gsap.set(`#hero-item-${currentVideoIndex}`, {
+        // Set the current video to the background
+        gsap.set(`#video-item-${currentVideoNumber}`, {
           display: "block",
           zIndex: 1,
         });
-        gsap.set(`#hero-item-${currentVideoIndex}-content`, {
-          clipPath:
-            "polygon(calc(50% - clamp(100px, 10vw, 200px)) calc(50% - clamp(100px, 10vw, 200px)), calc(50% + clamp(100px, 10vw, 200px)) calc(50% - clamp(100px, 10vw, 200px)), calc(50% + clamp(100px, 10vw, 200px)) calc(50% + clamp(100px, 10vw, 200px)), calc(50% - clamp(100px, 10vw, 200px)) calc(50% + clamp(100px, 10vw, 200px)))",
+        gsap.set(`#video-item-${currentVideoNumber}-content`, {
+          clipPath: `path("${nextVideoClipPath}")`,
         });
 
-        gsap.set(`#hero-item-${videoIndexPlusOne}`, {
+        // Set the next video on top of the current video
+        gsap.set(`#video-item-${nextVideoNumber}`, {
           display: "block",
           zIndex: 2,
         });
-        gsap.set(`#hero-item-${videoIndexPlusOne}-content`, {
-          clipPath:
-            "polygon(calc(50% - clamp(100px, 10vw, 200px)) calc(50% - clamp(100px, 10vw, 200px)), calc(50% + clamp(100px, 10vw, 200px)) calc(50% - clamp(100px, 10vw, 200px)), calc(50% + clamp(100px, 10vw, 200px)) calc(50% + clamp(100px, 10vw, 200px)), calc(50% - clamp(100px, 10vw, 200px)) calc(50% + clamp(100px, 10vw, 200px)))",
+        gsap.set(`#video-item-${nextVideoNumber}-content`, {
+          clipPath: `path("${nextVideoClipPath}")`,
         });
 
-        gsap.to(`#hero-item-${currentVideoIndex}-content`, {
-          clipPath:
-            "polygon(calc(0% - 0%) calc(0% - 0%), calc(100% + 0%) calc(0% - 0%), calc(100% + 0%) calc(100% + 0%), calc(0% - 0%) calc(100% + 0%))",
+        // Animate the current video border to expand to the size of the screen
+        gsap.to(`#video-item-${currentVideoNumber}-content-border`, {
+          display: "block",
+          attr: {
+            d: currentVideoClipPath,
+          },
+          duration: 1,
+          ease: "power1.inOut",
+        });
+
+        // Animate the current video to expand to the size of the screen
+        gsap.to(`#video-item-${currentVideoNumber}-content`, {
+          clipPath: `path("${currentVideoClipPath}")`,
           duration: 1,
           ease: "power1.inOut",
           onStart: () => {
-            const video = {
-              1: videoRef1,
-              2: videoRef2,
-              3: videoRef3,
-              4: videoRef4,
-            };
-
-            const currentVideo =
-              video[currentVideoIndex as keyof typeof video].current;
+            const currentVideo = videoRefs.current[currentVideoNumber];
 
             if (currentVideo) {
               currentVideo.play();
             }
           },
           onComplete: () => {
-            gsap.set(`#hero-item-${videoIndexMinusOne}`, {
+            // Hide the previous video once the current video takes up the full screen
+            gsap.set(`#video-item-${previousVideoNumber}`, {
               display: "none",
             });
-            gsap.set(`#hero-item-${videoIndexMinusOne}-content`, {
-              clipPath:
-                "polygon(calc(50% - clamp(100px, 10vw, 200px)) calc(50% - clamp(100px, 10vw, 200px)), calc(50% + clamp(100px, 10vw, 200px)) calc(50% - clamp(100px, 10vw, 200px)), calc(50% + clamp(100px, 10vw, 200px)) calc(50% + clamp(100px, 10vw, 200px)), calc(50% - clamp(100px, 10vw, 200px)) calc(50% + clamp(100px, 10vw, 200px)))",
-            });
-            const video = {
-              1: videoRef1,
-              2: videoRef2,
-              3: videoRef3,
-              4: videoRef4,
-            };
 
-            const previousVideo =
-              video[videoIndexMinusOne as keyof typeof video].current;
+            const previousVideo = videoRefs.current[previousVideoNumber];
 
             if (previousVideo) {
               previousVideo.pause();
@@ -119,7 +145,8 @@ export default function Hero() {
           },
         });
 
-        gsap.from(`#hero-item-${videoIndexPlusOne}-content`, {
+        // Grow in the next video option
+        gsap.from(`#video-item-${nextVideoNumber}-content`, {
           scale: 0,
           duration: 1,
           ease: "power1.inOut",
@@ -127,7 +154,7 @@ export default function Hero() {
       }
     },
     {
-      dependencies: [currentVideoIndex],
+      dependencies: [currentVideoNumber],
       revertOnUpdate: true,
     },
   );
@@ -135,12 +162,10 @@ export default function Hero() {
   useGSAP(() => {
     gsap.set("#hero-slides", {
       clipPath: "polygon(14% 0%, 72% 0%, 90% 90%, 0% 100%)",
-      borderRadius: "0 0 40% 10%",
     });
 
     gsap.from("#hero-slides", {
       clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-      borderRadius: "0 0 0 0",
       ease: "power1.inOut",
       scrollTrigger: {
         trigger: "#hero-slides",
@@ -151,103 +176,11 @@ export default function Hero() {
     });
   });
 
-  // const [isMouseOverHitArea, setIsMouseOverHitArea] = useState(false);
-  // const [isMouseMoving, setIsMouseMoving] = useState(false);
-  // const movementTimeout = 200; // Time (ms) to detect if the mouse stopped moving
-  // let timeoutId: ReturnType<typeof setTimeout>;
+  function determineVideoClipPath(videoNumber: number) {
+    if (videoNumber === currentVideoNumber) return currentVideoClipPath;
 
-  // const tl = useRef();
-
-  // const { contextSafe } = useGSAP(
-  //   () => {
-  //     tl.current = gsap
-  //       .timeline()
-  //       .to(`#hero-item-${videoIndexPlusOne}-content`, {
-  //         clipPath: "polygon(40% 36.5%, 60% 36.5%, 60% 63.5%, 40% 63.5%)",
-  //       })
-  //       .to(`#hero-item-${videoIndexPlusOne}-content`, {
-  //         clipPath: "polygon(37% 34%, 63% 34%, 63% 66%, 37% 66%)",
-  //       });
-  //   },
-  //   { scope: heroSectionRef },
-  // );
-
-  // const toggleTimeline = contextSafe(() => {
-  //   tl.current.reversed(!tl.current.reversed());
-  // });
-
-  // function handleMouseMove() {
-  //   // Clear the existing timeout to reset the stop detection
-  //   clearTimeout(timeoutId);
-
-  //   // Indicate the mouse is moving
-  //   setIsMouseMoving(true);
-
-  //   // Set a timeout to detect when the mouse stops moving
-  //   timeoutId = setTimeout(() => {
-  //     setIsMouseMoving(false);
-  //   }, movementTimeout);
-  // }
-
-  // useEffect(() => {
-  //   if (!heroSectionRef.current) return;
-
-  //   heroSectionRef.current.addEventListener("mousemove", handleMouseMove);
-
-  //   return () => {
-  //     if (!heroSectionRef.current) return;
-  //     heroSectionRef.current.removeEventListener("mousemove", handleMouseMove);
-  //   };
-  // }, []);
-
-  // const tl = useRef();
-
-  // const { contextSafe } = useGSAP(
-  //   () => {
-  //     tl.current = gsap
-  //       .timeline({ paused: true }) // Pause by default, to control manually
-  //       .to(
-  //         `#hero-item-${videoIndexPlusOne}-content`,
-  //         {
-  //           clipPath: "polygon(40% 36.5%, 60% 36.5%, 60% 63.5%, 40% 63.5%)",
-  //           duration: 1,
-  //           repeat: -1,
-  //           yoyo: true,
-  //           ease: "power1.inOut",
-  //         },
-  //         "+=0.5",
-  //       );
-  //   },
-  //   { scope: heroSectionRef },
-  // );
-
-  // const handlePlay = contextSafe(() => {
-  //   tl.current.play();
-  // });
-
-  // useGSAP(
-  //   () => {
-  //     if (isMouseMoving) {
-  //       gsap.to(`#hero-item-${videoIndexPlusOne}-content`, {
-  //         clipPath: "polygon(37% 34%, 63% 34%, 63% 66%, 37% 66%)",
-  //         duration: 0.5,
-  //         ease: "power1.inOut",
-  //       });
-  //       handlePlay();
-  //     }
-  //     // else {
-  //     //   if (isMouseOverHitArea) return;
-  //     //   gsap.to(`#hero-item-${videoIndexPlusOne}-content`, {
-  //     //     clipPath: "polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%)",
-  //     //     duration: 0.5,
-  //     //     ease: "power1.inOut",
-  //     //   });
-  //     // }
-  //   },
-  //   {
-  //     dependencies: [isMouseMoving],
-  //   },
-  // );
+    return nextVideoClipPath;
+  }
 
   return (
     <section
@@ -255,6 +188,18 @@ export default function Hero() {
       className="relative h-dvh w-screen overflow-x-hidden"
     >
       <div id="hero-slides" className="absolute left-0 top-0 z-[1] size-full">
+        {/* <svg
+          className="absolute left-0 top-0 z-[3] size-full fill-none"
+          stroke="#000000"
+          strokeWidth="2"
+          fill="none"
+        >
+          <path
+            id="hero-slides-border-path"
+            className="absolute left-0 top-0 z-[1] size-full fill-none"
+            d={heroItemClipPath}
+          ></path>
+        </svg> */}
         <div
           id="hero-hit-area"
           // onMouseEnter={() => setIsMouseOverHitArea(true)}
@@ -263,114 +208,59 @@ export default function Hero() {
           className="absolute left-1/2 top-1/2 z-[100] aspect-square w-1/5 -translate-x-1/2 -translate-y-1/2 cursor-pointer"
         ></div>
 
-        <div
-          id="hero-item-1"
-          className="absolute left-0 top-0 size-full"
-          style={{ zIndex: 1 }}
-        >
-          <div
-            id="hero-item-1-content"
-            className="absolute left-0 top-0 z-[1] size-full bg-violet-300"
-          >
-            <div
-              id="hero-item-1-inner"
-              className="visible absolute left-0 top-0 size-full opacity-100"
-            >
-              <video
-                ref={videoRef1}
-                src="videos/hero-1.mp4"
-                // autoPlay
-                muted
-                playsInline
-                loop
-                preload="metadata"
-                className="absolute left-0 top-0 size-full object-cover"
-              />
-            </div>
-          </div>
-        </div>
+        {heroVideos.map((video, index) => {
+          const videoNumber =
+            (index + 1) % totalVideos === 0 ? 4 : (index + 1) % totalVideos;
 
-        <div
-          id="hero-item-2"
-          className="absolute left-0 top-0 size-full overflow-hidden"
-          style={{ zIndex: 2 }}
-        >
-          <div
-            id="hero-item-2-content"
-            className="absolute left-0 top-0 z-[1] size-full"
-            style={{
-              clipPath:
-                "polygon(calc(50% - clamp(100px, 10vw, 200px)) calc(50% - clamp(100px, 10vw, 200px)), calc(50% + clamp(100px, 10vw, 200px)) calc(50% - clamp(100px, 10vw, 200px)), calc(50% + clamp(100px, 10vw, 200px)) calc(50% + clamp(100px, 10vw, 200px)), calc(50% - clamp(100px, 10vw, 200px)) calc(50% + clamp(100px, 10vw, 200px)))",
-            }}
-          >
+          return (
             <div
-              id="hero-item-2-inner"
-              className="visible absolute left-0 top-0 size-full bg-violet-300"
+              key={index}
+              id={`video-item-${videoNumber}`}
+              className="absolute left-0 top-0 size-full"
+              style={{
+                zIndex: video.initialZIndex,
+                display: video.initialDisplay,
+              }}
             >
-              <video
-                ref={videoRef2}
-                src="videos/hero-2.mp4"
-                muted
-                playsInline
-                loop
-                preload="metadata"
-                className="absolute left-0 top-0 size-full object-cover"
-              />
+              <div
+                id={`video-item-${videoNumber}-content`}
+                className="absolute left-0 top-0 z-[1] size-full bg-violet-300"
+                style={{
+                  clipPath: `path("${determineVideoClipPath(videoNumber)}")`,
+                }}
+              >
+                <svg
+                  className="absolute left-0 top-0 z-[3] size-full fill-none"
+                  stroke="#000000"
+                  strokeWidth="2"
+                  fill="none"
+                >
+                  <path
+                    id={`video-item-${videoNumber}-content-border`}
+                    style={{ display: video.initialDisplay }}
+                    className="absolute left-0 top-0 z-[3] size-full fill-none"
+                    d={determineVideoClipPath(videoNumber)}
+                  ></path>
+                </svg>
+                <div className="visible absolute left-0 top-0 size-full opacity-100">
+                  <video
+                    ref={(el) => {
+                      videoRefs.current[videoNumber] = el;
+                    }}
+                    src={`videos/hero-${videoNumber}.mp4`}
+                    autoPlay={video.autoPlay}
+                    muted
+                    playsInline
+                    loop
+                    preload="metadata"
+                    className="absolute left-0 top-0 size-full object-cover"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          );
+        })}
 
-        <div
-          id="hero-item-3"
-          className="absolute left-0 top-0 size-full"
-          style={{ zIndex: 0, display: "none" }}
-        >
-          <div
-            id="hero-item-3-content"
-            className="absolute left-0 top-0 z-[1] size-full bg-violet-300"
-          >
-            <div
-              id="hero-item-3-inner"
-              className="visible absolute left-0 top-0 size-full opacity-100"
-            >
-              <video
-                ref={videoRef3}
-                src="videos/hero-3.mp4"
-                muted
-                playsInline
-                loop
-                preload="metadata"
-                className="absolute left-0 top-0 size-full object-cover"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div
-          id="hero-item-4"
-          className="absolute left-0 top-0 size-full"
-          style={{ zIndex: 0, display: "none" }}
-        >
-          <div
-            id="hero-item-4-content"
-            className="absolute left-0 top-0 z-[1] size-full bg-violet-300"
-          >
-            <div
-              id="hero-item-4-inner"
-              className="visible absolute left-0 top-0 size-full opacity-100"
-            >
-              <video
-                ref={videoRef4}
-                src="videos/hero-4.mp4"
-                muted
-                playsInline
-                loop
-                preload="metadata"
-                className="absolute left-0 top-0 size-full object-cover"
-              />
-            </div>
-          </div>
-        </div>
         <div className="absolute left-0 top-0 z-40 size-full">
           <div className="mt-24 px-5 sm:px-10">
             <h1 className="special-font hero-heading text-blue-75">
