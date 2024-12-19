@@ -33,7 +33,7 @@ const heroVideos = [
 
 const totalVideos = heroVideos.length;
 const minSqaureSideLength = 100;
-const maxSquareSideLength = 300;
+const maxSquareSideLength = 250;
 
 export default function Hero() {
   const [currentVideoNumber, setCurrentVideoNumber] = useState(1);
@@ -44,6 +44,11 @@ export default function Hero() {
   const [nextVideoClipPath, setNextVideoClipPath] = useState("");
   const [currentVideoClipPath, setCurrentVideoClipPath] = useState("");
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const currentVideoNumberMinusTwo =
+    ((currentVideoNumber - 2 + totalVideos - 1) % totalVideos) + 1;
+  const previousVideoNumber =
+    ((currentVideoNumber - 1 + totalVideos - 1) % totalVideos) + 1;
+  const nextVideoNumber = (currentVideoNumber % totalVideos) + 1;
 
   useEffect(() => {
     setNextVideoClipPath(
@@ -67,19 +72,13 @@ export default function Hero() {
   useGSAP(
     () => {
       if (hasClickedHitArea) {
-        const currentVideoNumberMinusTwo =
-          ((currentVideoNumber - 2 + totalVideos - 1) % totalVideos) + 1;
-        const previousVideoNumber =
-          ((currentVideoNumber - 1 + totalVideos - 1) % totalVideos) + 1;
-        const nextVideoNumber = (currentVideoNumber % totalVideos) + 1;
-
         // Keep past videos hidden
         gsap.set(`#video-item-${currentVideoNumberMinusTwo}`, {
           display: "none",
           zIndex: 0,
         });
 
-        // Keep the previous video visible during transition
+        // Keep the previous video visible without a border during transition
         gsap.set(`#video-item-${previousVideoNumber}`, {
           display: "block",
           zIndex: 0,
@@ -88,7 +87,8 @@ export default function Hero() {
           clipPath: `path("${currentVideoClipPath}")`,
         });
 
-        // Set the current video to the background
+        // Borders are only added to the next video option
+        // Set the new current video with a border behind the next video option before it grows
         gsap.set(`#video-item-${currentVideoNumber}`, {
           display: "block",
           zIndex: 1,
@@ -96,8 +96,13 @@ export default function Hero() {
         gsap.set(`#video-item-${currentVideoNumber}-content`, {
           clipPath: `path("${nextVideoClipPath}")`,
         });
+        gsap.set(`#video-item-${currentVideoNumber}-content-border`, {
+          attr: {
+            d: nextVideoClipPath,
+          },
+        });
 
-        // Set the next video on top of the current video
+        // Set the next video option in front of the new current video
         gsap.set(`#video-item-${nextVideoNumber}`, {
           display: "block",
           zIndex: 2,
@@ -106,17 +111,24 @@ export default function Hero() {
           clipPath: `path("${nextVideoClipPath}")`,
         });
 
-        // Animate the current video border to expand to the size of the screen
+        // Animate the new current video border to expand to the size of the screen
         gsap.to(`#video-item-${currentVideoNumber}-content-border`, {
-          display: "block",
           attr: {
             d: currentVideoClipPath,
           },
           duration: 1,
           ease: "power1.inOut",
+          onComplete: () => {
+            // Hide the border once the video grows to full size
+            gsap.set(`#video-item-${currentVideoNumber}-content-border`, {
+              attr: {
+                d: "",
+              },
+            });
+          },
         });
 
-        // Animate the current video to expand to the size of the screen
+        // Animate the new current video to expand to the size of the screen
         gsap.to(`#video-item-${currentVideoNumber}-content`, {
           clipPath: `path("${currentVideoClipPath}")`,
           duration: 1,
@@ -129,7 +141,7 @@ export default function Hero() {
             }
           },
           onComplete: () => {
-            // Hide the previous video once the current video takes up the full screen
+            // Hide the previous video once the new current video grows to full size
             gsap.set(`#video-item-${previousVideoNumber}`, {
               display: "none",
             });
@@ -176,12 +188,6 @@ export default function Hero() {
     });
   });
 
-  function determineVideoClipPath(videoNumber: number) {
-    if (videoNumber === currentVideoNumber) return currentVideoClipPath;
-
-    return nextVideoClipPath;
-  }
-
   return (
     <section
       ref={heroSectionRef}
@@ -209,12 +215,17 @@ export default function Hero() {
         ></div>
 
         {heroVideos.map((video, index) => {
-          const videoNumber =
-            (index + 1) % totalVideos === 0 ? 4 : (index + 1) % totalVideos;
+          const videoNumber = index + 1;
+          const clipPath =
+            videoNumber === currentVideoNumber
+              ? currentVideoClipPath
+              : nextVideoClipPath;
+          const borderPath =
+            videoNumber == nextVideoNumber ? nextVideoClipPath : undefined;
 
           return (
             <div
-              key={index}
+              key={videoNumber}
               id={`video-item-${videoNumber}`}
               className="absolute left-0 top-0 size-full"
               style={{
@@ -226,23 +237,22 @@ export default function Hero() {
                 id={`video-item-${videoNumber}-content`}
                 className="absolute left-0 top-0 z-[1] size-full bg-violet-300"
                 style={{
-                  clipPath: `path("${determineVideoClipPath(videoNumber)}")`,
+                  clipPath: `path("${clipPath}")`,
                 }}
               >
                 <svg
                   className="absolute left-0 top-0 z-[3] size-full fill-none"
-                  stroke="#000000"
+                  stroke={"#000000"}
                   strokeWidth="2"
                   fill="none"
                 >
                   <path
                     id={`video-item-${videoNumber}-content-border`}
-                    style={{ display: video.initialDisplay }}
                     className="absolute left-0 top-0 z-[3] size-full fill-none"
-                    d={determineVideoClipPath(videoNumber)}
+                    d={borderPath}
                   ></path>
                 </svg>
-                <div className="visible absolute left-0 top-0 size-full opacity-100">
+                <div className="visible absolute left-0 top-0 size-full">
                   <video
                     ref={(el) => {
                       videoRefs.current[videoNumber] = el;
