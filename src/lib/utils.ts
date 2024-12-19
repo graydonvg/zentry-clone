@@ -5,29 +5,39 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export function getHitAreaWidth(
+  minHitAreaWidth: number,
+  maxHitAreaWidth: number,
+  windowDimensions: WindowDimensions,
+) {
+  const hitAreaMinWidth = Math.max(
+    windowDimensions.width * 0.2,
+    minHitAreaWidth,
+  );
+
+  return Math.min(hitAreaMinWidth, maxHitAreaWidth);
+}
+
 type WindowDimensions = {
   width: number;
   height: number;
 };
 
 export function getNextVideoClipPath(
-  minLength: number,
-  maxLength: number,
+  hitAreaWidth: number,
   windowDimensions: WindowDimensions,
 ) {
-  // Determine square side length
-  const minSideLength = Math.max(windowDimensions.width * 0.2, minLength);
-  const minMaxSideLength = Math.min(minSideLength, maxLength);
+  // Determine clip path min/max side length
 
-  // Square center
+  // Clip path center
   const centerX = windowDimensions.width / 2;
   const centerY = windowDimensions.height / 2;
 
-  // Square side lengths
-  const halfSideLength = minMaxSideLength / 2;
-  const quaterSideLength = minMaxSideLength / 4;
+  // Clip path lengths
+  const halfSideLength = hitAreaWidth / 2;
+  const quaterSideLength = hitAreaWidth / 4;
 
-  // Square points
+  // Clip path points
   const topLeftX = centerX - halfSideLength;
   const topLeftY = centerY - halfSideLength;
 
@@ -46,10 +56,10 @@ export function getNextVideoClipPath(
 }
 
 export function getCurrentVideoClipPath(windowDimensions: WindowDimensions) {
-  // Square center
+  // Determine clip path side length
   const centerX = windowDimensions.width / 2;
 
-  // Square points
+  // Clip path points
   const topLeftX = 0;
   const topLeftY = 0;
 
