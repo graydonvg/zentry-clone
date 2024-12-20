@@ -12,6 +12,8 @@ import {
   getHiddenHeroVideoNumbers,
   getHitAreaWidth,
   getNextVideoClipPath,
+  getFirstTransformedHeroClipPath,
+  getSecondTransformedHeroClipPath,
 } from "@/lib/utils";
 import useMouseMoving from "@/hooks/use-mouse-moving";
 import useScrolledToTop from "@/hooks/use-scrolled-to-top";
@@ -52,8 +54,13 @@ export default function Hero() {
   const [hiddenVideoClipPath, setHiddenVideoClipPath] = useState("");
   const [nextVideoClipPath, setNextVideoClipPath] = useState("");
   const [currentVideoClipPath, setCurrentVideoClipPath] = useState("");
+  const [firstTransformedHeroClipPath, setFirstTransformedHeroClipPath] =
+    useState("");
+  const [secondTransformedHeroClipPath, setSecondTransformedHeroClipPath] =
+    useState("");
   const [isMouseOverHitArea, setIsMouseOverHitArea] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
+  const heroBorderRef = useRef<SVGPathElement>(null);
   const videoItemContainerRefs = useRef<(HTMLDivElement | null)[]>([]);
   const videoItemContentRefs = useRef<(HTMLDivElement | null)[]>([]);
   const videoItemBorderRefs = useRef<(SVGPathElement | null)[]>([]);
@@ -75,6 +82,12 @@ export default function Hero() {
     setCurrentVideoClipPath(getCurrentVideoClipPath(windowDimensions));
     setHiddenVideoClipPath(getNextVideoClipPath(0, windowDimensions));
     setHitAreaWidth(minMaxHitAreaWidth);
+    setFirstTransformedHeroClipPath(
+      getFirstTransformedHeroClipPath(windowDimensions),
+    );
+    setSecondTransformedHeroClipPath(
+      getSecondTransformedHeroClipPath(windowDimensions),
+    );
   }, [windowDimensions]);
 
   function handleHitAreaClicked() {
@@ -238,22 +251,84 @@ export default function Hero() {
     },
   );
 
-  useGSAP(() => {
-    gsap.set(heroRef.current, {
-      clipPath: "polygon(14% 0%, 72% 0%, 90% 90%, 0% 100%)",
-    });
+  useGSAP(
+    () => {
+      gsap.set(heroRef.current, {
+        clipPath: `path("${firstTransformedHeroClipPath}")`,
+      });
 
-    gsap.from(heroRef.current, {
-      clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-      ease: "power1.inOut",
-      scrollTrigger: {
-        trigger: heroRef.current,
-        start: "center center",
-        end: "bottom center",
-        scrub: true,
-      },
-    });
-  });
+      gsap.from(heroRef.current, {
+        clipPath: `path("${currentVideoClipPath}")`,
+        ease: "power1.inOut",
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: "center center",
+          end: "bottom center",
+          scrub: true,
+        },
+        onComplete: () => {
+          // Set another clipPath after the first completes
+          gsap.set(heroRef.current, {
+            clipPath: `path("${secondTransformedHeroClipPath}")`,
+          });
+
+          gsap.from(heroRef.current, {
+            clipPath: `path("${firstTransformedHeroClipPath}")`,
+            ease: "power1.inOut",
+            scrollTrigger: {
+              trigger: heroRef.current,
+              start: "bottom center",
+              end: "bottom top",
+              scrub: true,
+            },
+          });
+        },
+      });
+
+      gsap.set(heroBorderRef.current, {
+        attr: {
+          d: firstTransformedHeroClipPath,
+        },
+      });
+
+      gsap.from(heroBorderRef.current, {
+        attr: {
+          d: isScrolledToTop ? "" : currentVideoClipPath,
+        },
+        ease: "power1.inOut",
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: "center center",
+          end: "bottom center",
+          scrub: true,
+        },
+        onComplete: () => {
+          // Set another clipPath after the first completes
+          gsap.set(heroBorderRef.current, {
+            attr: {
+              d: secondTransformedHeroClipPath,
+            },
+          });
+
+          gsap.from(heroBorderRef.current, {
+            attr: {
+              d: firstTransformedHeroClipPath,
+            },
+            ease: "power1.inOut",
+            scrollTrigger: {
+              trigger: heroRef.current,
+              start: "bottom center",
+              end: "bottom top",
+              scrub: true,
+            },
+          });
+        },
+      });
+    },
+    {
+      dependencies: [isScrolledToTop],
+    },
+  );
 
   return (
     <section className="relative h-dvh w-screen overflow-x-hidden">
@@ -262,18 +337,18 @@ export default function Hero() {
         id="hero-slides"
         className="absolute left-0 top-0 z-[1] size-full"
       >
-        {/* <svg
+        <svg
           className="absolute left-0 top-0 z-[3] size-full fill-none"
           stroke="#000000"
           strokeWidth="2"
           fill="none"
         >
           <path
-            id="hero-slides-border-path"
+            ref={heroBorderRef}
             className="absolute left-0 top-0 z-[1] size-full fill-none"
-            d={heroItemClipPath}
+            d=""
           ></path>
-        </svg> */}
+        </svg>
         <div
           onMouseEnter={() => setIsMouseOverHitArea(true)}
           onMouseLeave={() => setIsMouseOverHitArea(false)}
@@ -351,7 +426,7 @@ export default function Hero() {
               redefi<b>n</b>e
             </h1>
             <p className="mb-5 max-w-64 font-robert-regular text-blue-100">
-              Enter the Metaagame Layer <br /> Unleash the Play Economy
+              Enter the Metagame Layer <br /> Unleash the Play Economy
             </p>
             <Button
               id="watch-trailer"
