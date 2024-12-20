@@ -254,76 +254,63 @@ export default function Hero() {
   useGSAP(
     () => {
       gsap.set(heroRef.current, {
-        clipPath: `path("${firstTransformedHeroClipPath}")`,
-      });
-
-      gsap.from(heroRef.current, {
         clipPath: `path("${currentVideoClipPath}")`,
-        ease: "power1.inOut",
-        scrollTrigger: {
-          trigger: heroRef.current,
-          start: "center center",
-          end: "bottom center",
-          scrub: true,
-        },
-        onComplete: () => {
-          // Set another clipPath after the first completes
-          gsap.set(heroRef.current, {
-            clipPath: `path("${secondTransformedHeroClipPath}")`,
-          });
-
-          gsap.from(heroRef.current, {
-            clipPath: `path("${firstTransformedHeroClipPath}")`,
-            ease: "power1.inOut",
-            scrollTrigger: {
-              trigger: heroRef.current,
-              start: "bottom center",
-              end: "bottom top",
-              scrub: true,
-            },
-          });
-        },
       });
-
       gsap.set(heroBorderRef.current, {
-        attr: {
-          d: firstTransformedHeroClipPath,
-        },
-      });
-
-      gsap.from(heroBorderRef.current, {
         attr: {
           d: isScrolledToTop ? "" : currentVideoClipPath,
         },
-        ease: "power1.inOut",
+      });
+
+      const heroTransformAnimation = gsap.timeline({
         scrollTrigger: {
           trigger: heroRef.current,
           start: "center center",
-          end: "bottom center",
+          end: "bottom top",
           scrub: true,
         },
-        onComplete: () => {
-          // Set another clipPath after the first completes
-          gsap.set(heroBorderRef.current, {
-            attr: {
-              d: secondTransformedHeroClipPath,
-            },
-          });
+      });
 
-          gsap.from(heroBorderRef.current, {
-            attr: {
-              d: firstTransformedHeroClipPath,
-            },
-            ease: "power1.inOut",
-            scrollTrigger: {
-              trigger: heroRef.current,
-              start: "bottom center",
-              end: "bottom top",
-              scrub: true,
-            },
-          });
+      heroTransformAnimation.to(heroRef.current, {
+        clipPath: `path("${firstTransformedHeroClipPath}")`,
+        ease: "power1.inOut",
+      });
+
+      heroTransformAnimation.to(
+        heroRef.current,
+        {
+          clipPath: `path("${secondTransformedHeroClipPath}")`,
+          ease: "power1.inOut",
+        },
+        ">",
+      );
+
+      const heroBorderTransformAnimation = gsap.timeline({
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: "center center",
+          end: "bottom top",
+          scrub: true,
         },
       });
+
+      heroBorderTransformAnimation.to(heroBorderRef.current, {
+        attr: {
+          d: firstTransformedHeroClipPath,
+        },
+        ease: "power1.inOut",
+      });
+
+      heroBorderTransformAnimation.to(
+        heroBorderRef.current,
+        {
+          attr: {
+            d: secondTransformedHeroClipPath,
+          },
+          ease: "power1.inOut",
+        },
+        ">",
+      );
     },
     {
       dependencies: [isScrolledToTop],
