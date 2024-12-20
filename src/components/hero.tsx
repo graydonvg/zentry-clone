@@ -9,9 +9,12 @@ import gsap from "gsap";
 import useWindowDimensions from "@/hooks/use-window-dimensions";
 import {
   getCurrentVideoClipPath,
+  getHiddenHeroVideoNumbers,
   getHitAreaWidth,
   getNextVideoClipPath,
 } from "@/lib/utils";
+import useMouseMoving from "@/hooks/use-mouse-moving";
+import useScrolledToTop from "@/hooks/use-scrolled-to-top";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -35,11 +38,12 @@ const heroVideos = [
   },
 ];
 
-const totalVideos = heroVideos.length;
-const minHitAreaWidth = 100;
-const maxHitAreaWidth = 250;
+const MIN_HIT_AREA_WIDTH = 100;
+const MAX_HIT_AREA_WIDTH = 250;
 
 export default function Hero() {
+  const isMouseMoving = useMouseMoving();
+  const isScrolledToTop = useScrolledToTop();
   const windowDimensions = useWindowDimensions();
   const [currentVideoNumber, setCurrentVideoNumber] = useState(1);
   const [hasClickedHitArea, setHasClickedHitArea] = useState(false);
@@ -48,48 +52,21 @@ export default function Hero() {
   const [hiddenVideoClipPath, setHiddenVideoClipPath] = useState("");
   const [nextVideoClipPath, setNextVideoClipPath] = useState("");
   const [currentVideoClipPath, setCurrentVideoClipPath] = useState("");
-  const [isScrolledToTop, setIsScrolledToTop] = useState(true);
   const [isMouseOverHitArea, setIsMouseOverHitArea] = useState(false);
-  const [isMouseMoving, setIsMouseMoving] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const videoItemContainerRefs = useRef<(HTMLDivElement | null)[]>([]);
   const videoItemContentRefs = useRef<(HTMLDivElement | null)[]>([]);
   const videoItemBorderRefs = useRef<(SVGPathElement | null)[]>([]);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const currentVideoNumberMinusTwo =
-    ((currentVideoNumber - 2 + totalVideos - 1) % totalVideos) + 1;
+  const totalVideos = heroVideos.length;
   const previousVideoNumber =
     ((currentVideoNumber - 1 + totalVideos - 1) % totalVideos) + 1;
   const nextVideoNumber = (currentVideoNumber % totalVideos) + 1;
   const minMaxHitAreaWidth = getHitAreaWidth(
-    minHitAreaWidth,
-    maxHitAreaWidth,
+    MIN_HIT_AREA_WIDTH,
+    MAX_HIT_AREA_WIDTH,
     windowDimensions,
   );
-
-  useEffect(() => {
-    function handleMouseMove() {
-      setIsMouseMoving(true);
-
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-
-      timeoutRef.current = setTimeout(() => {
-        setIsMouseMoving(false);
-      }, 300);
-    }
-
-    window.addEventListener("mousemove", handleMouseMove);
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
 
   useEffect(() => {
     setNextVideoClipPath(
@@ -100,18 +77,6 @@ export default function Hero() {
     setHitAreaWidth(minMaxHitAreaWidth);
   }, [windowDimensions]);
 
-  useEffect(() => {
-    function handleScroll() {
-      setIsScrolledToTop(window.scrollY === 0);
-    }
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
   function handleHitAreaClicked() {
     if (isTransitioning) return;
     setIsTransitioning(true);
@@ -121,12 +86,58 @@ export default function Hero() {
 
   useGSAP(
     () => {
+      if (isTransitioning) return;
+
+      if (isMouseMoving && isScrolledToTop && !isMouseOverHitArea) {
+        gsap.to(videoItemContentRefs.current[nextVideoNumber], {
+          clipPath: `path("${nextVideoClipPath}")`,
+          duration: 1,
+          ease: "power1.inOut",
+        });
+        gsap.to(videoItemBorderRefs.current[nextVideoNumber], {
+          attr: {
+            d: nextVideoClipPath,
+          },
+          duration: 1,
+          ease: "power1.inOut",
+        });
+      } else {
+        if (isMouseOverHitArea && isScrolledToTop) return;
+
+        gsap.to(videoItemContentRefs.current[nextVideoNumber], {
+          clipPath: `path("${hiddenVideoClipPath}")`,
+          duration: 1,
+          ease: "power1.inOut",
+        });
+        gsap.to(videoItemBorderRefs.current[nextVideoNumber], {
+          attr: {
+            d: hiddenVideoClipPath,
+          },
+          duration: 1,
+          ease: "power1.inOut",
+        });
+      }
+    },
+    {
+      dependencies: [isMouseMoving, isScrolledToTop],
+    },
+  );
+
+  useGSAP(
+    () => {
       if (hasClickedHitArea) {
         // Keep past videos hidden
-        gsap.set(videoItemContainerRefs.current[currentVideoNumberMinusTwo], {
-          display: "none",
-          zIndex: 0,
-        });
+        const hiddenVideoNumbers = getHiddenHeroVideoNumbers(
+          currentVideoNumber,
+          totalVideos,
+        );
+
+        hiddenVideoNumbers.forEach((hiddenVideoNumber) =>
+          gsap.set(videoItemContainerRefs.current[hiddenVideoNumber], {
+            display: "none",
+            zIndex: 0,
+          }),
+        );
 
         // Keep the previous video visible during transition
         gsap.set(videoItemContainerRefs.current[previousVideoNumber], {
@@ -243,45 +254,6 @@ export default function Hero() {
       },
     });
   });
-
-  useGSAP(
-    () => {
-      if (isTransitioning) return;
-
-      if (isMouseMoving && isScrolledToTop && !isMouseOverHitArea) {
-        gsap.to(videoItemContentRefs.current[nextVideoNumber], {
-          clipPath: `path("${nextVideoClipPath}")`,
-          duration: 1,
-          ease: "power1.inOut",
-        });
-        gsap.to(videoItemBorderRefs.current[nextVideoNumber], {
-          attr: {
-            d: nextVideoClipPath,
-          },
-          duration: 1,
-          ease: "power1.inOut",
-        });
-      } else {
-        if (isMouseOverHitArea && isScrolledToTop) return;
-
-        gsap.to(videoItemContentRefs.current[nextVideoNumber], {
-          clipPath: `path("${hiddenVideoClipPath}")`,
-          duration: 1,
-          ease: "power1.inOut",
-        });
-        gsap.to(videoItemBorderRefs.current[nextVideoNumber], {
-          attr: {
-            d: hiddenVideoClipPath,
-          },
-          duration: 1,
-          ease: "power1.inOut",
-        });
-      }
-    },
-    {
-      dependencies: [isMouseMoving, isScrolledToTop],
-    },
-  );
 
   return (
     <section className="relative h-dvh w-screen overflow-x-hidden">

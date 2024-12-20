@@ -76,3 +76,27 @@ export function getCurrentVideoClipPath(windowDimensions: WindowDimensions) {
 
   return clipPath;
 }
+
+export function getHiddenHeroVideoNumbers(
+  currentVideoNumber: number,
+  totalVideos: number,
+) {
+  const hiddenVideoNumbers: number[] = [];
+
+  // Start hiding videos after the minimum visible videos
+  const MIN_VISIBLE_VIDEOS = 2;
+
+  for (
+    let distanceFromCurrent = MIN_VISIBLE_VIDEOS;
+    distanceFromCurrent < totalVideos - 1;
+    distanceFromCurrent++
+  ) {
+    hiddenVideoNumbers.push(
+      ((currentVideoNumber - distanceFromCurrent + totalVideos - 1) %
+        totalVideos) +
+        1,
+    );
+  }
+
+  return hiddenVideoNumbers;
+}
