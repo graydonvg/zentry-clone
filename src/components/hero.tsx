@@ -40,16 +40,23 @@ const minHitAreaWidth = 100;
 const maxHitAreaWidth = 250;
 
 export default function Hero() {
+  const windowDimensions = useWindowDimensions();
   const [currentVideoNumber, setCurrentVideoNumber] = useState(1);
   const [hasClickedHitArea, setHasClickedHitArea] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const heroSectionRef = useRef<HTMLElement>(null);
-  const windowDimensions = useWindowDimensions();
   const [hitAreaWidth, setHitAreaWidth] = useState<string | number>("20%");
   const [hiddenVideoClipPath, setHiddenVideoClipPath] = useState("");
   const [nextVideoClipPath, setNextVideoClipPath] = useState("");
   const [currentVideoClipPath, setCurrentVideoClipPath] = useState("");
+  const [isScrolledToTop, setIsScrolledToTop] = useState(true);
+  const [isMouseOverHitArea, setIsMouseOverHitArea] = useState(false);
+  const [isMouseMoving, setIsMouseMoving] = useState(false);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const videoItemContainerRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const videoItemContentRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const videoItemBorderRefs = useRef<(SVGPathElement | null)[]>([]);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const currentVideoNumberMinusTwo =
     ((currentVideoNumber - 2 + totalVideos - 1) % totalVideos) + 1;
   const previousVideoNumber =
@@ -60,10 +67,6 @@ export default function Hero() {
     maxHitAreaWidth,
     windowDimensions,
   );
-  const [isScrolledToTop, setIsScrolledToTop] = useState(true);
-  const [isMouseOverHitArea, setIsMouseOverHitArea] = useState(false);
-  const [isMouseMoving, setIsMouseMoving] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     function handleMouseMove() {
@@ -120,45 +123,45 @@ export default function Hero() {
     () => {
       if (hasClickedHitArea) {
         // Keep past videos hidden
-        gsap.set(`#video-item-${currentVideoNumberMinusTwo}`, {
+        gsap.set(videoItemContainerRefs.current[currentVideoNumberMinusTwo], {
           display: "none",
           zIndex: 0,
         });
 
         // Keep the previous video visible during transition
-        gsap.set(`#video-item-${previousVideoNumber}`, {
+        gsap.set(videoItemContainerRefs.current[previousVideoNumber], {
           display: "block",
           zIndex: 0,
         });
-        gsap.set(`#video-item-${previousVideoNumber}-content`, {
+        gsap.set(videoItemContentRefs.current[previousVideoNumber], {
           clipPath: `path("${currentVideoClipPath}")`,
         });
 
         // Set the new current video behind the next video option before it grows
-        gsap.set(`#video-item-${currentVideoNumber}`, {
+        gsap.set(videoItemContainerRefs.current[currentVideoNumber], {
           display: "block",
           zIndex: 1,
         });
-        gsap.set(`#video-item-${currentVideoNumber}-content`, {
+        gsap.set(videoItemContentRefs.current[currentVideoNumber], {
           clipPath: `path("${nextVideoClipPath}")`,
         });
-        gsap.set(`#video-item-${currentVideoNumber}-content-border`, {
+        gsap.set(videoItemBorderRefs.current[currentVideoNumber], {
           attr: {
             d: nextVideoClipPath,
           },
         });
 
         // Set the next video option in front of the new current video
-        gsap.set(`#video-item-${nextVideoNumber}`, {
+        gsap.set(videoItemContainerRefs.current[nextVideoNumber], {
           display: "block",
           zIndex: 2,
         });
-        gsap.set(`#video-item-${nextVideoNumber}-content`, {
+        gsap.set(videoItemContentRefs.current[nextVideoNumber], {
           clipPath: `path("${hiddenVideoClipPath}")`,
         });
 
         // Animate the new current video border to expand to the size of the screen
-        gsap.to(`#video-item-${currentVideoNumber}-content-border`, {
+        gsap.to(videoItemBorderRefs.current[currentVideoNumber], {
           attr: {
             d: currentVideoClipPath,
           },
@@ -166,7 +169,7 @@ export default function Hero() {
           ease: "power1.inOut",
           onComplete: () => {
             // Remove the border once the video grows to full size
-            gsap.set(`#video-item-${currentVideoNumber}-content-border`, {
+            gsap.set(videoItemBorderRefs.current[currentVideoNumber], {
               attr: {
                 d: "",
               },
@@ -175,7 +178,7 @@ export default function Hero() {
         });
 
         // Animate the new current video to expand to the size of the screen
-        gsap.to(`#video-item-${currentVideoNumber}-content`, {
+        gsap.to(videoItemContentRefs.current[currentVideoNumber], {
           clipPath: `path("${currentVideoClipPath}")`,
           duration: 1,
           ease: "power1.inOut",
@@ -188,7 +191,7 @@ export default function Hero() {
           },
           onComplete: () => {
             // Hide the previous video once the new current video grows to full size
-            gsap.set(`#video-item-${previousVideoNumber}`, {
+            gsap.set(videoItemContainerRefs.current[previousVideoNumber], {
               display: "none",
             });
 
@@ -204,12 +207,12 @@ export default function Hero() {
         });
 
         // Reveal the next video option
-        gsap.to(`#video-item-${nextVideoNumber}-content`, {
+        gsap.to(videoItemContentRefs.current[nextVideoNumber], {
           clipPath: `path("${nextVideoClipPath}")`,
           duration: 1,
           ease: "power1.inOut",
         });
-        gsap.to(`#video-item-${nextVideoNumber}-content-border`, {
+        gsap.to(videoItemBorderRefs.current[nextVideoNumber], {
           attr: {
             d: nextVideoClipPath,
           },
@@ -225,15 +228,15 @@ export default function Hero() {
   );
 
   useGSAP(() => {
-    gsap.set("#hero-slides", {
+    gsap.set(heroRef.current, {
       clipPath: "polygon(14% 0%, 72% 0%, 90% 90%, 0% 100%)",
     });
 
-    gsap.from("#hero-slides", {
+    gsap.from(heroRef.current, {
       clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
       ease: "power1.inOut",
       scrollTrigger: {
-        trigger: "#hero-slides",
+        trigger: heroRef.current,
         start: "center center",
         end: "bottom center",
         scrub: true,
@@ -245,13 +248,13 @@ export default function Hero() {
     () => {
       if (isTransitioning) return;
 
-      if (isMouseMoving && isScrolledToTop) {
-        gsap.to(`#video-item-${nextVideoNumber}-content`, {
+      if (isMouseMoving && isScrolledToTop && !isMouseOverHitArea) {
+        gsap.to(videoItemContentRefs.current[nextVideoNumber], {
           clipPath: `path("${nextVideoClipPath}")`,
           duration: 1,
           ease: "power1.inOut",
         });
-        gsap.to(`#video-item-${nextVideoNumber}-content-border`, {
+        gsap.to(videoItemBorderRefs.current[nextVideoNumber], {
           attr: {
             d: nextVideoClipPath,
           },
@@ -260,12 +263,13 @@ export default function Hero() {
         });
       } else {
         if (isMouseOverHitArea && isScrolledToTop) return;
-        gsap.to(`#video-item-${nextVideoNumber}-content`, {
+
+        gsap.to(videoItemContentRefs.current[nextVideoNumber], {
           clipPath: `path("${hiddenVideoClipPath}")`,
           duration: 1,
           ease: "power1.inOut",
         });
-        gsap.to(`#video-item-${nextVideoNumber}-content-border`, {
+        gsap.to(videoItemBorderRefs.current[nextVideoNumber], {
           attr: {
             d: hiddenVideoClipPath,
           },
@@ -280,11 +284,12 @@ export default function Hero() {
   );
 
   return (
-    <section
-      ref={heroSectionRef}
-      className="relative h-dvh w-screen overflow-x-hidden"
-    >
-      <div id="hero-slides" className="absolute left-0 top-0 z-[1] size-full">
+    <section className="relative h-dvh w-screen overflow-x-hidden">
+      <div
+        ref={heroRef}
+        id="hero-slides"
+        className="absolute left-0 top-0 z-[1] size-full"
+      >
         {/* <svg
           className="absolute left-0 top-0 z-[3] size-full fill-none"
           stroke="#000000"
@@ -298,7 +303,6 @@ export default function Hero() {
           ></path>
         </svg> */}
         <div
-          id="hero-hit-area"
           onMouseEnter={() => setIsMouseOverHitArea(true)}
           onMouseLeave={() => setIsMouseOverHitArea(false)}
           onClick={handleHitAreaClicked}
@@ -318,7 +322,9 @@ export default function Hero() {
           return (
             <div
               key={videoNumber}
-              id={`video-item-${videoNumber}`}
+              ref={(el) => {
+                videoItemContainerRefs.current[videoNumber] = el;
+              }}
               className="absolute left-0 top-0 size-full"
               style={{
                 zIndex: video.initialZIndex,
@@ -326,7 +332,9 @@ export default function Hero() {
               }}
             >
               <div
-                id={`video-item-${videoNumber}-content`}
+                ref={(el) => {
+                  videoItemContentRefs.current[videoNumber] = el;
+                }}
                 className="absolute left-0 top-0 z-[1] size-full bg-violet-300"
                 style={{
                   clipPath: `path("${clipPath}")`,
@@ -339,7 +347,9 @@ export default function Hero() {
                   fill="none"
                 >
                   <path
-                    id={`video-item-${videoNumber}-content-border`}
+                    ref={(el) => {
+                      videoItemBorderRefs.current[videoNumber] = el;
+                    }}
                     className="absolute left-0 top-0 z-[3] size-full fill-none"
                     d={borderPath}
                   ></path>
