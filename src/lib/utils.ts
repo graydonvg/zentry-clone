@@ -22,7 +22,7 @@ export function getHitAreaWidth(
 export function getNextVideoClipPath(
   hitAreaWidth: number,
   windowDimensions: WindowDimensions,
-  borderRadius = 8, // Add borderRadius as a parameter
+  borderRadius = 8,
 ) {
   // Clip path center
   const centerX = windowDimensions.width / 2;
@@ -63,9 +63,157 @@ export function getNextVideoClipPath(
   return clipPath;
 }
 
-export function getCurrentVideoClipPath(
+// export function getNextVideoClipPath(
+//   hitAreaWidth: number,
+//   windowDimensions: WindowDimensions,
+//   borderRadius = 8,
+//   cursorPosition: { x: number; y: number }, // x and y range from -1 to 1
+// ) {
+//   // Clip path center
+//   const centerX = windowDimensions.width / 2;
+//   const centerY = windowDimensions.height / 2;
+
+//   // Clip path lengths
+//   const halfSideLength = hitAreaWidth / 2;
+
+//   // Ensure the borderRadius doesn't exceed half the side length
+//   const clampedRadius = Math.min(borderRadius, halfSideLength);
+
+//   // Cursor influence factors
+//   const influenceX = cursorPosition.x * halfSideLength * 0.5;
+//   const influenceY = cursorPosition.y * halfSideLength * 0.5;
+
+//   // Adjusted corner points based on tilt
+//   const topLeftX = centerX - halfSideLength + influenceX;
+//   const topLeftY = centerY - halfSideLength + influenceY;
+
+//   const topRightX = centerX + halfSideLength + influenceX;
+//   const topRightY = centerY - halfSideLength + influenceY;
+
+//   const bottomRightX = centerX + halfSideLength + influenceX;
+//   const bottomRightY = centerY + halfSideLength + influenceY;
+
+//   const bottomLeftX = centerX - halfSideLength + influenceX;
+//   const bottomLeftY = centerY + halfSideLength + influenceY;
+
+//   // Generate the clip path
+//   const clipPath = `
+//     M ${topLeftX + clampedRadius} ${topLeftY}
+//     L ${topRightX - clampedRadius} ${topRightY}
+//     Q ${topRightX} ${topRightY} ${topRightX} ${topRightY + clampedRadius}
+//     L ${bottomRightX} ${bottomRightY - clampedRadius}
+//     Q ${bottomRightX} ${bottomRightY} ${bottomRightX - clampedRadius} ${bottomRightY}
+//     L ${bottomLeftX + clampedRadius} ${bottomLeftY}
+//     Q ${bottomLeftX} ${bottomLeftY} ${bottomLeftX} ${bottomLeftY - clampedRadius}
+//     L ${topLeftX} ${topLeftY + clampedRadius}
+//     Q ${topLeftX} ${topLeftY} ${topLeftX + clampedRadius} ${topLeftY}
+//     Z
+//   `.replace(/\s+/g, " "); // Remove extra spaces for a single-line path
+
+//   return clipPath;
+// }
+
+export function getAboutImageClipPath(
   windowDimensions: WindowDimensions,
-  borderRadius = 0, // Add borderRadius as a parameter
+  borderRadius = 8,
+) {
+  // Clip path center
+  const centerX = windowDimensions.width / 2;
+  const centerY = windowDimensions.height / 2;
+
+  // Set maximum dimensions for the clip path
+  const imageHeight = windowDimensions.height * 0.6;
+  const imageWidth = imageHeight * 0.67;
+
+  // Half side lengths for width and height
+  const halfHeight = imageHeight / 2;
+  const halfWidth = imageWidth / 2;
+
+  // Ensure the borderRadius doesn't exceed the minimum of halfWidth and halfHeight
+  const clampedRadius = Math.min(borderRadius, halfWidth, halfHeight);
+
+  // Corner points adjusted for the border radius
+  const topLeftX = centerX - halfWidth - 10;
+  const topLeftY = centerY - halfHeight + 52;
+
+  const topRightX = centerX + halfWidth - 50;
+  const topRightY = topLeftY + 50;
+
+  const bottomRightX = topRightX + 50;
+  const bottomRightY = centerY + halfHeight + 52 - 50;
+
+  const bottomLeftX = topLeftX + 20;
+  const bottomLeftY = bottomRightY + 50;
+
+  // Create the SVG path string
+  const clipPath = `
+    M ${topLeftX + clampedRadius} ${topLeftY}
+    L ${topRightX - clampedRadius} ${topRightY}
+    Q ${topRightX} ${topRightY} ${topRightX} ${topRightY + clampedRadius}
+    L ${bottomRightX} ${bottomRightY - clampedRadius}
+    Q ${bottomRightX} ${bottomRightY} ${bottomRightX - clampedRadius} ${bottomRightY}
+    L ${bottomLeftX + clampedRadius} ${bottomLeftY}
+    Q ${bottomLeftX} ${bottomLeftY} ${bottomLeftX} ${bottomLeftY - clampedRadius}
+    L ${topLeftX} ${topLeftY + clampedRadius}
+    Q ${topLeftX} ${topLeftY} ${topLeftX + clampedRadius} ${topLeftY}
+    Z
+  `.replace(/\s+/g, " "); // Remove extra spaces for a single-line path
+
+  return clipPath;
+}
+
+// export function getAboutImageClipPath(
+//   windowDimensions: WindowDimensions,
+//   borderRadius = 8,
+// ) {
+//   // Clip path center
+//   const centerX = windowDimensions.width / 2;
+//   const centerY = windowDimensions.height / 2;
+
+//   // Set maximum dimensions for the clip path
+//   const imageHeight = windowDimensions.height * 0.4;
+//   const imageWidth = imageHeight * 0.67;
+
+//   // Half side lengths for width and height
+//   const halfHeight = imageHeight / 2;
+//   const halfWidth = imageWidth / 2;
+
+//   // Ensure the borderRadius doesn't exceed the minimum of halfWidth and halfHeight
+//   const clampedRadius = Math.min(borderRadius, halfWidth, halfHeight);
+
+//   // Corner points adjusted for the border radius
+//   const topLeftX = centerX - halfWidth;
+//   const topLeftY = centerY - halfHeight + 52;
+
+//   const topRightX = centerX + halfWidth;
+//   const topRightY = topLeftY;
+
+//   const bottomRightX = topRightX;
+//   const bottomRightY = centerY + halfHeight + 52;
+
+//   const bottomLeftX = topLeftX;
+//   const bottomLeftY = bottomRightY;
+
+//   // Create the SVG path string
+//   const clipPath = `
+//     M ${topLeftX + clampedRadius} ${topLeftY}
+//     L ${topRightX - clampedRadius} ${topRightY}
+//     Q ${topRightX} ${topRightY} ${topRightX} ${topRightY + clampedRadius}
+//     L ${bottomRightX} ${bottomRightY - clampedRadius}
+//     Q ${bottomRightX} ${bottomRightY} ${bottomRightX - clampedRadius} ${bottomRightY}
+//     L ${bottomLeftX + clampedRadius} ${bottomLeftY}
+//     Q ${bottomLeftX} ${bottomLeftY} ${bottomLeftX} ${bottomLeftY - clampedRadius}
+//     L ${topLeftX} ${topLeftY + clampedRadius}
+//     Q ${topLeftX} ${topLeftY} ${topLeftX + clampedRadius} ${topLeftY}
+//     Z
+//   `.replace(/\s+/g, " "); // Remove extra spaces for a single-line path
+
+//   return clipPath;
+// }
+
+export function getFullScreenClipPath(
+  windowDimensions: WindowDimensions,
+  borderRadius = 0,
 ) {
   const halfSideLength = windowDimensions.width / 2;
 

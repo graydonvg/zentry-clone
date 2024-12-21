@@ -8,7 +8,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import gsap from "gsap";
 import useWindowDimensions from "@/hooks/use-window-dimensions";
 import {
-  getCurrentVideoClipPath,
+  getFullScreenClipPath,
   getHiddenHeroVideoNumbers,
   getHitAreaWidth,
   getNextVideoClipPath,
@@ -25,7 +25,7 @@ if (typeof window !== "undefined") {
 const heroVideos = [
   {
     initialZIndex: 1,
-    autoPlay: false,
+    autoPlay: true,
   },
   {
     initialZIndex: 2,
@@ -79,7 +79,7 @@ export default function Hero() {
     setNextVideoClipPath(
       getNextVideoClipPath(minMaxHitAreaWidth, windowDimensions),
     );
-    setCurrentVideoClipPath(getCurrentVideoClipPath(windowDimensions));
+    setCurrentVideoClipPath(getFullScreenClipPath(windowDimensions));
     setHiddenVideoClipPath(getNextVideoClipPath(0, windowDimensions));
     setHitAreaWidth(minMaxHitAreaWidth);
     setFirstTransformedHeroClipPath(
@@ -132,7 +132,7 @@ export default function Hero() {
       }
     },
     {
-      dependencies: [isMouseMoving, isScrolledToTop],
+      dependencies: [isMouseMoving, isScrolledToTop, isTransitioning],
     },
   );
 

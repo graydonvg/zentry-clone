@@ -37,7 +37,10 @@ export default function AnimatedTitle({ title, containerClassName }: Props) {
   return (
     <div
       ref={containerRef}
-      className={cn("animated-title", containerClassName)}
+      className={cn(
+        "flex flex-col gap-1 text-7xl uppercase leading-[.8] text-white sm:px-32 md:text-[6rem]",
+        containerClassName,
+      )}
     >
       {title.split("<br />").map((line, index) => (
         <div
@@ -47,7 +50,7 @@ export default function AnimatedTitle({ title, containerClassName }: Props) {
           {line.split(" ").map((word, index) => (
             <span
               key={index}
-              className="animated-word"
+              className="animated-word special-font font-zentry font-black opacity-0"
               dangerouslySetInnerHTML={{ __html: word }}
             />
           ))}
