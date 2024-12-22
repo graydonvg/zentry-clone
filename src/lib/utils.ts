@@ -122,11 +122,12 @@ export function getAboutImageClipPath(
   const centerY = windowDimensions.height / 2;
 
   // Set maximum dimensions for the clip path
-  const minWidth = 200;
-  const maxWidth = 400;
-  const imageMinWidth = Math.max(windowDimensions.width * 0.25, minWidth);
+  const minWidth = 50;
+  const maxWidth = 450;
+  const imageMinWidth = Math.max(windowDimensions.width * 0.3, minWidth);
   const imageMinMaxWidth = Math.min(imageMinWidth, maxWidth);
   const imageHeight = imageMinMaxWidth * 1.5;
+  const scalingFactor = imageMinMaxWidth / maxWidth;
 
   // Half side lengths for width and height
   const halfHeight = imageHeight / 2;
@@ -135,24 +136,23 @@ export function getAboutImageClipPath(
   // Ensure the borderRadius doesn't exceed the minimum of halfWidth and halfHeight
   const clampedRadius = Math.min(
     // Scale the border radius by the width
-    borderRadius * (imageMinMaxWidth / maxWidth),
+    borderRadius * scalingFactor,
     halfWidth,
     halfHeight,
   );
 
   // Corner points adjusted for the border radius
-  const topLeftX = centerX - halfWidth;
-  const topLeftY = centerY - halfHeight + 50;
+  const topLeftX = centerX - halfWidth - 50 * scalingFactor;
+  const topLeftY = centerY - halfHeight - 125 * scalingFactor;
 
-  const topRightX = centerX + halfWidth - 50;
-  const topRightY = topLeftY - 50 + 80;
+  const topRightX = centerX + halfWidth - 50 * scalingFactor;
+  const topRightY = topLeftY + 30 * scalingFactor;
 
-  // const bottomRightX = topRightX + 30;
-  const bottomRightX = topRightX + 50;
-  const bottomRightY = centerY + halfHeight + 50;
+  const bottomRightX = topRightX + 75 * scalingFactor;
+  const bottomRightY = centerY + halfHeight - 75 * scalingFactor;
 
-  const bottomLeftX = topLeftX + 50;
-  const bottomLeftY = bottomRightY + 50;
+  const bottomLeftX = topLeftX + 50 * scalingFactor;
+  const bottomLeftY = bottomRightY + 75 * scalingFactor;
 
   const clipPath = `
     M ${topLeftX + clampedRadius} ${topLeftY}
@@ -169,55 +169,6 @@ export function getAboutImageClipPath(
 
   return clipPath;
 }
-
-// export function getAboutImageClipPath(
-//   windowDimensions: WindowDimensions,
-//   borderRadius = 8,
-// ) {
-//   // Clip path center
-//   const centerX = windowDimensions.width / 2;
-//   const centerY = windowDimensions.height / 2;
-
-//   // Set maximum dimensions for the clip path
-//   const imageHeight = windowDimensions.height * 0.4;
-//   const imageWidth = imageHeight * 0.67;
-
-//   // Half side lengths for width and height
-//   const halfHeight = imageHeight / 2;
-//   const halfWidth = imageWidth / 2;
-
-//   // Ensure the borderRadius doesn't exceed the minimum of halfWidth and halfHeight
-//   const clampedRadius = Math.min(borderRadius, halfWidth, halfHeight);
-
-//   // Corner points adjusted for the border radius
-//   const topLeftX = centerX - halfWidth;
-//   const topLeftY = centerY - halfHeight + 52;
-
-//   const topRightX = centerX + halfWidth;
-//   const topRightY = topLeftY;
-
-//   const bottomRightX = topRightX;
-//   const bottomRightY = centerY + halfHeight + 52;
-
-//   const bottomLeftX = topLeftX;
-//   const bottomLeftY = bottomRightY;
-
-//   // Create the SVG path string
-//   const clipPath = `
-//     M ${topLeftX + clampedRadius} ${topLeftY}
-//     L ${topRightX - clampedRadius} ${topRightY}
-//     Q ${topRightX} ${topRightY} ${topRightX} ${topRightY + clampedRadius}
-//     L ${bottomRightX} ${bottomRightY - clampedRadius}
-//     Q ${bottomRightX} ${bottomRightY} ${bottomRightX - clampedRadius} ${bottomRightY}
-//     L ${bottomLeftX + clampedRadius} ${bottomLeftY}
-//     Q ${bottomLeftX} ${bottomLeftY} ${bottomLeftX} ${bottomLeftY - clampedRadius}
-//     L ${topLeftX} ${topLeftY + clampedRadius}
-//     Q ${topLeftX} ${topLeftY} ${topLeftX + clampedRadius} ${topLeftY}
-//     Z
-//   `.replace(/\s+/g, " "); // Remove extra spaces for a single-line path
-
-//   return clipPath;
-// }
 
 export function getFullScreenClipPath(
   windowDimensions: WindowDimensions,

@@ -17,10 +17,11 @@ export default function About() {
   const windowDimensions = useWindowDimensions();
   const [imageClipPath, setImageClipPath] = useState("");
   const [fullScreenClipPath, setFullScreenClipPath] = useState("");
-  const aboutContainer = useRef<HTMLDivElement>(null);
-  const imageConatinerRef = useRef<HTMLDivElement>(null);
-  const imageBorderRef = useRef<SVGPathElement>(null);
-  const imageWrapperRef = useRef<HTMLImageElement>(null);
+  const clipPathContainerRef = useRef<HTMLDivElement>(null);
+  const imageContainerRef = useRef<HTMLDivElement>(null);
+  const imageBorderPathRef = useRef<SVGPathElement>(null);
+  const imageContentWrapperRef = useRef<HTMLImageElement>(null);
+  const stonesImageRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
     setImageClipPath(getAboutImageClipPath(windowDimensions));
@@ -32,25 +33,25 @@ export default function About() {
       gsap
         .timeline({
           scrollTrigger: {
-            trigger: aboutContainer.current,
+            trigger: clipPathContainerRef.current,
             start: "top top",
             end: "bottom top",
             scrub: 0.5,
             pin: true,
             onLeave: () => {
-              gsap.set(imageBorderRef.current, {
+              gsap.set(imageBorderPathRef.current, {
                 display: "none",
               });
             },
             onEnterBack: () => {
-              gsap.set(imageBorderRef.current, {
+              gsap.set(imageBorderPathRef.current, {
                 display: "block",
               });
             },
           },
         })
         .fromTo(
-          imageConatinerRef.current,
+          imageContainerRef.current,
           {
             clipPath: `path("${imageClipPath}")`,
           },
@@ -60,7 +61,7 @@ export default function About() {
           },
         )
         .fromTo(
-          imageBorderRef.current,
+          imageBorderPathRef.current,
           {
             attr: {
               d: imageClipPath,
@@ -75,7 +76,13 @@ export default function About() {
           0,
         )
         .fromTo(
-          imageWrapperRef.current,
+          imageContentWrapperRef.current,
+          { scale: 1.2 },
+          { scale: 1, ease: "power1.inOut" },
+          0,
+        )
+        .fromTo(
+          stonesImageRef.current,
           { scale: 1.2 },
           { scale: 1, ease: "power1.inOut" },
           0,
@@ -85,71 +92,79 @@ export default function About() {
   );
 
   return (
-    <div
-      ref={aboutContainer}
-      className="relative mt-36 flex size-full min-h-dvh w-screen flex-col items-center gap-5"
-    >
-      <p className="font-general text-sm uppercase md:text-[10px]">
-        Welcome to Zentry
-      </p>
+    <div className="mt-32">
+      <div className="flex flex-col items-center justify-center">
+        <p className="font-general text-sm uppercase md:text-[10px]">
+          Welcome to Zentry
+        </p>
 
-      <AnimatedTitle
-        title="Disc<b>o</b>ver the world's <br /> largest shared <b>a</b>dventure"
-        containerClassName="mt-5 !text-black text-center"
-      />
+        <AnimatedTitle
+          title="Disc<b>o</b>ver the world's <br /> largest shared <b>a</b>dventure"
+          containerClassName="mt-5 text-black"
+        />
+      </div>
 
       <div
-        ref={imageConatinerRef}
-        className="absolute left-0 top-0 z-50 size-full"
-        style={{
-          clipPath: `path("${imageClipPath}")`,
-        }}
+        ref={clipPathContainerRef}
+        className="relative flex size-full min-h-dvh w-screen flex-col items-center gap-5 overflow-hidden pb-16"
       >
-        <svg
-          className="absolute left-0 top-0 z-50 size-full fill-none"
-          stroke={"#000000"}
-          strokeWidth="2"
-          fill="none"
-        >
-          <path
-            ref={imageBorderRef}
-            className="absolute left-0 top-0 z-50 size-full fill-none"
-            d={imageClipPath}
-          ></path>
-        </svg>
         <div
-          ref={imageWrapperRef}
-          className="absolute left-0 top-0 size-full"
-          style={{ scale: 1.2 }}
+          ref={imageContainerRef}
+          className="absolute left-0 top-0 z-10 size-full"
+          style={{
+            clipPath: `path("${imageClipPath}")`,
+          }}
         >
-          <Image
-            src="/img/about.webp"
-            alt="background"
-            fill
-            sizes="100vw"
-            className="absolute left-0 top-0 size-full object-cover"
-          />
+          <svg
+            className="absolute left-0 top-0 z-10 size-full fill-none"
+            stroke={"#000000"}
+            strokeWidth="2"
+            fill="none"
+          >
+            <path
+              ref={imageBorderPathRef}
+              className="absolute left-0 top-0 z-10 size-full fill-none"
+              d={imageClipPath}
+            ></path>
+          </svg>
+          <div
+            ref={imageContentWrapperRef}
+            className="absolute left-0 top-0 size-full"
+            style={{ scale: 1.2 }}
+          >
+            <Image
+              src="/img/about.webp"
+              alt="background"
+              fill
+              sizes="100vw"
+              className="absolute left-0 top-0 size-full object-cover"
+            />
+          </div>
         </div>
-      </div>
 
-      <div className="absolute left-0 top-0 z-50 size-full">
-        <div className="absolute left-0 top-0 size-full">
-          <Image
-            src="/img/stones.webp"
-            alt="background"
-            fill
-            sizes="100vw"
-            className="absolute left-0 top-0 size-full object-cover"
-          />
+        <div className="absolute left-0 top-0 z-10 size-full">
+          <div
+            ref={stonesImageRef}
+            className="absolute left-0 top-0 size-full"
+            style={{ scale: 1.2 }}
+          >
+            <Image
+              src="/img/stones.webp"
+              alt="background"
+              fill
+              sizes="100vw"
+              className="absolute left-0 top-0 size-full object-cover"
+            />
+          </div>
         </div>
-      </div>
 
-      <div className="absolute bottom-12 left-1/2 w-full max-w-96 -translate-x-1/2 text-center font-circular-web text-lg leading-tight tracking-tight md:max-w-[34rem]">
-        <p>The Game of Games begins&mdash;your life, now and epic MMORPG</p>
-        <p className="text-black/40">
-          Zentry unites every player from countless games and platforms,
-          <br /> both digital and physical, into a unified Play Economy
-        </p>
+        <div className="flex grow flex-col items-center justify-end text-center font-circular-web text-lg leading-tight tracking-tight">
+          <p>The Game of Games begins&mdash;your life, now and epic MMORPG</p>
+          <p className="text-black/40">
+            Zentry unites every player from countless games and platforms,
+            <br /> both digital and physical, into a unified Play Economy
+          </p>
+        </div>
       </div>
     </div>
   );
