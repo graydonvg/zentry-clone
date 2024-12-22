@@ -29,32 +29,43 @@ export default function About() {
 
   useGSAP(
     () => {
-      const clipAnimation = gsap.timeline({
-        scrollTrigger: {
-          trigger: aboutContainer.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: 0.5,
-          pin: true,
-          pinSpacing: true,
-          onLeave: () =>
-            gsap.set(imageBorderRef.current, {
-              display: "none",
-            }),
-          onEnterBack: () =>
-            gsap.set(imageBorderRef.current, {
-              display: "block",
-            }),
-        },
-      });
-
-      clipAnimation
-        .to(imageConatinerRef.current, {
-          clipPath: `path("${fullScreenClipPath}")`,
-          ease: "power1.inOut",
+      gsap
+        .timeline({
+          scrollTrigger: {
+            trigger: aboutContainer.current,
+            start: "top top",
+            end: "bottom top",
+            scrub: 0.5,
+            pin: true,
+            onLeave: () => {
+              gsap.set(imageBorderRef.current, {
+                display: "none",
+              });
+            },
+            onEnterBack: () => {
+              gsap.set(imageBorderRef.current, {
+                display: "block",
+              });
+            },
+          },
         })
-        .to(
+        .fromTo(
+          imageConatinerRef.current,
+          {
+            clipPath: `path("${imageClipPath}")`,
+          },
+          {
+            clipPath: `path("${fullScreenClipPath}")`,
+            ease: "power1.inOut",
+          },
+        )
+        .fromTo(
           imageBorderRef.current,
+          {
+            attr: {
+              d: imageClipPath,
+            },
+          },
           {
             attr: {
               d: fullScreenClipPath,
@@ -63,16 +74,14 @@ export default function About() {
           },
           0,
         )
-        .to(
+        .fromTo(
           imageWrapperRef.current,
-          {
-            scale: 1,
-            ease: "power1.inOut",
-          },
+          { scale: 1.2 },
+          { scale: 1, ease: "power1.inOut" },
           0,
         );
     },
-    // null
+    { dependencies: [imageClipPath, fullScreenClipPath], revertOnUpdate: true },
   );
 
   return (
@@ -110,11 +119,23 @@ export default function About() {
         </svg>
         <div
           ref={imageWrapperRef}
-          className="visible absolute left-0 top-0 size-full"
+          className="absolute left-0 top-0 size-full"
           style={{ scale: 1.2 }}
         >
           <Image
             src="/img/about.webp"
+            alt="background"
+            fill
+            sizes="100vw"
+            className="absolute left-0 top-0 size-full object-cover"
+          />
+        </div>
+      </div>
+
+      <div className="absolute left-0 top-0 z-50 size-full">
+        <div className="absolute left-0 top-0 size-full">
+          <Image
+            src="/img/stones.webp"
             alt="background"
             fill
             sizes="100vw"

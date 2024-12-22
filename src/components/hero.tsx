@@ -25,7 +25,7 @@ if (typeof window !== "undefined") {
 const heroVideos = [
   {
     initialZIndex: 1,
-    autoPlay: true,
+    autoPlay: false,
   },
   {
     initialZIndex: 2,
@@ -116,7 +116,6 @@ export default function Hero() {
         });
       } else {
         if (isMouseOverHitArea && isScrolledToTop) return;
-
         gsap.to(videoItemContentRefs.current[nextVideoNumber], {
           clipPath: `path("${hiddenVideoClipPath}")`,
           duration: 1,
@@ -253,67 +252,70 @@ export default function Hero() {
 
   useGSAP(
     () => {
-      gsap.set(heroRef.current, {
-        clipPath: `path("${currentVideoClipPath}")`,
-      });
-      gsap.set(heroBorderRef.current, {
-        attr: {
-          d: isScrolledToTop ? "" : currentVideoClipPath,
-        },
-      });
-
-      const heroTransformAnimation = gsap.timeline({
-        scrollTrigger: {
-          trigger: heroRef.current,
-          start: "center center",
-          end: "bottom top",
-          scrub: true,
-        },
-      });
-
-      heroTransformAnimation.to(heroRef.current, {
-        clipPath: `path("${firstTransformedHeroClipPath}")`,
-        ease: "power1.inOut",
-      });
-
-      heroTransformAnimation.to(
-        heroRef.current,
-        {
-          clipPath: `path("${secondTransformedHeroClipPath}")`,
-          ease: "power1.inOut",
-        },
-        ">",
-      );
-
-      const heroBorderTransformAnimation = gsap.timeline({
-        scrollTrigger: {
-          trigger: heroRef.current,
-          start: "center center",
-          end: "bottom top",
-          scrub: true,
-        },
-      });
-
-      heroBorderTransformAnimation.to(heroBorderRef.current, {
-        attr: {
-          d: firstTransformedHeroClipPath,
-        },
-        ease: "power1.inOut",
-      });
-
-      heroBorderTransformAnimation.to(
-        heroBorderRef.current,
-        {
-          attr: {
-            d: secondTransformedHeroClipPath,
+      gsap
+        .timeline({
+          scrollTrigger: {
+            trigger: heroRef.current,
+            start: "center center",
+            end: "bottom top",
+            scrub: 0.5,
           },
-          ease: "power1.inOut",
-        },
-        ">",
-      );
+        })
+        .fromTo(
+          heroRef.current,
+          {
+            clipPath: `path("${currentVideoClipPath}")`,
+          },
+          {
+            clipPath: `path("${firstTransformedHeroClipPath}")`,
+            ease: "power1.inOut",
+          },
+        )
+        .fromTo(
+          heroBorderRef.current,
+          {
+            attr: {
+              d: isScrolledToTop ? "" : currentVideoClipPath,
+            },
+          },
+          {
+            attr: {
+              d: firstTransformedHeroClipPath,
+            },
+            ease: "power1.inOut",
+          },
+          // Start at the beginning of the timeline
+          0,
+        )
+        .to(
+          heroRef.current,
+          {
+            clipPath: `path("${secondTransformedHeroClipPath}")`,
+            ease: "power1.inOut",
+          },
+          // Insert at the END of the previous animation
+          ">",
+        )
+        .to(
+          heroBorderRef.current,
+          {
+            attr: {
+              d: secondTransformedHeroClipPath,
+            },
+            ease: "power1.inOut",
+          },
+          // Insert at the START of the  previous animation
+          "<",
+        );
     },
     {
-      dependencies: [isScrolledToTop],
+      dependencies: [
+        isScrolledToTop,
+        currentVideoClipPath,
+        firstTransformedHeroClipPath,
+        secondTransformedHeroClipPath,
+      ],
+      revertOnUpdate: true,
     },
   );
 

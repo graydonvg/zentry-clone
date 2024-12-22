@@ -38,7 +38,7 @@ export default function AnimatedTitle({ title, containerClassName }: Props) {
     <div
       ref={containerRef}
       className={cn(
-        "flex flex-col gap-1 text-7xl uppercase leading-[.8] text-white sm:px-32 md:text-[6rem]",
+        "flex flex-col gap-1 text-[clamp(14px,6.3vw,120px)] uppercase leading-[.8] text-white sm:px-32",
         containerClassName,
       )}
     >
