@@ -322,7 +322,7 @@ export default function Hero() {
   );
 
   return (
-    <section className="relative h-screen w-screen overflow-x-hidden">
+    <section className="relative h-screen w-full overflow-x-hidden">
       <div
         ref={heroRef}
         id="hero-slides"

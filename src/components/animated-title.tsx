@@ -2,60 +2,104 @@ import { cn } from "@/lib/utils";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useRef } from "react";
+import React, { forwardRef, useImperativeHandle, useRef } from "react";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
 }
 
 type Props = {
-  title: string;
+  titleLrg: string;
+  titleSml: string;
   containerClassName?: string;
 };
 
-export default function AnimatedTitle({ title, containerClassName }: Props) {
-  const containerRef = useRef<HTMLDivElement>(null);
+const AnimatedTitle = forwardRef<HTMLDivElement, Props>(
+  ({ titleLrg, titleSml, containerClassName }, ref) => {
+    const containerRef = useRef<HTMLDivElement>(null);
 
-  useGSAP(() => {
-    const titleAnimation = gsap.timeline({
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "100 bottom",
-        end: "center bottom",
-        toggleActions: "play none none reverse",
-      },
+    useGSAP(() => {
+      const titleAnimation = gsap.timeline({
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "50% bottom",
+          toggleActions: "play none none reverse",
+        },
+      });
+
+      titleAnimation.to("h2", {
+        transform: "translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
+        ease: "power2.out",
+        duration: 1,
+      });
+
+      titleAnimation.to(
+        ".animated-word",
+        {
+          opacity: 1,
+          duration: 0,
+          stagger: 0.065,
+        },
+        0,
+      );
     });
 
-    titleAnimation.to(".animated-word", {
-      opacity: 1,
-      transform: "translate3d(0, 0, 0) rotateY(0deg) rotateX(0deg)",
-      ease: "power2.inOut",
-      stagger: 0.02,
-    });
-  });
-
-  return (
-    <div
-      ref={containerRef}
-      className={cn(
-        "flex flex-col gap-1 text-[clamp(14px,6.3vw,120px)] uppercase leading-[.8] text-white sm:px-32",
-        containerClassName,
-      )}
-    >
-      {title.split("<br />").map((line, index) => (
-        <div
-          key={index}
-          className="flex-center max-w-full flex-wrap gap-2 px-10 md:gap-3"
+    return (
+      <div
+        ref={containerRef}
+        style={{
+          perspective: 1000,
+        }}
+      >
+        <h2
+          className={cn(
+            "hidden flex-col gap-1 text-[clamp(2.5rem,6.3vw,7.5rem)] uppercase leading-[.8] text-white sm:flex sm:px-32",
+            containerClassName,
+          )}
+          style={{
+            transform:
+              "translate3d(-107.977px, 51.303px, -59.3966px) rotateY(-50deg) rotateX(-20deg)",
+            transformOrigin: "50% 50% -150px",
+          }}
         >
-          {line.split(" ").map((word, index) => (
-            <span
+          {titleLrg.split("<br />").map((line, index) => (
+            <div
               key={index}
-              className="animated-word special-font font-zentry font-black opacity-0"
-              dangerouslySetInnerHTML={{ __html: word }}
-            />
+              className="flex-center max-w-full flex-wrap gap-2 md:gap-3"
+            >
+              {line.split(" ").map((word, index) => (
+                <span
+                  key={index}
+                  className="animated-word special-font font-zentry font-black opacity-0"
+                  dangerouslySetInnerHTML={{ __html: word }}
+                />
+              ))}
+            </div>
           ))}
-        </div>
-      ))}
-    </div>
-  );
-}
+        </h2>
+        <h2
+          className={cn(
+            "flex flex-col gap-1 text-[clamp(1.5rem,12.6vw,7.5rem)] uppercase leading-[.8] text-white sm:hidden sm:px-32",
+            containerClassName,
+          )}
+        >
+          {titleSml.split("<br />").map((line, index) => (
+            <div key={index} className="flex-center max-w-full flex-wrap px-4">
+              {line.split(" ").map((word, index) => (
+                <span
+                  key={index}
+                  className="animated-word special-font mr-2 font-zentry font-black opacity-0"
+                  dangerouslySetInnerHTML={{ __html: word }}
+                />
+              ))}
+            </div>
+          ))}
+        </h2>
+      </div>
+    );
+  },
+);
+
+AnimatedTitle.displayName = "AnimatedTitle";
+
+export default AnimatedTitle;

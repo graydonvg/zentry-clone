@@ -22,6 +22,7 @@ export default function About() {
   const imageBorderPathRef = useRef<SVGPathElement>(null);
   const imageContentWrapperRef = useRef<HTMLImageElement>(null);
   const stonesImageRef = useRef<HTMLImageElement>(null);
+  const titleContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setImageClipPath(getAboutImageClipPath(windowDimensions));
@@ -91,22 +92,50 @@ export default function About() {
     { dependencies: [imageClipPath, fullScreenClipPath], revertOnUpdate: true },
   );
 
+  useGSAP(() => {
+    gsap.fromTo(
+      ".welcome-word-span",
+      {
+        opacity: 0,
+        x: -20,
+      },
+      {
+        opacity: 1,
+        x: 0,
+        duration: 0,
+        stagger: 0.125,
+        scrollTrigger: {
+          trigger: titleContainerRef.current,
+          start: "50% bottom",
+          toggleActions: "play none none reverse",
+        },
+      },
+    );
+  });
+
   return (
-    <div className="mt-32">
-      <div className="flex flex-col items-center justify-center">
-        <p className="font-general text-sm uppercase md:text-[10px]">
-          Welcome to Zentry
+    <div className="mt-16 sm:mt-32">
+      <div
+        ref={titleContainerRef}
+        className="flex flex-col items-center justify-center"
+      >
+        <p className="font-general text-[10px] uppercase">
+          <span className="welcome-word-span opacity-0">Welcome</span>{" "}
+          <span className="welcome-word-span opacity-0">to</span>{" "}
+          <span className="welcome-word-span opacity-0">Zentry</span>
         </p>
 
         <AnimatedTitle
-          title="Disc<b>o</b>ver the world's <br /> largest shared <b>a</b>dventure"
+          ref={titleContainerRef}
+          titleLrg="Disc<b>o</b>ver the world's <br /> largest shared <b>a</b>dventure"
+          titleSml="Disc<b>o</b>ver the <br /> world's largest <br /> shared <b>a</b>dventure"
           containerClassName="mt-5 text-black"
         />
       </div>
 
       <div
         ref={clipPathContainerRef}
-        className="relative flex size-full min-h-dvh w-screen flex-col items-center gap-5 overflow-hidden pb-16"
+        className="relative flex size-full min-h-dvh w-full flex-col items-center gap-5 overflow-hidden pb-16"
       >
         <div
           ref={imageContainerRef}
@@ -158,7 +187,7 @@ export default function About() {
           </div>
         </div>
 
-        <div className="flex h-full flex-col items-center justify-end text-center font-circular-web text-lg leading-tight tracking-tight">
+        <div className="absolute bottom-16 flex w-full flex-col items-center justify-end text-center font-circular-web text-[clamp(0.5rem,3vw,1rem)] leading-tight tracking-tight">
           <p>The Game of Games begins&mdash;your life, now and epic MMORPG</p>
           <p className="text-black/40">
             Zentry unites every player from countless games and platforms,

@@ -118,7 +118,7 @@ export function getAboutImageClipPath(
   borderRadius = 8,
 ) {
   // Set maximum dimensions for the clip path
-  const minWidth = 50;
+  const minWidth = 200;
   const maxWidth = 450;
 
   // Calculate width as a percentage of both width and height
