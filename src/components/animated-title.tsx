@@ -58,8 +58,9 @@ const AnimatedTitle = forwardRef<HTMLDivElement, Props>(
           )}
           style={{
             transform:
-              "translate3d(-107.977px, 51.303px, -59.3966px) rotateY(-50deg) rotateX(-20deg)",
+              "translate3d(-110px, 50px, -60px) rotateY(-50deg) rotateX(-20deg)",
             transformOrigin: "50% 50% -150px",
+            willChange: "transform",
           }}
         >
           {titleLrg.split("<br />").map((line, index) => (
@@ -71,6 +72,7 @@ const AnimatedTitle = forwardRef<HTMLDivElement, Props>(
                 <span
                   key={index}
                   className="animated-word special-font font-zentry font-black opacity-0"
+                  style={{ willChange: "opacity" }}
                   dangerouslySetInnerHTML={{ __html: word }}
                 />
               ))}
@@ -79,16 +81,22 @@ const AnimatedTitle = forwardRef<HTMLDivElement, Props>(
         </h2>
         <h2
           className={cn(
-            "flex flex-col gap-1 text-[clamp(1.5rem,12.6vw,7.5rem)] uppercase leading-[.8] text-white sm:hidden sm:px-32",
+            "flex flex-col gap-1 text-[clamp(1.5rem,12.6vw,7.5rem)] uppercase leading-[.8] text-white sm:hidden",
             containerClassName,
           )}
+          style={{
+            transform:
+              "translate3d(-110px, 50px, -60px) rotateY(-50deg) rotateX(-20deg)",
+            transformOrigin: "50% 50% -150px",
+            willChange: "transform",
+          }}
         >
           {titleSml.split("<br />").map((line, index) => (
             <div key={index} className="flex-center max-w-full flex-wrap px-4">
               {line.split(" ").map((word, index) => (
                 <span
                   key={index}
-                  className="animated-word special-font mr-2 font-zentry font-black opacity-0"
+                  className="special-font mr-2 font-zentry font-black"
                   dangerouslySetInnerHTML={{ __html: word }}
                 />
               ))}

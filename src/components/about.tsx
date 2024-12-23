@@ -102,7 +102,7 @@ export default function About() {
       {
         opacity: 1,
         x: 0,
-        duration: 0,
+        duration: 0.01,
         stagger: 0.125,
         scrollTrigger: {
           trigger: titleContainerRef.current,
@@ -117,9 +117,24 @@ export default function About() {
     <div className="mt-16 sm:mt-32">
       <div className="flex flex-col items-center justify-center">
         <p className="font-general text-[10px] uppercase">
-          <span className="welcome-word-span opacity-0">Welcome</span>{" "}
-          <span className="welcome-word-span opacity-0">to</span>{" "}
-          <span className="welcome-word-span opacity-0">Zentry</span>
+          <span
+            className="welcome-word-span inline-flex"
+            style={{ willChange: "opacity" }}
+          >
+            Welcome
+          </span>{" "}
+          <span
+            className="welcome-word-span inline-flex"
+            style={{ willChange: "opacity" }}
+          >
+            to
+          </span>{" "}
+          <span
+            className="welcome-word-span inline-flex"
+            style={{ willChange: "opacity" }}
+          >
+            Zentry
+          </span>
         </p>
 
         <AnimatedTitle
