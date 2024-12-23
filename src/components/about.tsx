@@ -115,10 +115,7 @@ export default function About() {
 
   return (
     <div className="mt-16 sm:mt-32">
-      <div
-        ref={titleContainerRef}
-        className="flex flex-col items-center justify-center"
-      >
+      <div className="flex flex-col items-center justify-center">
         <p className="font-general text-[10px] uppercase">
           <span className="welcome-word-span opacity-0">Welcome</span>{" "}
           <span className="welcome-word-span opacity-0">to</span>{" "}

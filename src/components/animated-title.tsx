@@ -16,12 +16,12 @@ type Props = {
 
 const AnimatedTitle = forwardRef<HTMLDivElement, Props>(
   ({ titleLrg, titleSml, containerClassName }, ref) => {
-    const containerRef = useRef<HTMLDivElement>(null);
-
     useGSAP(() => {
+      if (!ref || typeof ref !== "object" || ref.current === null) return;
+
       const titleAnimation = gsap.timeline({
         scrollTrigger: {
-          trigger: containerRef.current,
+          trigger: ref.current,
           start: "50% bottom",
           toggleActions: "play none none reverse",
         },
@@ -46,7 +46,7 @@ const AnimatedTitle = forwardRef<HTMLDivElement, Props>(
 
     return (
       <div
-        ref={containerRef}
+        ref={ref}
         style={{
           perspective: 1000,
         }}
