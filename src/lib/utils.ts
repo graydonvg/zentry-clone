@@ -240,7 +240,7 @@ export function getFirstTransformedHeroClipPath(
   const bottomRightY = windowDimensions.height * 0.9;
 
   const bottomLeftX = -20;
-  const bottomLeftY = windowDimensions.height;
+  const bottomLeftY = windowDimensions.height * 0.95;
 
   const clipPath = `
     M ${topLeftX + clampedRadius} ${topLeftY}

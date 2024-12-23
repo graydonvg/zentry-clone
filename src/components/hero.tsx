@@ -14,6 +14,7 @@ import {
   getNextVideoClipPath,
   getFirstTransformedHeroClipPath,
   getSecondTransformedHeroClipPath,
+  cn,
 } from "@/lib/utils";
 import useMouseMoving from "@/hooks/use-mouse-moving";
 import useScrolledToTop from "@/hooks/use-scrolled-to-top";
@@ -61,6 +62,8 @@ export default function Hero() {
   const [secondTransformedHeroClipPath, setSecondTransformedHeroClipPath] =
     useState("");
   const [isMouseOverHitArea, setIsMouseOverHitArea] = useState(false);
+  const [isNextVideoOptionFullSize, setIsNextVideoOptionFullSize] =
+    useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const heroBorderRef = useRef<SVGPathElement>(null);
   const videoItemContainerRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -93,7 +96,7 @@ export default function Hero() {
   }, [windowDimensions]);
 
   function handleHitAreaClicked() {
-    if (isTransitioning) return;
+    if (isTransitioning || !isScrolledToTop) return;
     setIsTransitioning(true);
     setHasClickedHitArea(true);
     setCurrentVideoNumber((prevIndex) => (prevIndex % totalVideos) + 1);
@@ -103,11 +106,16 @@ export default function Hero() {
     () => {
       if (isTransitioning) return;
 
-      if (isMouseMoving && isScrolledToTop && !isMouseOverHitArea) {
+      if (
+        isMouseMoving &&
+        isScrolledToTop &&
+        !(isMouseOverHitArea && isNextVideoOptionFullSize)
+      ) {
         gsap.to(videoItemContentRefs.current[nextVideoNumber], {
           clipPath: `path("${nextVideoClipPath}")`,
           duration: 1,
           ease: "power1.inOut",
+          onComplete: () => setIsNextVideoOptionFullSize(true),
         });
         gsap.to(videoItemBorderRefs.current[nextVideoNumber], {
           attr: {
@@ -118,10 +126,12 @@ export default function Hero() {
         });
       } else {
         if (isMouseOverHitArea && isScrolledToTop) return;
+
         gsap.to(videoItemContentRefs.current[nextVideoNumber], {
           clipPath: `path("${hiddenVideoClipPath}")`,
           duration: 1,
           ease: "power1.inOut",
+          onComplete: () => setIsNextVideoOptionFullSize(false),
         });
         gsap.to(videoItemBorderRefs.current[nextVideoNumber], {
           attr: {
@@ -340,13 +350,15 @@ export default function Hero() {
             d=""
           ></path>
         </svg>
-        <div
-          onMouseEnter={() => setIsMouseOverHitArea(true)}
-          onMouseLeave={() => setIsMouseOverHitArea(false)}
-          onClick={handleHitAreaClicked}
-          className="absolute left-1/2 top-1/2 z-[100] aspect-square -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-lg"
-          style={{ width: hitAreaSideLength, height: hitAreaSideLength }}
-        ></div>
+        {isScrolledToTop && (
+          <div
+            onMouseEnter={() => setIsMouseOverHitArea(true)}
+            onMouseLeave={() => setIsMouseOverHitArea(false)}
+            onClick={handleHitAreaClicked}
+            className="absolute left-1/2 top-1/2 z-[100] aspect-square -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-lg"
+            style={{ width: hitAreaSideLength, height: hitAreaSideLength }}
+          ></div>
+        )}
 
         {heroVideos.map((video, index) => {
           const videoNumber = index + 1;
