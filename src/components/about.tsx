@@ -158,7 +158,7 @@ export default function About() {
           </div>
         </div>
 
-        <div className="flex grow flex-col items-center justify-end text-center font-circular-web text-lg leading-tight tracking-tight">
+        <div className="flex h-full flex-col items-center justify-end text-center font-circular-web text-lg leading-tight tracking-tight">
           <p>The Game of Games begins&mdash;your life, now and epic MMORPG</p>
           <p className="text-black/40">
             Zentry unites every player from countless games and platforms,

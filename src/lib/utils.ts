@@ -6,21 +6,21 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function getHitAreaWidth(
-  minHitAreaWidth: number,
-  maxHitAreaWidth: number,
+export function getHitAreaSideLength(
+  minHitAreaSideLength: number,
+  maxHitAreaSideLength: number,
   windowDimensions: WindowDimensions,
 ) {
-  const hitAreaMinWidth = Math.max(
-    windowDimensions.width * 0.2,
-    minHitAreaWidth,
+  const hitAreaMinSideLength = Math.max(
+    Math.min(windowDimensions.width * 0.2, windowDimensions.height * 0.2),
+    minHitAreaSideLength,
   );
 
-  return Math.min(hitAreaMinWidth, maxHitAreaWidth);
+  return Math.min(hitAreaMinSideLength, maxHitAreaSideLength);
 }
 
 export function getNextVideoClipPath(
-  hitAreaWidth: number,
+  hitAreaSideLength: number,
   windowDimensions: WindowDimensions,
   borderRadius = 8,
 ) {
@@ -29,7 +29,7 @@ export function getNextVideoClipPath(
   const centerY = windowDimensions.height / 2;
 
   // Clip path lengths
-  const halfSideLength = hitAreaWidth / 2;
+  const halfSideLength = hitAreaSideLength / 2;
 
   // Ensure the borderRadius doesn't exceed half the side length
   const clampedRadius = Math.min(borderRadius, halfSideLength);
@@ -117,29 +117,40 @@ export function getAboutImageClipPath(
   windowDimensions: WindowDimensions,
   borderRadius = 8,
 ) {
-  // Clip path center
-  const centerX = windowDimensions.width / 2;
-  const centerY = windowDimensions.height / 2;
-
   // Set maximum dimensions for the clip path
   const minWidth = 50;
   const maxWidth = 450;
-  const imageMinWidth = Math.max(windowDimensions.width * 0.3, minWidth);
+
+  // Calculate width as a percentage of both width and height
+  const widthFromHeight = windowDimensions.height * 0.4;
+  const widthFromWidth = windowDimensions.width * 0.3;
+
+  // Take the smaller dimension for responsiveness
+  const imageMinWidth = Math.max(
+    Math.min(widthFromHeight, widthFromWidth),
+    minWidth,
+  );
   const imageMinMaxWidth = Math.min(imageMinWidth, maxWidth);
+
+  // Maintain the aspect ratio
   const imageHeight = imageMinMaxWidth * 1.5;
-  const scalingFactor = imageMinMaxWidth / maxWidth;
 
   // Half side lengths for width and height
   const halfHeight = imageHeight / 2;
   const halfWidth = imageMinMaxWidth / 2;
 
+  const scalingFactor = imageMinMaxWidth / maxWidth;
+
   // Ensure the borderRadius doesn't exceed the minimum of halfWidth and halfHeight
   const clampedRadius = Math.min(
-    // Scale the border radius by the width
     borderRadius * scalingFactor,
     halfWidth,
     halfHeight,
   );
+
+  // Clip path center
+  const centerX = windowDimensions.width / 2;
+  const centerY = windowDimensions.height / 2;
 
   // Corner points adjusted for the border radius
   const topLeftX = centerX - halfWidth - 50 * scalingFactor;

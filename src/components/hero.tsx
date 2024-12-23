@@ -10,7 +10,7 @@ import useWindowDimensions from "@/hooks/use-window-dimensions";
 import {
   getFullScreenClipPath,
   getHiddenHeroVideoNumbers,
-  getHitAreaWidth,
+  getHitAreaSideLength,
   getNextVideoClipPath,
   getFirstTransformedHeroClipPath,
   getSecondTransformedHeroClipPath,
@@ -40,8 +40,8 @@ const heroVideos = [
   },
 ];
 
-const MIN_HIT_AREA_WIDTH = 100;
-const MAX_HIT_AREA_WIDTH = 250;
+const MIN_HIT_AREA_SIDE_LENGTH = 100;
+const MAX_HIT_AREA_SIDE_LENGTH = 250;
 
 export default function Hero() {
   const isMouseMoving = useMouseMoving();
@@ -50,7 +50,9 @@ export default function Hero() {
   const [currentVideoNumber, setCurrentVideoNumber] = useState(1);
   const [hasClickedHitArea, setHasClickedHitArea] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [hitAreaWidth, setHitAreaWidth] = useState<string | number>("20%");
+  const [hitAreaSideLength, setHitAreaSideLength] = useState<string | number>(
+    "20%",
+  );
   const [hiddenVideoClipPath, setHiddenVideoClipPath] = useState("");
   const [nextVideoClipPath, setNextVideoClipPath] = useState("");
   const [currentVideoClipPath, setCurrentVideoClipPath] = useState("");
@@ -69,19 +71,19 @@ export default function Hero() {
   const previousVideoNumber =
     ((currentVideoNumber - 1 + totalVideos - 1) % totalVideos) + 1;
   const nextVideoNumber = (currentVideoNumber % totalVideos) + 1;
-  const minMaxHitAreaWidth = getHitAreaWidth(
-    MIN_HIT_AREA_WIDTH,
-    MAX_HIT_AREA_WIDTH,
+  const minMaxHitAreaSideLength = getHitAreaSideLength(
+    MIN_HIT_AREA_SIDE_LENGTH,
+    MAX_HIT_AREA_SIDE_LENGTH,
     windowDimensions,
   );
 
   useEffect(() => {
     setNextVideoClipPath(
-      getNextVideoClipPath(minMaxHitAreaWidth, windowDimensions),
+      getNextVideoClipPath(minMaxHitAreaSideLength, windowDimensions),
     );
     setCurrentVideoClipPath(getFullScreenClipPath(windowDimensions));
     setHiddenVideoClipPath(getNextVideoClipPath(0, windowDimensions));
-    setHitAreaWidth(minMaxHitAreaWidth);
+    setHitAreaSideLength(minMaxHitAreaSideLength);
     setFirstTransformedHeroClipPath(
       getFirstTransformedHeroClipPath(windowDimensions),
     );
@@ -343,7 +345,7 @@ export default function Hero() {
           onMouseLeave={() => setIsMouseOverHitArea(false)}
           onClick={handleHitAreaClicked}
           className="absolute left-1/2 top-1/2 z-[100] aspect-square -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-lg"
-          style={{ width: hitAreaWidth }}
+          style={{ width: hitAreaSideLength, height: hitAreaSideLength }}
         ></div>
 
         {heroVideos.map((video, index) => {
