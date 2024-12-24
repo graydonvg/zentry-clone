@@ -7,7 +7,7 @@ import Image from "next/image";
 import AnimatedTitle from "./animated-title";
 import { getAboutImageClipPath, getFullScreenClipPath } from "@/lib/utils";
 import useWindowDimensions from "@/hooks/use-window-dimensions";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -117,30 +117,21 @@ export default function About() {
     <div className="mt-16 sm:mt-32">
       <div className="flex flex-col items-center justify-center">
         <p className="font-general text-[10px] uppercase">
-          <span
-            className="welcome-word-span inline-flex"
-            style={{ willChange: "opacity" }}
-          >
-            Welcome
-          </span>{" "}
-          <span
-            className="welcome-word-span inline-flex"
-            style={{ willChange: "opacity" }}
-          >
-            to
-          </span>{" "}
-          <span
-            className="welcome-word-span inline-flex"
-            style={{ willChange: "opacity" }}
-          >
-            Zentry
-          </span>
+          {"Welcom to Zentry".split(" ").map((word, index) => (
+            <Fragment key={index}>
+              <span
+                className="welcome-word-span inline-flex"
+                style={{ willChange: "opacity" }}
+                dangerouslySetInnerHTML={{ __html: word }}
+              />{" "}
+            </Fragment>
+          ))}
         </p>
 
         <AnimatedTitle
           ref={titleContainerRef}
-          titleLrg="Disc<b>o</b>ver the world's <br /> largest shared <b>a</b>dventure"
-          titleSml="Disc<b>o</b>ver the <br /> world's largest <br /> shared <b>a</b>dventure"
+          titleLrg="Disc<b>o</b>ver the world's<br />largest shared <b>a</b>dventure"
+          titleSml="Disc<b>o</b>ver the<br />world's largest<br />shared <b>a</b>dventure"
           containerClassName="mt-5 text-black"
         />
       </div>

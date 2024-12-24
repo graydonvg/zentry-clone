@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import React, { forwardRef, useImperativeHandle, useRef } from "react";
+import { forwardRef, Fragment } from "react";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -28,7 +28,8 @@ const AnimatedTitle = forwardRef<HTMLDivElement, Props>(
       });
 
       titleAnimation.to("h2", {
-        transform: "translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
+        transform:
+          "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
         ease: "power2.out",
         duration: 1,
       });
@@ -45,12 +46,7 @@ const AnimatedTitle = forwardRef<HTMLDivElement, Props>(
     });
 
     return (
-      <div
-        ref={ref}
-        style={{
-          perspective: 1000,
-        }}
-      >
+      <div ref={ref}>
         <h2
           className={cn(
             "hidden flex-col gap-1 text-[clamp(2.5rem,6.3vw,7.5rem)] uppercase leading-[.8] text-white sm:flex sm:px-32",
@@ -58,7 +54,7 @@ const AnimatedTitle = forwardRef<HTMLDivElement, Props>(
           )}
           style={{
             transform:
-              "translate3d(-110px, 50px, -60px) rotateY(-50deg) rotateX(-20deg)",
+              "perspective(1000px) translate3d(-110px, 50px, -60px) rotateY(-50deg) rotateX(-20deg)",
             transformOrigin: "50% 50% -150px",
             willChange: "transform",
           }}
@@ -81,12 +77,12 @@ const AnimatedTitle = forwardRef<HTMLDivElement, Props>(
         </h2>
         <h2
           className={cn(
-            "flex flex-col gap-1 text-[clamp(1.5rem,12.6vw,7.5rem)] uppercase leading-[.8] text-white sm:hidden",
+            "flex flex-col gap-1 text-[clamp(1rem,12vw,7.5rem)] uppercase leading-[.8] text-white sm:hidden",
             containerClassName,
           )}
           style={{
             transform:
-              "translate3d(-110px, 50px, -60px) rotateY(-50deg) rotateX(-20deg)",
+              "perspective(1000px)  translate3d(-110px, 50px, -60px) rotateY(-50deg) rotateX(-20deg)",
             transformOrigin: "50% 50% -150px",
             willChange: "transform",
           }}

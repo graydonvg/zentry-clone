@@ -62,9 +62,9 @@ export default function Hero() {
   const [secondTransformedHeroClipPath, setSecondTransformedHeroClipPath] =
     useState("");
   const [isMouseOverHitArea, setIsMouseOverHitArea] = useState(false);
-  const [isNextVideoOptionFullSize, setIsNextVideoOptionFullSize] =
-    useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
+  const hitAreaRef = useRef<HTMLDivElement>(null);
+  // const transformTitleRef = useRef<HTMLHeadingElement>(null);
   const heroBorderRef = useRef<SVGPathElement>(null);
   const videoItemContainerRefs = useRef<(HTMLDivElement | null)[]>([]);
   const videoItemContentRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -79,6 +79,20 @@ export default function Hero() {
     MAX_HIT_AREA_SIDE_LENGTH,
     windowDimensions,
   );
+
+  // useGSAP(
+  //   () => {
+  //     if (hasClickedHitArea) {
+  //       gsap.to(transformTitleRef.current, {
+  //         transform:
+  //           "perspective(1000px) translate3d(250px, 80px, 20px) rotateY(60deg) rotateX(-20deg)",
+  //         ease: "power1.out",
+  //         // duration: 1,
+  //       });
+  //     }
+  //   },
+  //   { dependencies: [hasClickedHitArea] },
+  // );
 
   useEffect(() => {
     setNextVideoClipPath(
@@ -106,16 +120,14 @@ export default function Hero() {
     () => {
       if (isTransitioning) return;
 
-      if (
-        isMouseMoving &&
-        isScrolledToTop &&
-        !(isMouseOverHitArea && isNextVideoOptionFullSize)
-      ) {
+      if (isMouseMoving && isScrolledToTop && !isMouseOverHitArea) {
+        gsap.to(hitAreaRef.current, {
+          scale: 1,
+        });
         gsap.to(videoItemContentRefs.current[nextVideoNumber], {
           clipPath: `path("${nextVideoClipPath}")`,
           duration: 1,
           ease: "power1.inOut",
-          onComplete: () => setIsNextVideoOptionFullSize(true),
         });
         gsap.to(videoItemBorderRefs.current[nextVideoNumber], {
           attr: {
@@ -127,11 +139,13 @@ export default function Hero() {
       } else {
         if (isMouseOverHitArea && isScrolledToTop) return;
 
+        gsap.to(hitAreaRef.current, {
+          scale: 0,
+        });
         gsap.to(videoItemContentRefs.current[nextVideoNumber], {
           clipPath: `path("${hiddenVideoClipPath}")`,
           duration: 1,
           ease: "power1.inOut",
-          onComplete: () => setIsNextVideoOptionFullSize(false),
         });
         gsap.to(videoItemBorderRefs.current[nextVideoNumber], {
           attr: {
@@ -143,7 +157,12 @@ export default function Hero() {
       }
     },
     {
-      dependencies: [isMouseMoving, isScrolledToTop, isTransitioning],
+      dependencies: [
+        isMouseMoving,
+        isScrolledToTop,
+        isTransitioning,
+        hiddenVideoClipPath,
+      ],
     },
   );
 
@@ -201,7 +220,7 @@ export default function Hero() {
             d: currentVideoClipPath,
           },
           duration: 1,
-          ease: "power1.inOut",
+          ease: "power2.out",
           onComplete: () => {
             // Remove the border once the video grows to full size
             gsap.set(videoItemBorderRefs.current[currentVideoNumber], {
@@ -216,7 +235,7 @@ export default function Hero() {
         gsap.to(videoItemContentRefs.current[currentVideoNumber], {
           clipPath: `path("${currentVideoClipPath}")`,
           duration: 1,
-          ease: "power1.inOut",
+          ease: "power2.out",
           onStart: () => {
             const currentVideo = videoRefs.current[currentVideoNumber];
 
@@ -245,14 +264,14 @@ export default function Hero() {
         gsap.to(videoItemContentRefs.current[nextVideoNumber], {
           clipPath: `path("${nextVideoClipPath}")`,
           duration: 1,
-          ease: "power1.inOut",
+          ease: "power2.out",
         });
         gsap.to(videoItemBorderRefs.current[nextVideoNumber], {
           attr: {
             d: nextVideoClipPath,
           },
           duration: 1,
-          ease: "power1.inOut",
+          ease: "power2.out",
         });
       }
     },
@@ -336,7 +355,7 @@ export default function Hero() {
       <div
         ref={heroRef}
         id="hero-slides"
-        className="absolute left-0 top-0 z-[1] size-full"
+        className="absolute left-0 top-0 z-[1] size-full overflow-hidden"
       >
         <svg
           className="absolute left-0 top-0 z-[3] size-full fill-none"
@@ -350,15 +369,14 @@ export default function Hero() {
             d=""
           ></path>
         </svg>
-        {isScrolledToTop && (
-          <div
-            onMouseEnter={() => setIsMouseOverHitArea(true)}
-            onMouseLeave={() => setIsMouseOverHitArea(false)}
-            onClick={handleHitAreaClicked}
-            className="absolute left-1/2 top-1/2 z-[100] aspect-square -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-lg"
-            style={{ width: hitAreaSideLength, height: hitAreaSideLength }}
-          ></div>
-        )}
+        <div
+          ref={hitAreaRef}
+          onMouseEnter={() => setIsMouseOverHitArea(true)}
+          onMouseLeave={() => setIsMouseOverHitArea(false)}
+          onClick={handleHitAreaClicked}
+          className="absolute left-1/2 top-1/2 z-[100] aspect-square -translate-x-1/2 -translate-y-1/2 scale-0 cursor-pointer rounded-lg"
+          style={{ width: hitAreaSideLength, height: hitAreaSideLength }}
+        ></div>
 
         {heroVideos.map((video, index) => {
           const videoNumber = index + 1;
@@ -440,7 +458,16 @@ export default function Hero() {
             </Button>
           </div>
         </div>
-        <h1 className="special-font hero-heading absolute bottom-5 right-5 z-40 text-blue-75">
+        <h1
+          // ref={transformTitleRef}
+          className="special-font hero-heading absolute bottom-5 right-5 z-40 text-blue-75"
+          // style={{
+          //   transform:
+          //     "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
+          //   transformOrigin: "250px 140px",
+          //   willChange: "transform",
+          // }}
+        >
           g<b>a</b>ming
         </h1>
       </div>
