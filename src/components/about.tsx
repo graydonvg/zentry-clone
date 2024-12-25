@@ -30,26 +30,18 @@ export default function About() {
   }, [windowDimensions]);
 
   useGSAP(() => {
-    gsap.fromTo(
-      ".welcome-word-span",
-      {
-        opacity: 0,
-        x: -20,
+    gsap.to(".welcome-word", {
+      opacity: 1,
+      duration: 0.01,
+      stagger: {
+        amount: 0.2,
       },
-      {
-        opacity: 1,
-        x: 0,
-        duration: 0.001,
-        stagger: {
-          amount: 0.2,
-        },
-        scrollTrigger: {
-          trigger: titleContainerRef.current,
-          start: "50% bottom",
-          toggleActions: "play none none reverse",
-        },
+      scrollTrigger: {
+        trigger: titleContainerRef.current,
+        start: "50% bottom",
+        toggleActions: "play none none reverse",
       },
-    );
+    });
   });
 
   useGSAP(
@@ -116,13 +108,13 @@ export default function About() {
   );
 
   return (
-    <div className="mt-16 sm:mt-32">
-      <div className="flex flex-col items-center justify-center gap-6">
+    <div className="mt-16 sm:mt-[7.5rem]">
+      <div className="flex flex-col items-center justify-center gap-3">
         <p className="font-general text-[10px] uppercase">
           {"Welcom to Zentry".split(" ").map((word, index) => (
             <Fragment key={index}>
               <span
-                className="welcome-word-span inline-flex"
+                className="welcome-word inline-flex opacity-0"
                 style={{ willChange: "opacity" }}
                 dangerouslySetInnerHTML={{ __html: word }}
               />{" "}
@@ -134,7 +126,7 @@ export default function About() {
           ref={titleContainerRef}
           titleLrg="Disc<b>o</b>ver the world's<br />largest shared <b>a</b>dventure"
           titleSml="Disc<b>o</b>ver the<br />world's largest<br />shared <b>a</b>dventure"
-          containerClassName="text-black"
+          containerClassName="mt-5 text-black"
         />
       </div>
 

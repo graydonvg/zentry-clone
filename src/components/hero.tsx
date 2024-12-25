@@ -442,7 +442,7 @@ export default function Hero() {
         className="absolute left-0 top-0 z-10 size-full overflow-hidden"
       >
         <svg
-          className="absolute left-0 top-0 z-30 size-full fill-none"
+          className="pointer-events-none absolute left-0 top-0 z-30 size-full fill-none"
           stroke="#000000"
           strokeWidth="2"
           fill="none"
@@ -528,7 +528,7 @@ export default function Hero() {
           <h1 className="hero-heading mt-24 text-blue-75">
             redefi<b>n</b>e
           </h1>
-          <p className="mb-5 max-w-64 font-robert-regular text-blue-100">
+          <p className="mb-5 font-robert-regular text-blue-100">
             Enter the Metagame Layer <br /> Unleash the Play Economy
           </p>
           <Button
