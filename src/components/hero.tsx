@@ -14,7 +14,6 @@ import {
   getNextVideoClipPath,
   getFirstTransformedHeroClipPath,
   getSecondTransformedHeroClipPath,
-  cn,
 } from "@/lib/utils";
 import useMouseMoving from "@/hooks/use-mouse-moving";
 import useScrolledToTop from "@/hooks/use-scrolled-to-top";
@@ -23,32 +22,68 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
 }
 
+function splitAndMapTextWithTags(str: string, className: string) {
+  const regex = /<[^>]+>[^<]*<\/[^>]+>|[^<]/g; // Matches entire tags with content or single characters
+
+  return str.match(regex)?.map((part, index) => {
+    if (part.startsWith("<")) {
+      // If the part is an HTML tag with content, return tag with content wrapped in a span
+      return (
+        <span
+          key={index}
+          className={className}
+          dangerouslySetInnerHTML={{ __html: part }}
+        />
+      );
+    }
+    // For regular characters, wrap them in spans
+    return (
+      <span
+        key={index}
+        className={className}
+        dangerouslySetInnerHTML={{ __html: part }}
+      />
+    );
+  });
+}
+
 const heroVideos = [
   {
     initialZIndex: 1,
     autoPlay: false,
+    src: "videos/hero-1.mp4",
   },
   {
     initialZIndex: 2,
+    src: "videos/hero-2.mp4",
   },
   {
     initialZIndex: 0,
     initialDisplay: "none",
+    src: "videos/hero-3.mp4",
   },
   {
     initialZIndex: 0,
     initialDisplay: "none",
+    src: "videos/hero-4.mp4",
   },
 ];
 
 const MIN_HIT_AREA_SIDE_LENGTH = 100;
 const MAX_HIT_AREA_SIDE_LENGTH = 250;
 
+const animatedTitles = [
+  "g<b>a</b>ming",
+  "ide<b>n</b>tity",
+  "re<b>a</b>lity",
+  "lif<b>e</b>style",
+];
+
 export default function Hero() {
   const isMouseMoving = useMouseMoving();
   const isScrolledToTop = useScrolledToTop();
   const windowDimensions = useWindowDimensions();
-  const [currentVideoNumber, setCurrentVideoNumber] = useState(1);
+  const [currentVideoNumber, setCurrentVideoNumber] = useState(0);
   const [hasClickedHitArea, setHasClickedHitArea] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [hitAreaSideLength, setHitAreaSideLength] = useState<string | number>(
@@ -62,9 +97,9 @@ export default function Hero() {
   const [secondTransformedHeroClipPath, setSecondTransformedHeroClipPath] =
     useState("");
   const [isMouseOverHitArea, setIsMouseOverHitArea] = useState(false);
+  const [animateTitleIndex, setAnimateTitleIndex] = useState({ out: 0, in: 1 });
   const heroRef = useRef<HTMLDivElement>(null);
   const hitAreaRef = useRef<HTMLDivElement>(null);
-  // const transformTitleRef = useRef<HTMLHeadingElement>(null);
   const heroBorderRef = useRef<SVGPathElement>(null);
   const videoItemContainerRefs = useRef<(HTMLDivElement | null)[]>([]);
   const videoItemContentRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -72,27 +107,71 @@ export default function Hero() {
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const totalVideos = heroVideos.length;
   const previousVideoNumber =
-    ((currentVideoNumber - 1 + totalVideos - 1) % totalVideos) + 1;
-  const nextVideoNumber = (currentVideoNumber % totalVideos) + 1;
+    (currentVideoNumber - 1 + totalVideos) % totalVideos;
+  const nextVideoNumber = (currentVideoNumber + 1) % totalVideos;
   const minMaxHitAreaSideLength = getHitAreaSideLength(
     MIN_HIT_AREA_SIDE_LENGTH,
     MAX_HIT_AREA_SIDE_LENGTH,
     windowDimensions,
   );
 
-  // useGSAP(
-  //   () => {
-  //     if (hasClickedHitArea) {
-  //       gsap.to(transformTitleRef.current, {
-  //         transform:
-  //           "perspective(1000px) translate3d(250px, 80px, 20px) rotateY(60deg) rotateX(-20deg)",
-  //         ease: "power1.out",
-  //         // duration: 1,
-  //       });
-  //     }
-  //   },
-  //   { dependencies: [hasClickedHitArea] },
-  // );
+  useGSAP(
+    () => {
+      if (hasClickedHitArea) {
+        gsap
+          .timeline()
+          .fromTo(
+            ".animate-tile-out",
+            {
+              transform:
+                "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
+            },
+            {
+              transform:
+                "perspective(1000px) translate3d(100px, 30px, 20px) rotateY(60deg) rotateX(-20deg)",
+            },
+          )
+          .fromTo(
+            ".animate-tile-char-out",
+            { opacity: 1 },
+            {
+              opacity: 0,
+              duration: 0.01,
+              stagger: {
+                amount: 0.4,
+              },
+            },
+            0.2,
+          )
+          .fromTo(
+            ".animate-tile-in",
+            {
+              transform:
+                "perspective(1000px) translate3d(0px, -150px, 20px) rotateZ(-20deg) rotateX(60deg)",
+            },
+            {
+              transform:
+                "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
+            },
+            0.4,
+          )
+          .fromTo(
+            ".animate-tile-char-in",
+            { opacity: 0 },
+            {
+              opacity: 1,
+              duration: 0.01,
+              stagger: {
+                amount: 0.6,
+              },
+            },
+            0.4,
+          );
+      }
+    },
+
+    { dependencies: [hasClickedHitArea] },
+  );
 
   useEffect(() => {
     setNextVideoClipPath(
@@ -111,9 +190,11 @@ export default function Hero() {
 
   function handleHitAreaClicked() {
     if (isTransitioning || !isScrolledToTop) return;
+
     setIsTransitioning(true);
     setHasClickedHitArea(true);
-    setCurrentVideoNumber((prevIndex) => (prevIndex % totalVideos) + 1);
+    setAnimateTitleIndex({ out: currentVideoNumber, in: nextVideoNumber });
+    setCurrentVideoNumber((prevIndex) => (prevIndex + 1) % totalVideos);
   }
 
   useGSAP(
@@ -175,12 +256,12 @@ export default function Hero() {
           totalVideos,
         );
 
-        hiddenVideoNumbers.forEach((hiddenVideoNumber) =>
+        hiddenVideoNumbers.forEach((hiddenVideoNumber) => {
           gsap.set(videoItemContainerRefs.current[hiddenVideoNumber], {
             display: "none",
             zIndex: 0,
-          }),
-        );
+          });
+        });
 
         // Keep the previous video visible during transition
         gsap.set(videoItemContainerRefs.current[previousVideoNumber], {
@@ -351,7 +432,7 @@ export default function Hero() {
   );
 
   return (
-    <section className="relative h-screen w-full overflow-x-hidden">
+    <section className="relative h-screen w-full overflow-hidden">
       <div
         ref={heroRef}
         id="hero-slides"
@@ -379,19 +460,18 @@ export default function Hero() {
         ></div>
 
         {heroVideos.map((video, index) => {
-          const videoNumber = index + 1;
           const clipPath =
-            videoNumber === currentVideoNumber
+            index === currentVideoNumber
               ? currentVideoClipPath
               : hiddenVideoClipPath;
           const borderPath =
-            videoNumber == nextVideoNumber ? hiddenVideoClipPath : undefined;
+            index == nextVideoNumber ? hiddenVideoClipPath : undefined;
 
           return (
             <div
-              key={videoNumber}
+              key={index}
               ref={(el) => {
-                videoItemContainerRefs.current[videoNumber] = el;
+                videoItemContainerRefs.current[index] = el;
               }}
               className="absolute left-0 top-0 size-full"
               style={{
@@ -401,7 +481,7 @@ export default function Hero() {
             >
               <div
                 ref={(el) => {
-                  videoItemContentRefs.current[videoNumber] = el;
+                  videoItemContentRefs.current[index] = el;
                 }}
                 className="absolute left-0 top-0 z-[1] size-full bg-violet-300"
                 style={{
@@ -416,7 +496,7 @@ export default function Hero() {
                 >
                   <path
                     ref={(el) => {
-                      videoItemBorderRefs.current[videoNumber] = el;
+                      videoItemBorderRefs.current[index] = el;
                     }}
                     className="absolute left-0 top-0 z-[3] size-full fill-none"
                     d={borderPath}
@@ -425,9 +505,9 @@ export default function Hero() {
                 <div className="visible absolute left-0 top-0 size-full">
                   <video
                     ref={(el) => {
-                      videoRefs.current[videoNumber] = el;
+                      videoRefs.current[index] = el;
                     }}
-                    src={`videos/hero-${videoNumber}.mp4`}
+                    src={video.src}
                     autoPlay={video.autoPlay}
                     muted
                     playsInline
@@ -441,39 +521,79 @@ export default function Hero() {
           );
         })}
 
-        <div className="absolute left-0 top-0 z-40 size-full">
-          <div className="mt-24 px-5 sm:px-10">
-            <h1 className="special-font hero-heading text-blue-75">
-              redefi<b>n</b>e
-            </h1>
-            <p className="mb-5 max-w-64 font-robert-regular text-blue-100">
-              Enter the Metagame Layer <br /> Unleash the Play Economy
-            </p>
-            <Button
-              id="watch-trailer"
-              leftIcon={<TiLocationArrow className="size-4 rotate-45" />}
-              className="bg-yellow-300"
-            >
-              Watch Trailer
-            </Button>
-          </div>
+        <div className="absolute left-0 top-0 z-40 size-full px-8">
+          <h1 className="hero-heading mt-24 text-blue-75">
+            redefi<b>n</b>e
+          </h1>
+          <p className="mb-5 max-w-64 font-robert-regular text-blue-100">
+            Enter the Metagame Layer <br /> Unleash the Play Economy
+          </p>
+          <Button
+            id="watch-trailer"
+            leftIcon={<TiLocationArrow className="size-4 rotate-45" />}
+            className="bg-yellow-300"
+          >
+            Watch Trailer
+          </Button>
         </div>
+
         <h1
-          // ref={transformTitleRef}
-          className="special-font hero-heading absolute bottom-5 right-5 z-40 text-blue-75"
-          // style={{
-          //   transform:
-          //     "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
-          //   transformOrigin: "250px 140px",
-          //   willChange: "transform",
-          // }}
+          className="hero-heading animate-tile-out absolute bottom-6 right-8 z-40 text-blue-75"
+          style={{
+            transform:
+              "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
+            transformOrigin: "250px 140px",
+            willChange: "transform",
+          }}
         >
-          g<b>a</b>ming
+          {splitAndMapTextWithTags(
+            animatedTitles[animateTitleIndex.out],
+            "animate-tile-char-out opacity-100",
+          )}
+        </h1>
+        <h1
+          className="hero-heading animate-tile-in absolute bottom-6 right-8 z-40 text-blue-75"
+          style={{
+            transform:
+              "perspective(1000px) translate3d(0px, -150px, 20px) rotateZ(-20deg) rotateX(60deg)",
+            transformOrigin: "250px 140px",
+            willChange: "transform",
+          }}
+        >
+          {splitAndMapTextWithTags(
+            animatedTitles[animateTitleIndex.in],
+            "animate-tile-char-in opacity-0",
+          )}
         </h1>
       </div>
 
-      <h1 className="special-font hero-heading absolute bottom-5 right-5 text-black">
-        g<b>a</b>ming
+      <h1
+        className="hero-heading animate-tile-out absolute bottom-6 right-8 -z-10 text-black"
+        style={{
+          transform:
+            "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
+          transformOrigin: "250px 140px",
+          willChange: "transform",
+        }}
+      >
+        {splitAndMapTextWithTags(
+          animatedTitles[animateTitleIndex.out],
+          "animate-tile-char-out opacity-100",
+        )}
+      </h1>
+      <h1
+        className="hero-heading animate-tile-in absolute bottom-6 right-8 -z-10 text-black"
+        style={{
+          transform:
+            "perspective(1000px) translate3d(0px, -150px, 20px) rotateZ(-20deg) rotateX(60deg)",
+          transformOrigin: "250px 140px",
+          willChange: "transform",
+        }}
+      >
+        {splitAndMapTextWithTags(
+          animatedTitles[animateTitleIndex.in],
+          "animate-tile-char-in opacity-0",
+        )}
       </h1>
     </section>
   );

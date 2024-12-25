@@ -68,7 +68,8 @@ body {
   }
 
   .hero-heading {
-    @apply font-zentry text-5xl font-black uppercase sm:right-10 sm:text-7xl md:text-9xl lg:text-[12rem];
+    @apply special-font font-zentry text-[clamp(1rem,10vw+2rem,10rem)] font-black uppercase leading-none;
+    /* @apply font-zentry text-5xl font-black uppercase sm:right-10 sm:text-7xl md:text-9xl lg:text-[12rem]; */
   }
 
   /* .about-subtext {

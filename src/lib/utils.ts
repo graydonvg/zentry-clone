@@ -308,13 +308,11 @@ export function getHiddenHeroVideoNumbers(
 
   for (
     let distanceFromCurrent = MIN_VISIBLE_VIDEOS;
-    distanceFromCurrent < totalVideos - 1;
+    distanceFromCurrent < totalVideos;
     distanceFromCurrent++
   ) {
     hiddenVideoNumbers.push(
-      ((currentVideoNumber - distanceFromCurrent + totalVideos - 1) %
-        totalVideos) +
-        1,
+      (currentVideoNumber - distanceFromCurrent + totalVideos) % totalVideos,
     );
   }
 
