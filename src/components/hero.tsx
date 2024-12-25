@@ -49,21 +49,21 @@ function splitAndMapTextWithTags(str: string, className: string) {
 
 const heroVideos = [
   {
-    initialZIndex: 1,
+    initialZIndex: 10,
     autoPlay: false,
     src: "videos/hero-1.mp4",
   },
   {
-    initialZIndex: 2,
+    initialZIndex: 20,
     src: "videos/hero-2.mp4",
   },
   {
-    initialZIndex: 0,
+    initialZIndex: -10,
     initialDisplay: "none",
     src: "videos/hero-3.mp4",
   },
   {
-    initialZIndex: 0,
+    initialZIndex: -10,
     initialDisplay: "none",
     src: "videos/hero-4.mp4",
   },
@@ -97,7 +97,10 @@ export default function Hero() {
   const [secondTransformedHeroClipPath, setSecondTransformedHeroClipPath] =
     useState("");
   const [isMouseOverHitArea, setIsMouseOverHitArea] = useState(false);
-  const [animateTitleIndex, setAnimateTitleIndex] = useState({ out: 0, in: 1 });
+  const [animateTitleIndex, setAnimateTitleIndex] = useState({
+    exit: 0,
+    enter: 1,
+  });
   const heroRef = useRef<HTMLDivElement>(null);
   const hitAreaRef = useRef<HTMLDivElement>(null);
   const heroBorderRef = useRef<SVGPathElement>(null);
@@ -113,64 +116,6 @@ export default function Hero() {
     MIN_HIT_AREA_SIDE_LENGTH,
     MAX_HIT_AREA_SIDE_LENGTH,
     windowDimensions,
-  );
-
-  useGSAP(
-    () => {
-      if (hasClickedHitArea) {
-        gsap
-          .timeline()
-          .fromTo(
-            ".animate-tile-out",
-            {
-              transform:
-                "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
-            },
-            {
-              transform:
-                "perspective(1000px) translate3d(100px, 30px, 20px) rotateY(60deg) rotateX(-20deg)",
-            },
-          )
-          .fromTo(
-            ".animate-tile-char-out",
-            { opacity: 1 },
-            {
-              opacity: 0,
-              duration: 0.01,
-              stagger: {
-                amount: 0.4,
-              },
-            },
-            0.2,
-          )
-          .fromTo(
-            ".animate-tile-in",
-            {
-              transform:
-                "perspective(1000px) translate3d(0px, -150px, 20px) rotateZ(-20deg) rotateX(60deg)",
-            },
-            {
-              transform:
-                "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
-            },
-            0.4,
-          )
-          .fromTo(
-            ".animate-tile-char-in",
-            { opacity: 0 },
-            {
-              opacity: 1,
-              duration: 0.01,
-              stagger: {
-                amount: 0.6,
-              },
-            },
-            0.4,
-          );
-      }
-    },
-
-    { dependencies: [hasClickedHitArea] },
   );
 
   useEffect(() => {
@@ -193,7 +138,7 @@ export default function Hero() {
 
     setIsTransitioning(true);
     setHasClickedHitArea(true);
-    setAnimateTitleIndex({ out: currentVideoNumber, in: nextVideoNumber });
+    setAnimateTitleIndex({ exit: currentVideoNumber, enter: nextVideoNumber });
     setCurrentVideoNumber((prevIndex) => (prevIndex + 1) % totalVideos);
   }
 
@@ -259,14 +204,14 @@ export default function Hero() {
         hiddenVideoNumbers.forEach((hiddenVideoNumber) => {
           gsap.set(videoItemContainerRefs.current[hiddenVideoNumber], {
             display: "none",
-            zIndex: 0,
+            zIndex: -10,
           });
         });
 
         // Keep the previous video visible during transition
         gsap.set(videoItemContainerRefs.current[previousVideoNumber], {
           display: "block",
-          zIndex: 0,
+          zIndex: -10,
         });
         gsap.set(videoItemContentRefs.current[previousVideoNumber], {
           clipPath: `path("${currentVideoClipPath}")`,
@@ -275,7 +220,7 @@ export default function Hero() {
         // Set the new current video behind the next video option before it grows
         gsap.set(videoItemContainerRefs.current[currentVideoNumber], {
           display: "block",
-          zIndex: 1,
+          zIndex: 10,
         });
         gsap.set(videoItemContentRefs.current[currentVideoNumber], {
           clipPath: `path("${nextVideoClipPath}")`,
@@ -289,7 +234,7 @@ export default function Hero() {
         // Set the next video option in front of the new current video
         gsap.set(videoItemContainerRefs.current[nextVideoNumber], {
           display: "block",
-          zIndex: 2,
+          zIndex: 20,
         });
         gsap.set(videoItemContentRefs.current[nextVideoNumber], {
           clipPath: `path("${hiddenVideoClipPath}")`,
@@ -360,6 +305,64 @@ export default function Hero() {
       dependencies: [currentVideoNumber],
       revertOnUpdate: true,
     },
+  );
+
+  useGSAP(
+    () => {
+      if (hasClickedHitArea) {
+        gsap
+          .timeline()
+          .fromTo(
+            ".animate-tile-exit",
+            {
+              transform:
+                "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
+            },
+            {
+              transform:
+                "perspective(1000px) translate3d(100px, 30px, 20px) rotateY(60deg) rotateX(-20deg)",
+            },
+          )
+          .fromTo(
+            ".animate-tile-char-exit",
+            { opacity: 1 },
+            {
+              opacity: 0,
+              duration: 0.01,
+              stagger: {
+                amount: 0.4,
+              },
+            },
+            0.2,
+          )
+          .fromTo(
+            ".animate-tile-enter",
+            {
+              transform:
+                "perspective(1000px) translate3d(0px, -150px, 20px) rotateZ(-20deg) rotateX(60deg)",
+            },
+            {
+              transform:
+                "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
+            },
+            0.4,
+          )
+          .fromTo(
+            ".animate-tile-char-enter",
+            { opacity: 0 },
+            {
+              opacity: 1,
+              duration: 0.01,
+              stagger: {
+                amount: 0.6,
+              },
+            },
+            0.4,
+          );
+      }
+    },
+
+    { dependencies: [hasClickedHitArea] },
   );
 
   useGSAP(
@@ -436,17 +439,17 @@ export default function Hero() {
       <div
         ref={heroRef}
         id="hero-slides"
-        className="absolute left-0 top-0 z-[1] size-full overflow-hidden"
+        className="absolute left-0 top-0 z-10 size-full overflow-hidden"
       >
         <svg
-          className="absolute left-0 top-0 z-[3] size-full fill-none"
+          className="absolute left-0 top-0 z-30 size-full fill-none"
           stroke="#000000"
           strokeWidth="2"
           fill="none"
         >
           <path
             ref={heroBorderRef}
-            className="absolute left-0 top-0 z-[1] size-full fill-none"
+            className="absolute left-0 top-0 z-10 size-full fill-none"
             d=""
           ></path>
         </svg>
@@ -455,7 +458,7 @@ export default function Hero() {
           onMouseEnter={() => setIsMouseOverHitArea(true)}
           onMouseLeave={() => setIsMouseOverHitArea(false)}
           onClick={handleHitAreaClicked}
-          className="absolute left-1/2 top-1/2 z-[100] aspect-square -translate-x-1/2 -translate-y-1/2 scale-0 cursor-pointer rounded-lg"
+          className="absolute left-1/2 top-1/2 z-50 aspect-square -translate-x-1/2 -translate-y-1/2 scale-0 cursor-pointer rounded-lg"
           style={{ width: hitAreaSideLength, height: hitAreaSideLength }}
         ></div>
 
@@ -483,13 +486,13 @@ export default function Hero() {
                 ref={(el) => {
                   videoItemContentRefs.current[index] = el;
                 }}
-                className="absolute left-0 top-0 z-[1] size-full bg-violet-300"
+                className="absolute left-0 top-0 z-10 size-full bg-violet-300"
                 style={{
                   clipPath: `path("${clipPath}")`,
                 }}
               >
                 <svg
-                  className="absolute left-0 top-0 z-[3] size-full fill-none"
+                  className="absolute left-0 top-0 z-30 size-full fill-none"
                   stroke={"#000000"}
                   strokeWidth="2"
                   fill="none"
@@ -498,7 +501,7 @@ export default function Hero() {
                     ref={(el) => {
                       videoItemBorderRefs.current[index] = el;
                     }}
-                    className="absolute left-0 top-0 z-[3] size-full fill-none"
+                    className="absolute left-0 top-0 z-30 size-full fill-none"
                     d={borderPath}
                   ></path>
                 </svg>
@@ -521,7 +524,7 @@ export default function Hero() {
           );
         })}
 
-        <div className="absolute left-0 top-0 z-40 size-full px-8">
+        <div className="absolute left-0 top-0 z-20 size-full px-8">
           <h1 className="hero-heading mt-24 text-blue-75">
             redefi<b>n</b>e
           </h1>
@@ -538,7 +541,7 @@ export default function Hero() {
         </div>
 
         <h1
-          className="hero-heading animate-tile-out absolute bottom-6 right-8 z-40 text-blue-75"
+          className="hero-heading animate-tile-exit absolute bottom-6 right-8 z-20 text-blue-75"
           style={{
             transform:
               "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
@@ -547,12 +550,12 @@ export default function Hero() {
           }}
         >
           {splitAndMapTextWithTags(
-            animatedTitles[animateTitleIndex.out],
-            "animate-tile-char-out opacity-100",
+            animatedTitles[animateTitleIndex.exit],
+            "animate-tile-char-exit opacity-100",
           )}
         </h1>
         <h1
-          className="hero-heading animate-tile-in absolute bottom-6 right-8 z-40 text-blue-75"
+          className="hero-heading animate-tile-enter absolute bottom-6 right-8 z-20 text-blue-75"
           style={{
             transform:
               "perspective(1000px) translate3d(0px, -150px, 20px) rotateZ(-20deg) rotateX(60deg)",
@@ -561,14 +564,14 @@ export default function Hero() {
           }}
         >
           {splitAndMapTextWithTags(
-            animatedTitles[animateTitleIndex.in],
-            "animate-tile-char-in opacity-0",
+            animatedTitles[animateTitleIndex.enter],
+            "animate-tile-char-enter opacity-0",
           )}
         </h1>
       </div>
 
       <h1
-        className="hero-heading animate-tile-out absolute bottom-6 right-8 -z-10 text-black"
+        className="hero-heading animate-tile-exit absolute bottom-6 right-8 -z-10 text-black"
         style={{
           transform:
             "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
@@ -577,12 +580,12 @@ export default function Hero() {
         }}
       >
         {splitAndMapTextWithTags(
-          animatedTitles[animateTitleIndex.out],
-          "animate-tile-char-out opacity-100",
+          animatedTitles[animateTitleIndex.exit],
+          "animate-tile-char-exit opacity-100",
         )}
       </h1>
       <h1
-        className="hero-heading animate-tile-in absolute bottom-6 right-8 -z-10 text-black"
+        className="hero-heading animate-tile-enter absolute bottom-6 right-8 -z-10 text-black"
         style={{
           transform:
             "perspective(1000px) translate3d(0px, -150px, 20px) rotateZ(-20deg) rotateX(60deg)",
@@ -591,8 +594,8 @@ export default function Hero() {
         }}
       >
         {splitAndMapTextWithTags(
-          animatedTitles[animateTitleIndex.in],
-          "animate-tile-char-in opacity-0",
+          animatedTitles[animateTitleIndex.enter],
+          "animate-tile-char-enter opacity-0",
         )}
       </h1>
     </section>

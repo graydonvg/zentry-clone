@@ -29,6 +29,29 @@ export default function About() {
     setFullScreenClipPath(getFullScreenClipPath(windowDimensions));
   }, [windowDimensions]);
 
+  useGSAP(() => {
+    gsap.fromTo(
+      ".welcome-word-span",
+      {
+        opacity: 0,
+        x: -20,
+      },
+      {
+        opacity: 1,
+        x: 0,
+        duration: 0.001,
+        stagger: {
+          amount: 0.2,
+        },
+        scrollTrigger: {
+          trigger: titleContainerRef.current,
+          start: "50% bottom",
+          toggleActions: "play none none reverse",
+        },
+      },
+    );
+  });
+
   useGSAP(
     () => {
       gsap
@@ -92,30 +115,9 @@ export default function About() {
     { dependencies: [imageClipPath, fullScreenClipPath], revertOnUpdate: true },
   );
 
-  useGSAP(() => {
-    gsap.fromTo(
-      ".welcome-word-span",
-      {
-        opacity: 0,
-        x: -20,
-      },
-      {
-        opacity: 1,
-        x: 0,
-        duration: 0.01,
-        stagger: 0.125,
-        scrollTrigger: {
-          trigger: titleContainerRef.current,
-          start: "50% bottom",
-          toggleActions: "play none none reverse",
-        },
-      },
-    );
-  });
-
   return (
     <div className="mt-16 sm:mt-32">
-      <div className="flex flex-col items-center justify-center">
+      <div className="flex flex-col items-center justify-center gap-6">
         <p className="font-general text-[10px] uppercase">
           {"Welcom to Zentry".split(" ").map((word, index) => (
             <Fragment key={index}>
@@ -132,7 +134,7 @@ export default function About() {
           ref={titleContainerRef}
           titleLrg="Disc<b>o</b>ver the world's<br />largest shared <b>a</b>dventure"
           titleSml="Disc<b>o</b>ver the<br />world's largest<br />shared <b>a</b>dventure"
-          containerClassName="mt-5 text-black"
+          containerClassName="text-black"
         />
       </div>
 

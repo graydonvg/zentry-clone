@@ -19,30 +19,31 @@ const AnimatedTitle = forwardRef<HTMLDivElement, Props>(
     useGSAP(() => {
       if (!ref || typeof ref !== "object" || ref.current === null) return;
 
-      const titleAnimation = gsap.timeline({
-        scrollTrigger: {
-          trigger: ref.current,
-          start: "50% bottom",
-          toggleActions: "play none none reverse",
-        },
-      });
-
-      titleAnimation.to("h2", {
-        transform:
-          "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
-        ease: "power2.out",
-        duration: 1,
-      });
-
-      titleAnimation.to(
-        ".animated-word",
-        {
-          opacity: 1,
-          duration: 0,
-          stagger: 0.065,
-        },
-        0,
-      );
+      gsap
+        .timeline({
+          scrollTrigger: {
+            trigger: ref.current,
+            start: "50% bottom",
+            toggleActions: "play none none reverse",
+          },
+        })
+        .to("h2", {
+          transform:
+            "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
+          ease: "power2.out",
+          duration: 1,
+        })
+        .to(
+          ".animated-word",
+          {
+            opacity: 1,
+            duration: 0.01,
+            stagger: {
+              amount: 0.5,
+            },
+          },
+          0,
+        );
     });
 
     return (
