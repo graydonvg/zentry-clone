@@ -15,17 +15,17 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         {...props}
         className={cn(
-          "group relative z-10 flex w-fit cursor-pointer items-center overflow-hidden rounded-full bg-violet-50 px-7 py-3 text-black",
+          "group relative z-10 flex w-fit cursor-pointer items-center overflow-hidden rounded-full bg-violet-50 px-7 py-3",
           className,
         )}
       >
-        <span className="relative inline-flex overflow-hidden font-general text-xs uppercase">
-          <div className="flex translate-y-0 skew-y-0 items-center justify-center gap-2 transition duration-500 group-hover:translate-y-[-160%] group-hover:skew-y-12">
+        <span className="relative inline-flex overflow-hidden font-general text-xs font-medium uppercase text-black">
+          <div className="flex translate-y-0 skew-y-0 items-center justify-center gap-2 opacity-100 transition-all duration-300 ease-in-out group-hover:translate-y-[-160%] group-hover:skew-y-12 group-hover:opacity-0">
             {leftIcon}
             {children}
             {rightIcon}
           </div>
-          <div className="absolute flex translate-y-[164%] skew-y-12 items-center justify-center gap-2 transition duration-500 group-hover:translate-y-0 group-hover:skew-y-0">
+          <div className="absolute flex translate-y-[164%] skew-y-12 items-center justify-center gap-2 opacity-0 transition-all duration-300 ease-in-out group-hover:translate-y-0 group-hover:skew-y-0 group-hover:opacity-100">
             {leftIcon}
             {children}
             {rightIcon}
@@ -35,6 +35,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     );
   },
 );
+
 Button.displayName = "Button";
 
 export { Button };

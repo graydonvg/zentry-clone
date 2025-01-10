@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { forwardRef, Fragment } from "react";
+import { forwardRef } from "react";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -50,6 +50,7 @@ const AnimatedTitle = forwardRef<HTMLDivElement, Props>(
       <div ref={ref}>
         <h2
           className={cn(
+            // add rem to text-[clamp(1rem,12vw+rem!!!!!,7.5rem)]
             "hidden flex-col gap-1 text-[clamp(2.5rem,6.3vw,7.5rem)] uppercase leading-[.8] text-white sm:flex sm:px-32",
             containerClassName,
           )}
@@ -78,6 +79,7 @@ const AnimatedTitle = forwardRef<HTMLDivElement, Props>(
         </h2>
         <h2
           className={cn(
+            // add rem to text-[clamp(1rem,12vw+rem!!!!!,7.5rem)]
             "flex flex-col gap-1 text-[clamp(1rem,12vw,7.5rem)] uppercase leading-[.8] text-white sm:hidden",
             containerClassName,
           )}

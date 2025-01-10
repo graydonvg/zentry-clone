@@ -131,7 +131,7 @@ export default function Hero() {
     setSecondTransformedHeroClipPath(
       getSecondTransformedHeroClipPath(windowDimensions),
     );
-  }, [windowDimensions]);
+  }, [windowDimensions, minMaxHitAreaSideLength]);
 
   function handleHitAreaClicked() {
     if (isTransitioning || !isScrolledToTop) return;

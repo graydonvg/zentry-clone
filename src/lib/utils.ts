@@ -24,28 +24,23 @@ export function getNextVideoClipPath(
   windowDimensions: WindowDimensions,
   borderRadius = 8,
 ) {
-  // Clip path center
   const centerX = windowDimensions.width / 2;
   const centerY = windowDimensions.height / 2;
 
-  // Clip path lengths
   const halfSideLength = hitAreaSideLength / 2;
-
-  // Ensure the borderRadius doesn't exceed half the side length
   const clampedRadius = Math.min(borderRadius, halfSideLength);
 
-  // Corner points adjusted for the border radius
   const topLeftX = centerX - halfSideLength;
   const topLeftY = centerY - halfSideLength;
 
   const topRightX = centerX + halfSideLength;
-  const topRightY = topLeftY;
+  const topRightY = centerY - halfSideLength;
 
-  const bottomRightX = topRightX;
+  const bottomRightX = centerX + halfSideLength;
   const bottomRightY = centerY + halfSideLength;
 
-  const bottomLeftX = topLeftX;
-  const bottomLeftY = bottomRightY;
+  const bottomLeftX = centerX - halfSideLength;
+  const bottomLeftY = centerY + halfSideLength;
 
   const clipPath = `
     M ${topLeftX + clampedRadius} ${topLeftY}
@@ -58,60 +53,10 @@ export function getNextVideoClipPath(
     L ${topLeftX} ${topLeftY + clampedRadius}
     Q ${topLeftX} ${topLeftY} ${topLeftX + clampedRadius} ${topLeftY}
     Z
-  `.replace(/\s+/g, " "); // Remove extra spaces for a single-line path
+  `.replace(/\s+/g, " ");
 
   return clipPath;
 }
-
-// export function getNextVideoClipPath(
-//   hitAreaWidth: number,
-//   windowDimensions: WindowDimensions,
-//   borderRadius = 8,
-//   cursorPosition: { x: number; y: number }, // x and y range from -1 to 1
-// ) {
-//   // Clip path center
-//   const centerX = windowDimensions.width / 2;
-//   const centerY = windowDimensions.height / 2;
-
-//   // Clip path lengths
-//   const halfSideLength = hitAreaWidth / 2;
-
-//   // Ensure the borderRadius doesn't exceed half the side length
-//   const clampedRadius = Math.min(borderRadius, halfSideLength);
-
-//   // Cursor influence factors
-//   const influenceX = cursorPosition.x * halfSideLength * 0.5;
-//   const influenceY = cursorPosition.y * halfSideLength * 0.5;
-
-//   // Adjusted corner points based on tilt
-//   const topLeftX = centerX - halfSideLength + influenceX;
-//   const topLeftY = centerY - halfSideLength + influenceY;
-
-//   const topRightX = centerX + halfSideLength + influenceX;
-//   const topRightY = centerY - halfSideLength + influenceY;
-
-//   const bottomRightX = centerX + halfSideLength + influenceX;
-//   const bottomRightY = centerY + halfSideLength + influenceY;
-
-//   const bottomLeftX = centerX - halfSideLength + influenceX;
-//   const bottomLeftY = centerY + halfSideLength + influenceY;
-
-//   // Generate the clip path
-//   const clipPath = `
-//     M ${topLeftX + clampedRadius} ${topLeftY}
-//     L ${topRightX - clampedRadius} ${topRightY}
-//     Q ${topRightX} ${topRightY} ${topRightX} ${topRightY + clampedRadius}
-//     L ${bottomRightX} ${bottomRightY - clampedRadius}
-//     Q ${bottomRightX} ${bottomRightY} ${bottomRightX - clampedRadius} ${bottomRightY}
-//     L ${bottomLeftX + clampedRadius} ${bottomLeftY}
-//     Q ${bottomLeftX} ${bottomLeftY} ${bottomLeftX} ${bottomLeftY - clampedRadius}
-//     L ${topLeftX} ${topLeftY + clampedRadius}
-//     Q ${topLeftX} ${topLeftY} ${topLeftX + clampedRadius} ${topLeftY}
-//     Z
-//   `.replace(/\s+/g, " "); // Remove extra spaces for a single-line path
-
-//   return clipPath;
-// }
 
 export function getAboutImageClipPath(
   windowDimensions: WindowDimensions,

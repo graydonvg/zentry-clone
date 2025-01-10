@@ -54,6 +54,7 @@ export default function About() {
             end: "bottom top",
             scrub: 0.5,
             pin: true,
+            invalidateOnRefresh: true,
             onLeave: () => {
               gsap.set(imageBorderPathRef.current, {
                 display: "none",
@@ -108,7 +109,7 @@ export default function About() {
   );
 
   return (
-    <div className="mt-16 sm:mt-[7.5rem]">
+    <div id="about" className="mt-16 sm:mt-[7.5rem]">
       <div className="flex flex-col items-center justify-center gap-3">
         <p className="font-general text-[10px] uppercase">
           {"Welcom to Zentry".split(" ").map((word, index) => (
