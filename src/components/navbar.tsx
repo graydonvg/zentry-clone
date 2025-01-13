@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
 }
+
 const navItems = [
   {
     label: "Nexus",
@@ -33,11 +34,13 @@ const navItems = [
 ];
 
 export default function Navbar() {
+  const navContainerRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLElement>(null);
-  const navLinkContainerRef = useRef<HTMLUListElement>(null);
+  const navBackgroundRef = useRef<HTMLDivElement>(null);
+  const navLinksContainerRef = useRef<HTMLDivElement>(null);
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const audioElementRef = useRef<HTMLAudioElement>(null);
-  const navLinkOverlayRef = useRef<HTMLDivElement>(null);
+  const navLinkBackgroundRef = useRef<HTMLDivElement>(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [isIndicatorActive, setIsIndicatorActive] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(true);
@@ -80,16 +83,17 @@ export default function Navbar() {
     () => {
       const tl = gsap.timeline();
 
-      tl.to(navRef.current, {
+      tl.to(navContainerRef.current, {
         y: isNavVisible ? 0 : -100,
         duration: 0.5,
         ease: "power1.out",
       });
 
-      tl.set(
-        navRef.current,
+      tl.to(
+        navBackgroundRef.current,
         {
-          backgroundColor: isScrollYTop ? "transparent" : "black",
+          opacity: isScrollYTop ? 0 : 1,
+          duration: 0.2,
         },
         ">",
       );
@@ -102,165 +106,199 @@ export default function Navbar() {
     setIsIndicatorActive((prev) => !prev);
   }
 
-  useGSAP(
-    (_, contextSafe) => {
-      if (!linkRefs.current || !contextSafe) return;
+  useGSAP((_, contextSafe) => {
+    const nav = navRef.current;
+    const navLinksContainer = navLinksContainerRef.current;
+    const navLinks = linkRefs.current;
+    const navLinkBackground = navLinkBackgroundRef.current;
 
-      const navLinkOverlay = navLinkOverlayRef.current;
-      const navRect = navRef.current?.getBoundingClientRect();
+    if (
+      !nav ||
+      !navLinksContainer ||
+      !navLinks ||
+      !navLinkBackground ||
+      !contextSafe
+    )
+      return;
 
-      if (!navLinkOverlay || !navRect) return;
+    function getNavRect() {
+      return nav!.getBoundingClientRect();
+    }
 
-      const handleMouseEnter = contextSafe((e: MouseEvent) => {
-        const target = e.target as HTMLElement;
-        const targetRect = target.getBoundingClientRect();
-        const tl = gsap.timeline({ defaults: { duration: 0.3 } });
+    let linkMouseEnterTl: gsap.core.Timeline;
+    let setTextBlackTime = 0;
 
-        if (isFirstMouseEnterRef.current) {
-          tl.set(navLinkOverlay, {
-            left: targetRect.left - navRect.left,
-            top: targetRect.top - navRect.top,
-            height: targetRect.height,
-            width: targetRect.width,
-            opacity: 1,
-          });
-          tl.set(target, {
-            color: "black",
-          });
+    const handleMouseEnter = contextSafe((e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const targetRect = target.getBoundingClientRect();
+      const navRect = getNavRect();
 
-          isFirstMouseEnterRef.current = false;
-        }
+      const linkBackgroundLeft = targetRect.left - navRect.left;
+      const linkBackgroundHeight = targetRect.height;
+      const linkBackgroundWidth = targetRect.width;
 
-        if (!isFirstMouseEnterRef.current) {
-          tl.to(navLinkOverlay, {
-            left: targetRect.left - navRect.left,
-            top: targetRect.top - navRect.top,
-            height: targetRect.height,
-            width: targetRect.width,
-            opacity: 1,
-          });
-
-          tl.to(
-            target,
-            {
-              color: "black",
-            },
-            "<",
-          );
-        }
-      });
-
-      const handleMouseLeave = contextSafe((e: MouseEvent) => {
-        const target = e.target as HTMLElement;
-        const tl = gsap.timeline({ defaults: { duration: 0.3 } });
-
-        tl.to(navLinkOverlay, {
-          opacity: 0,
+      if (isFirstMouseEnterRef.current) {
+        gsap.set(navLinkBackground, {
+          left: linkBackgroundLeft,
+          height: linkBackgroundHeight,
+          width: linkBackgroundWidth,
+          opacity: 1,
         });
 
-        tl.to(
+        gsap.set(target, {
+          color: "black",
+        });
+
+        isFirstMouseEnterRef.current = false;
+      }
+
+      if (!isFirstMouseEnterRef.current) {
+        const tl = gsap.timeline({ defaults: { duration: 0.3 } });
+        linkMouseEnterTl = tl;
+
+        tl.to(navLinkBackground, {
+          left: linkBackgroundLeft,
+          height: linkBackgroundHeight,
+          width: linkBackgroundWidth,
+        });
+
+        setTextBlackTime = tl.duration();
+
+        tl.set(
           target,
           {
-            color: "white",
+            color: "black",
           },
-          "<",
+          "<0.15",
         );
-      });
+      }
+    });
 
-      linkRefs.current.forEach((link) => {
-        link?.addEventListener("mouseenter", handleMouseEnter);
-      });
-      linkRefs.current.forEach((link) => {
-        link?.addEventListener("mouseleave", handleMouseLeave);
-      });
+    const handleMouseLeave = contextSafe((e: MouseEvent) => {
+      const target = e.target as HTMLElement;
 
-      return () => {
-        if (!linkRefs.current) return;
+      if (linkMouseEnterTl.time() < setTextBlackTime) {
+        // The text gets set to black with a 0.15s delay in the mouse enter event.
+        // If the mouse leaves before this, the text will get set to white (below) and then to black after the delay.
+        // Therefore, clear the timeline if the linkMouseEnterTl has not completed.
+        linkMouseEnterTl.clear();
+      }
 
-        linkRefs.current.forEach((link) => {
-          link?.removeEventListener("mouseenter", handleMouseEnter);
-        });
-        linkRefs.current.forEach((link) => {
-          link?.removeEventListener("mouseleave", handleMouseLeave);
-        });
-      };
-    },
-    { dependencies: [isFirstMouseEnterRef.current] },
-  );
+      gsap.set(target, {
+        color: "white",
+      });
+    });
+
+    const handleContainerMouseLeave = contextSafe(() => {
+      isFirstMouseEnterRef.current = true;
+
+      gsap.set(navLinkBackground, {
+        opacity: 0,
+      });
+    });
+
+    navLinksContainer.addEventListener("mouseleave", handleContainerMouseLeave);
+    navLinks.forEach((link) => {
+      link?.addEventListener("mouseenter", handleMouseEnter);
+    });
+    navLinks.forEach((link) => {
+      link?.addEventListener("mouseleave", handleMouseLeave);
+    });
+
+    return () => {
+      navLinksContainer.removeEventListener(
+        "mouseleave",
+        handleContainerMouseLeave,
+      );
+      navLinks.forEach((link) => {
+        link?.removeEventListener("mouseenter", handleMouseEnter);
+      });
+      navLinks.forEach((link) => {
+        link?.removeEventListener("mouseleave", handleMouseLeave);
+      });
+    };
+  });
 
   return (
-    <nav ref={navRef} className="fixed z-50 mt-4 rounded-lg sm:inset-x-6">
-      <div className="relative flex size-full items-center justify-between overflow-hidden p-4">
-        <div className="flex items-center gap-7">
-          <Image src="/img/logo.png" alt="logo" width={40} height={40} />
-          <Button
-            id="product-button"
-            rightIcon={<TiLocationArrow className="rotate-[135deg]" />}
-            className="hidden bg-blue-50 md:flex"
-          >
-            Products
-          </Button>
-        </div>
+    <div ref={navContainerRef} className="fixed z-50 sm:inset-x-4">
+      <div className="relative mt-2 overflow-hidden rounded-lg">
         <div
-          ref={navLinkOverlayRef}
-          className="pointer-events-none absolute -z-10 rounded-3xl bg-white opacity-0"
+          ref={navBackgroundRef}
+          className="absolute inset-0 rounded-lg border border-neutral-800 bg-black opacity-0"
         />
-        <ul
-          ref={navLinkContainerRef}
-          onMouseLeave={() => {
-            isFirstMouseEnterRef.current = true;
-          }}
-          className="hidden h-full items-center md:flex"
+        <nav
+          ref={navRef}
+          className="relative flex size-full items-center justify-between p-4"
         >
-          {navItems.map((item, index) => {
-            const Icon = item.icon;
-
-            return (
-              <li key={index}>
-                <a
-                  href={`#${item.label.toLowerCase()}`}
-                  ref={(el) => {
-                    linkRefs.current[index] = el;
-                  }}
-                  className="flex items-center gap-1 px-4 py-2 text-sm font-semibold text-white"
-                >
-                  {item.label}
-                  {Icon && <Icon className="text-xs" />}
-                </a>
-              </li>
-            );
-          })}
-          <li
-            onMouseLeave={() => {
-              isFirstMouseEnterRef.current = true;
-            }}
-          >
-            <button
-              onClick={toggleAudio}
-              className="flex items-center space-x-0.5 px-4 py-2"
+          <div className="flex items-center gap-7">
+            <Image
+              src="/img/zentry-symbol-white.png"
+              alt="logo"
+              width={60}
+              height={60}
+              className="absolute left-1 top-0"
+            />
+            <Button
+              id="product-button"
+              rightIcon={<TiLocationArrow className="rotate-[135deg]" />}
+              className="ml-16 bg-blue-50 px-4 py-2"
             >
-              <audio
-                ref={audioElementRef}
-                src="/audio/loop.mp3"
-                loop
-                className="hidden"
-              />
-              {Array.from(Array(5)).map((_, index) => (
-                <div
-                  key={index}
-                  className={cn(
-                    "indicator-line h-1 w-px rounded-full bg-white transition-all duration-200 ease-in-out",
-                    {
-                      active: isIndicatorActive,
-                    },
-                  )}
-                  style={{ animationDelay: `${(index + 1) * 0.1}s` }}
+              Products
+            </Button>
+          </div>
+          <div
+            ref={navLinkBackgroundRef}
+            className="pointer-events-none absolute z-40 rounded-3xl bg-white"
+          />
+          <ul className="z-50 hidden items-center md:flex">
+            <div ref={navLinksContainerRef} className="flex">
+              {navItems.map((item, index) => {
+                const Icon = item.icon;
+
+                return (
+                  <li key={index}>
+                    <a
+                      href={`#${item.label.toLowerCase()}`}
+                      ref={(el) => {
+                        linkRefs.current[index] = el;
+                      }}
+                      className="flex items-center gap-1 px-4 py-2 text-xs font-semibold uppercase text-white"
+                    >
+                      {item.label}
+                      {Icon && <Icon />}
+                    </a>
+                  </li>
+                );
+              })}
+            </div>
+            <li>
+              <button
+                onClick={toggleAudio}
+                className="flex items-center space-x-0.5 px-4 py-2"
+              >
+                <audio
+                  ref={audioElementRef}
+                  src="/audio/loop.mp3"
+                  loop
+                  className="hidden"
                 />
-              ))}
-            </button>
-          </li>
-        </ul>
+                {Array.from(Array(5)).map((_, index) => (
+                  <div
+                    key={index}
+                    className={cn(
+                      "indicator-line h-1 w-px rounded-full bg-white transition-all duration-200 ease-in-out",
+                      {
+                        active: isIndicatorActive,
+                      },
+                    )}
+                    style={{ animationDelay: `${(index + 1) * 0.1}s` }}
+                  />
+                ))}
+              </button>
+            </li>
+          </ul>
+        </nav>
       </div>
-    </nav>
+    </div>
   );
 }
