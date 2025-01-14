@@ -58,7 +58,7 @@ export function getNextVideoClipPath(
   return clipPath;
 }
 
-export function getAboutImageClipPath(
+export function getIntroImageClipPath(
   windowDimensions: WindowDimensions,
   borderRadius = 8,
 ) {

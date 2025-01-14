@@ -5,7 +5,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import gsap from "gsap";
 import Image from "next/image";
 import AnimatedTitle from "./animated-title";
-import { getAboutImageClipPath, getFullScreenClipPath } from "@/lib/utils";
+import { getIntroImageClipPath, getFullScreenClipPath } from "@/lib/utils";
 import useWindowDimensions from "@/hooks/use-window-dimensions";
 import { Fragment, useEffect, useRef, useState } from "react";
 
@@ -13,7 +13,7 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
 }
 
-export default function About() {
+export default function Intro() {
   const windowDimensions = useWindowDimensions();
   const [imageClipPath, setImageClipPath] = useState("");
   const [fullScreenClipPath, setFullScreenClipPath] = useState("");
@@ -25,7 +25,7 @@ export default function About() {
   const titleContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setImageClipPath(getAboutImageClipPath(windowDimensions));
+    setImageClipPath(getIntroImageClipPath(windowDimensions));
     setFullScreenClipPath(getFullScreenClipPath(windowDimensions));
   }, [windowDimensions]);
 
@@ -54,15 +54,20 @@ export default function About() {
             end: "bottom top",
             scrub: 0.5,
             pin: true,
-            invalidateOnRefresh: true,
             onLeave: () => {
               gsap.set(imageBorderPathRef.current, {
                 display: "none",
+              });
+              gsap.set(clipPathContainerRef.current, {
+                backgroundColor: "black",
               });
             },
             onEnterBack: () => {
               gsap.set(imageBorderPathRef.current, {
                 display: "block",
+              });
+              gsap.set(clipPathContainerRef.current, {
+                backgroundColor: "unset",
               });
             },
           },
@@ -109,7 +114,7 @@ export default function About() {
   );
 
   return (
-    <div id="about" className="mt-16 sm:mt-[7.5rem]">
+    <section id="intro" className="mt-16 sm:mt-[7.5rem]">
       <div className="flex flex-col items-center justify-center gap-3">
         <p className="font-general text-[10px] uppercase">
           {"Welcom to Zentry".split(" ").map((word, index) => (
@@ -132,8 +137,9 @@ export default function About() {
       </div>
 
       <div
+        id="pinned-intro-element"
         ref={clipPathContainerRef}
-        className="relative flex size-full min-h-dvh w-full flex-col items-center gap-5 overflow-hidden pb-16"
+        className="relative flex size-full min-h-screen w-full flex-col items-center gap-5 overflow-hidden pb-16"
       >
         <div
           ref={imageContainerRef}
@@ -160,7 +166,7 @@ export default function About() {
             style={{ scale: 1.2 }}
           >
             <Image
-              src="/img/about.webp"
+              src="/img/intro.webp"
               alt="background"
               fill
               sizes="100vw"
@@ -193,6 +199,6 @@ export default function About() {
           </p>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

@@ -5,7 +5,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import gsap from "gsap";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Button } from "./button";
+import { Button } from "./ui/button";
 import { TiLocationArrow } from "react-icons/ti";
 import { cn } from "@/lib/utils";
 
@@ -220,11 +220,11 @@ export default function Navbar() {
   });
 
   return (
-    <div ref={navContainerRef} className="fixed z-50 sm:inset-x-4">
+    <div ref={navContainerRef} className="fixed inset-x-2 z-50 sm:inset-x-4">
       <div className="relative mt-2 overflow-hidden rounded-lg">
         <div
           ref={navBackgroundRef}
-          className="absolute inset-0 rounded-lg border border-neutral-800 bg-black opacity-0"
+          className="border-border absolute inset-0 rounded-lg border bg-black opacity-0"
         />
         <nav
           ref={navRef}

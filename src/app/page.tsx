@@ -1,4 +1,5 @@
-import About from "@/components/about";
+import Intro from "@/components/intro";
+import Products from "@/components/products/products";
 import Hero from "@/components/hero";
 import Navbar from "@/components/navbar";
 
@@ -10,8 +11,8 @@ export default function Home() {
       </header>
       <main className="relative min-h-screen w-full overflow-x-hidden">
         <Hero />
-        <About />
-        <section className="min-h-screen w-full bg-black" />
+        <Intro />
+        <Products />
       </main>
     </>
   );
