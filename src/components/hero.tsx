@@ -17,6 +17,7 @@ import {
 } from "@/lib/utils";
 import useMouseMoving from "@/hooks/use-mouse-moving";
 import useScrolledToTop from "@/hooks/use-scrolled-to-top";
+import { ListBlobResultBlob } from "@vercel/blob";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -47,27 +48,38 @@ function splitAndMapTextWithTags(str: string, className: string) {
   });
 }
 
-const heroVideos = [
-  {
-    initialZIndex: 10,
-    autoPlay: false,
-    src: "videos/hero-1.mp4",
-  },
-  {
-    initialZIndex: 20,
-    src: "videos/hero-2.mp4",
-  },
-  {
-    initialZIndex: -10,
-    initialDisplay: "none",
-    src: "videos/hero-3.mp4",
-  },
-  {
-    initialZIndex: -10,
-    initialDisplay: "none",
-    src: "videos/hero-4.mp4",
-  },
-];
+function getHeroVideos(heroVideosBlob: ListBlobResultBlob[]) {
+  const videoMap = new Map(
+    heroVideosBlob.map((video) => [
+      video.pathname.split("/").at(-1),
+      video.url,
+    ]),
+  );
+
+  const heroVideos = [
+    {
+      initialZIndex: 10,
+      autoPlay: false,
+      src: videoMap.get("hero-1.mp4"),
+    },
+    {
+      initialZIndex: 20,
+      src: videoMap.get("hero-2.mp4"),
+    },
+    {
+      initialZIndex: -10,
+      initialDisplay: "none",
+      src: videoMap.get("hero-3.mp4"),
+    },
+    {
+      initialZIndex: -10,
+      initialDisplay: "none",
+      src: videoMap.get("hero-4.mp4"),
+    },
+  ];
+
+  return heroVideos;
+}
 
 const MIN_HIT_AREA_SIDE_LENGTH = 100;
 const MAX_HIT_AREA_SIDE_LENGTH = 250;
@@ -79,7 +91,11 @@ const animatedTitles = [
   "lif<b>e</b>style",
 ];
 
-export default function Hero() {
+type Props = {
+  heroVideosBlob: ListBlobResultBlob[];
+};
+
+export default function Hero({ heroVideosBlob }: Props) {
   const isMouseMoving = useMouseMoving();
   const isScrolledToTop = useScrolledToTop();
   const windowDimensions = useWindowDimensions();
@@ -108,6 +124,7 @@ export default function Hero() {
   const videoItemContentRefs = useRef<(HTMLDivElement | null)[]>([]);
   const videoItemBorderRefs = useRef<(SVGPathElement | null)[]>([]);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const heroVideos = getHeroVideos(heroVideosBlob);
   const totalVideos = heroVideos.length;
   const previousVideoNumber =
     (currentVideoNumber - 1 + totalVideos) % totalVideos;

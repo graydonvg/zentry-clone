@@ -8,6 +8,7 @@ import Image from "next/image";
 import { Button } from "./ui/button";
 import { TiLocationArrow } from "react-icons/ti";
 import { cn } from "@/lib/utils";
+import { ListBlobResultBlob } from "@vercel/blob";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -33,7 +34,11 @@ const navItems = [
   },
 ];
 
-export default function Navbar() {
+type Props = {
+  audioBlob: ListBlobResultBlob[];
+};
+
+export default function Navbar({ audioBlob }: Props) {
   const navContainerRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLElement>(null);
   const navBackgroundRef = useRef<HTMLDivElement>(null);
@@ -278,7 +283,8 @@ export default function Navbar() {
               >
                 <audio
                   ref={audioElementRef}
-                  src="/audio/loop.mp3"
+                  src={audioBlob[0].url}
+                  // src="/audio/loop.mp3"
                   loop
                   className="hidden"
                 />
