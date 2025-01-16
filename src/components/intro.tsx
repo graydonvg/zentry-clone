@@ -4,10 +4,10 @@ import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import gsap from "gsap";
 import Image from "next/image";
-import AnimatedTitle from "./animated-title";
+import AnimatedTitle from "./animation/animated-title";
 import { getIntroImageClipPath, getFullScreenClipPath } from "@/lib/utils";
 import useWindowDimensions from "@/hooks/use-window-dimensions";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -22,27 +22,11 @@ export default function Intro() {
   const imageBorderPathRef = useRef<SVGPathElement>(null);
   const imageContentWrapperRef = useRef<HTMLImageElement>(null);
   const stonesImageRef = useRef<HTMLImageElement>(null);
-  const titleContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setImageClipPath(getIntroImageClipPath(windowDimensions));
     setFullScreenClipPath(getFullScreenClipPath(windowDimensions));
   }, [windowDimensions]);
-
-  useGSAP(() => {
-    gsap.to(".welcome-word", {
-      opacity: 1,
-      duration: 0.01,
-      stagger: {
-        amount: 0.2,
-      },
-      scrollTrigger: {
-        trigger: titleContainerRef.current,
-        start: "50% bottom",
-        toggleActions: "play none none reverse",
-      },
-    });
-  });
 
   useGSAP(
     () => {
@@ -115,26 +99,12 @@ export default function Intro() {
 
   return (
     <section id="intro" className="mt-16 sm:mt-[7.5rem]">
-      <div className="flex flex-col items-center justify-center gap-3">
-        <p className="font-general text-[10px] uppercase">
-          {"Welcom to Zentry".split(" ").map((word, index) => (
-            <Fragment key={index}>
-              <span
-                className="welcome-word inline-flex opacity-0"
-                style={{ willChange: "opacity" }}
-                dangerouslySetInnerHTML={{ __html: word }}
-              />{" "}
-            </Fragment>
-          ))}
-        </p>
-
-        <AnimatedTitle
-          ref={titleContainerRef}
-          titleLrg="Disc<b>o</b>ver the world's<br />largest shared <b>a</b>dventure"
-          titleSml="Disc<b>o</b>ver the<br />world's largest<br />shared <b>a</b>dventure"
-          containerClassName="mt-5 text-black"
-        />
-      </div>
+      <AnimatedTitle
+        titleLrg="Disc<b>o</b>ver the world's<br />largest shared <b>a</b>dventure"
+        titleSml="Disc<b>o</b>ver the<br />world's largest<br />shared <b>a</b>dventure"
+        caption="Welcom to Zentry"
+        containerClassName="mt-5 text-black"
+      />
 
       <div
         id="pinned-intro-element"

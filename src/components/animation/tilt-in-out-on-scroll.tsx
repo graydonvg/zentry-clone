@@ -12,7 +12,7 @@ type Props = {
   children: ReactNode;
 };
 
-export default function TiltInOnViewportEnter({
+export default function TiltInOutOnScroll({
   containerClassName,
   children,
 }: Props) {

@@ -40,8 +40,10 @@ export default function TiltOnHover({
       const relativeX = (e.clientX - tiltItemRect.left) / tiltItemRect.width;
       const relativeY = (e.clientY - tiltItemRect.top) / tiltItemRect.height;
 
-      const tiltX = (relativeY - 0.5) * 5;
-      const tiltY = (relativeX - 0.5) * -5;
+      const tiltIntensity = 5;
+
+      const tiltX = (relativeY - 0.5) * tiltIntensity;
+      const tiltY = (relativeX - 0.5) * -tiltIntensity;
 
       gsap.to(tiltItem, {
         transform: `perspective(500px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(0.95)`,

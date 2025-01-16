@@ -2,8 +2,8 @@ import { ReactNode, useEffect, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import TiltOnHover from "../tilt-on-hover";
-import TiltInOnViewportEnter from "../tilt-in-on-viewport-enter";
+import TiltOnHover from "../animation/tilt-on-hover";
+import TiltInOutOnScroll from "../animation/tilt-in-out-on-scroll";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(useGSAP, ScrollTrigger);
@@ -40,7 +40,7 @@ export default function ProductCard({
   }, [isHovering, autoplay]);
 
   return (
-    <TiltInOnViewportEnter containerClassName={containerClassName}>
+    <TiltInOutOnScroll containerClassName={containerClassName}>
       <TiltOnHover
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
@@ -69,6 +69,6 @@ export default function ProductCard({
           </div>
         </div>
       </TiltOnHover>
-    </TiltInOnViewportEnter>
+    </TiltInOutOnScroll>
   );
 }

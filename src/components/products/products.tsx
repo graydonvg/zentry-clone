@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import ProductCard from "./product-card";
-import TiltOnHover from "../tilt-on-hover";
-import TiltInOnViewportEnter from "../tilt-in-on-viewport-enter";
+import TiltOnHover from "../animation/tilt-on-hover";
+import TiltInOutOnScroll from "../animation/tilt-in-out-on-scroll";
 import { ListBlobResultBlob } from "@vercel/blob";
 
 function getProductVideos(productVideosBlob: ListBlobResultBlob[]) {
@@ -101,7 +101,7 @@ export default function Products({ productVideosBlob }: Props) {
             containerClassName="order-3 col-span-2 row-span-1 mr-auto aspect-[266/190] w-4/5 md:order-4 md:col-span-1 md:aspect-[630/400] md:w-full"
           />
 
-          <TiltInOnViewportEnter containerClassName="order-5 col-span-2 aspect-square w-1/2 md:col-span-1 md:aspect-[630/400] md:w-full">
+          <TiltInOutOnScroll containerClassName="order-5 col-span-2 aspect-square w-1/2 md:col-span-1 md:aspect-[630/400] md:w-full">
             <TiltOnHover className="flex size-full overflow-hidden rounded-lg bg-violet-300 p-5">
               <div className="flex-1">
                 <h2 className="special-font font-zentry text-[clamp(1.875rem,1.0227rem+4.2614vw,3.75rem)]/[0.82]">
@@ -120,7 +120,7 @@ export default function Products({ productVideosBlob }: Props) {
                 />
               </div>
             </TiltOnHover>
-          </TiltInOnViewportEnter>
+          </TiltInOutOnScroll>
 
           <ProductCard
             src={productVideos[4].src || ""}
