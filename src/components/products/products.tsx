@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import ProductCard from "./product-card";
 import TiltOnHover from "../animation/tilt-on-hover";
 import TiltInOutOnScroll from "../animation/tilt-in-out-on-scroll";
@@ -44,7 +43,7 @@ export default function Products({ productVideosBlob }: Props) {
 
   return (
     <section className="min-h-screen bg-black">
-      <div className="mx-auto max-w-screen-2xl space-y-32 overflow-hidden px-3 py-32 md:px-10">
+      <div className="mx-auto max-w-screen-2xl space-y-32 overflow-hidden px-3 py-32 sm:px-8 md:px-24">
         <div>
           <p className="font-circular-web text-lg/none text-blue-50">
             Explore the Zentry Universe
@@ -112,12 +111,14 @@ export default function Products({ productVideosBlob }: Props) {
                   <br />
                 </h2>
               </div>
-              <div className="relative -bottom-5 -right-5 mt-auto size-[15vw] max-h-24 max-w-24 shrink-0">
-                <Image
-                  src="/img/zentry-symbol-black.png"
-                  alt="zentry logo"
-                  fill
-                />
+              <div className="bottom-0 right-0 mt-auto">
+                <svg
+                  aria-hidden="true"
+                  className="size-[10vw] md:size-[3.5vw]"
+                  fill="black"
+                >
+                  <use href="/arrows-icon.svg#arrows-icon"></use>
+                </svg>
               </div>
             </TiltOnHover>
           </TiltInOutOnScroll>

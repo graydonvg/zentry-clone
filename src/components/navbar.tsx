@@ -4,7 +4,6 @@ import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import gsap from "gsap";
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import { Button } from "./ui/button";
 import { TiLocationArrow } from "react-icons/ti";
 import { cn } from "@/lib/utils";
@@ -240,18 +239,14 @@ export default function Navbar({ audioBlob }: Props) {
           ref={navRef}
           className="relative flex size-full items-center justify-between p-4"
         >
-          <div className="flex items-center gap-7">
-            <Image
-              src="/img/zentry-symbol-white.png"
-              alt="logo"
-              width={60}
-              height={60}
-              className="absolute left-1 top-0"
-            />
+          <div className="flex items-center gap-8">
+            <svg aria-hidden="true" className="size-8" fill="white">
+              <use href="/arrows-icon.svg#arrows-icon"></use>
+            </svg>
             <Button
               id="product-button"
               rightIcon={<TiLocationArrow className="rotate-[135deg]" />}
-              className="ml-16 bg-blue-50 px-4 py-2"
+              className="bg-blue-50 px-4 py-2"
             >
               Products
             </Button>
