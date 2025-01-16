@@ -97,7 +97,7 @@ export default function Navbar({ audioBlob }: Props) {
       tl.to(
         navBackgroundRef.current,
         {
-          opacity: isScrollYTop ? 0 : 1,
+          autoAlpha: isScrollYTop ? 0 : 1,
           duration: 0.2,
         },
         ">",
@@ -147,7 +147,7 @@ export default function Navbar({ audioBlob }: Props) {
           left: linkBackgroundLeft,
           height: linkBackgroundHeight,
           width: linkBackgroundWidth,
-          opacity: 1,
+          autoAlpha: 1,
         });
 
         gsap.set(target, {
@@ -198,7 +198,7 @@ export default function Navbar({ audioBlob }: Props) {
       isFirstMouseEnterRef.current = true;
 
       gsap.set(navLinkBackground, {
-        opacity: 0,
+        autoAlpha: 0,
       });
     });
 
@@ -225,11 +225,16 @@ export default function Navbar({ audioBlob }: Props) {
   });
 
   return (
-    <div ref={navContainerRef} className="fixed inset-x-2 z-50 sm:inset-x-4">
+    <div
+      ref={navContainerRef}
+      className="fixed inset-x-2 z-50 sm:inset-x-4"
+      style={{ willChange: "transform" }}
+    >
       <div className="relative mt-2 overflow-hidden rounded-lg">
         <div
           ref={navBackgroundRef}
           className="border-border absolute inset-0 rounded-lg border bg-black opacity-0"
+          style={{ willChange: "opacity" }}
         />
         <nav
           ref={navRef}
@@ -254,6 +259,7 @@ export default function Navbar({ audioBlob }: Props) {
           <div
             ref={navLinkBackgroundRef}
             className="pointer-events-none absolute z-40 rounded-3xl bg-white"
+            style={{ willChange: "opacity, transform" }}
           />
           <ul className="z-50 hidden items-center md:flex">
             <div ref={navLinksContainerRef} className="flex">

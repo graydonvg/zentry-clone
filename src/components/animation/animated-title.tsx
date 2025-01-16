@@ -25,51 +25,116 @@ export default function AnimatedTitle({
 
   useGSAP(
     () => {
-      gsap
-        .timeline({
-          scrollTrigger: {
-            trigger: titleContainerRef.current,
-            start: "70% bottom",
-            toggleActions: "play none none reverse",
-          },
-        })
-        .to(".caption .animated-word", {
-          opacity: 1,
-          duration: 0.01,
-          stagger: {
-            amount: 0.2,
-          },
-        })
+      gsap.set(".caption .animated-word", { autoAlpha: 0 });
+      gsap.set("h2", { autoAlpha: 0 });
+      gsap.set("h2 .animated-word", { autoAlpha: 0 });
 
-        .to(
-          "h2",
-          {
-            opacity: 1,
-            duration: 0.01,
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: titleContainerRef.current,
+          start: "70% bottom",
+          onEnter: () => {
+            tl.fromTo(
+              ".caption .animated-word",
+              { autoAlpha: 0 },
+              {
+                autoAlpha: 1,
+                duration: 0.01,
+                stagger: {
+                  amount: 0.2,
+                },
+              },
+            )
+
+              .fromTo(
+                "h2",
+                { autoAlpha: 0 },
+                {
+                  autoAlpha: 1,
+                  duration: 0.01,
+                },
+                ">",
+              )
+              .fromTo(
+                "h2",
+                {
+                  transform:
+                    "perspective(1000px) translate3d(-110px, 50px, -60px) rotateY(-50deg) rotateX(-20deg)",
+                },
+                {
+                  transform:
+                    "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
+                  ease: "power2.out",
+                  duration: 1,
+                },
+                "<",
+              )
+              .fromTo(
+                "h2 .animated-word",
+                { autoAlpha: 0 },
+                {
+                  autoAlpha: 1,
+                  duration: 0.01,
+                  stagger: {
+                    amount: 0.3,
+                  },
+                },
+                "<",
+              );
           },
-          ">",
-        )
-        .to(
-          "h2",
-          {
-            transform:
-              "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
-            ease: "power2.out",
-            duration: 1,
+
+          onLeaveBack: () => {
+            tl.fromTo(
+              ".caption .animated-word",
+              { autoAlpha: 1 },
+              {
+                autoAlpha: 0,
+                duration: 0.01,
+                stagger: {
+                  amount: 0.2,
+                },
+              },
+            )
+
+              .fromTo(
+                "h2",
+                {
+                  transform:
+                    "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
+                },
+                {
+                  transform:
+                    "perspective(1000px) translate3d(110px, 50px, -60px) rotateY(50deg) rotateX(-20deg)",
+                  ease: "power2.out",
+                  duration: 1,
+                },
+                ">",
+              )
+              .fromTo(
+                "h2 .animated-word",
+                { autoAlpha: 1 },
+                {
+                  autoAlpha: 0,
+                  duration: 0.01,
+                  stagger: {
+                    amount: 0.2,
+                    from: "end",
+                  },
+                },
+                "<",
+              )
+              .fromTo(
+                "h2",
+                { opacity: 1 },
+                {
+                  opacity: 0,
+                  duration: 0.01,
+                },
+                ">",
+              );
           },
-          "<",
-        )
-        .to(
-          "h2 .animated-word",
-          {
-            opacity: 1,
-            duration: 0.01,
-            stagger: {
-              amount: 0.3,
-            },
-          },
-          "<",
-        );
+        },
+      });
     },
     { scope: titleContainerRef },
   );
@@ -84,7 +149,7 @@ export default function AnimatedTitle({
           {caption.split(" ").map((word, index) => (
             <Fragment key={index}>
               <span
-                className="animated-word inline-flex opacity-0"
+                className="animated-word inline-flex"
                 style={{ willChange: "opacity" }}
                 dangerouslySetInnerHTML={{ __html: word }}
               />{" "}
@@ -95,12 +160,10 @@ export default function AnimatedTitle({
 
       <h2
         className={cn(
-          "hidden flex-col gap-1 text-[clamp(3.125rem,1.0662rem+5.1471vw,7.5rem)] uppercase leading-[.8] text-white opacity-0 sm:flex sm:px-32",
+          "hidden flex-col gap-1 text-[clamp(3.125rem,1.0662rem+5.1471vw,7.5rem)] uppercase leading-[.8] text-white sm:flex sm:px-32",
           containerClassName,
         )}
         style={{
-          transform:
-            "perspective(1000px) translate3d(-110px, 50px, -60px) rotateY(-50deg) rotateX(-20deg)",
           transformOrigin: "50% 50% -150px",
           willChange: "transform, opacity",
         }}
@@ -113,7 +176,7 @@ export default function AnimatedTitle({
             {line.split(" ").map((word, index) => (
               <span
                 key={index}
-                className="animated-word special-font font-zentry font-black opacity-0"
+                className="animated-word special-font font-zentry font-black"
                 style={{ willChange: "opacity" }}
                 dangerouslySetInnerHTML={{ __html: word }}
               />
@@ -123,7 +186,7 @@ export default function AnimatedTitle({
       </h2>
       <h2
         className={cn(
-          "flex flex-col gap-1 text-[clamp(2.5rem,0rem+12.5vw,5rem)] uppercase leading-[.8] text-white opacity-0 sm:hidden",
+          "flex flex-col gap-1 text-[clamp(2.5rem,0rem+12.5vw,5rem)] uppercase leading-[.8] text-white sm:hidden",
           containerClassName,
         )}
         style={{
