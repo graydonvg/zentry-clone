@@ -3,6 +3,7 @@ import Products from "@/components/products/products";
 import Hero from "@/components/hero";
 import Navbar from "@/components/navbar";
 import { list } from "@vercel/blob";
+import Narrative from "@/components/narrative";
 
 export default async function Home() {
   const { blobs } = await list();
@@ -26,6 +27,7 @@ export default async function Home() {
         <Hero heroVideosBlob={heroVideosBlob} />
         <Intro />
         <Products productVideosBlob={productVideosBlob} />
+        <Narrative />
       </main>
     </>
   );

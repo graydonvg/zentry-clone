@@ -253,7 +253,7 @@ export default function Navbar({ audioBlob }: Props) {
           </div>
           <div
             ref={navLinkBackgroundRef}
-            className="pointer-events-none absolute z-40 rounded-3xl bg-white"
+            className="pointer-events-none absolute z-40 rounded-3xl bg-blue-50"
             style={{ willChange: "opacity, transform" }}
           />
           <ul className="z-50 hidden items-center md:flex">

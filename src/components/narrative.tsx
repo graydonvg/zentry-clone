@@ -1,7 +1,110 @@
-// "use client";
+"use client";
 
-// type Props = {};
+import Image from "next/image";
+import AnimatedTitle from "./animation/animated-title";
+import { useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import RoundedCorners from "./rounded-corners";
 
-// export default function Narrative() {
-//   return <div></div>;
-// }
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(useGSAP);
+}
+
+export default function Narrative() {
+  const pinnedIntroElement =
+    typeof window !== "undefined"
+      ? document.getElementById("pinned-intro-element")
+      : null;
+  const pinnedIntroElementHeight = pinnedIntroElement?.clientHeight ?? 0;
+  const imageClipPathRef = useRef<HTMLDivElement>(null);
+  const imageContentRef = useRef<HTMLDivElement>(null);
+
+  useGSAP((_context, contextSafe) => {
+    const imageClipPath = imageClipPathRef.current;
+    const imageContent = imageContentRef.current;
+
+    if (!imageClipPath || !imageContent || !contextSafe) return;
+
+    function getElementReact(element: HTMLElement) {
+      return element.getBoundingClientRect();
+    }
+
+    const handleMouseMove = contextSafe((e: MouseEvent) => {
+      const imageClipPathRect = getElementReact(imageClipPath);
+
+      const relativeX =
+        (e.clientX - imageClipPathRect.left) / imageClipPathRect.width;
+      const relativeY =
+        (e.clientY - imageClipPathRect.top) / imageClipPathRect.height;
+
+      const tiltIntensity = 1;
+
+      const tiltX = (relativeY - 0.5) * -tiltIntensity;
+      const tiltY = (relativeX - 0.5) * tiltIntensity;
+
+      gsap.to(imageClipPath, {
+        rotateX: tiltX,
+        rotateY: tiltY,
+        transformPerspective: 100,
+        transformOrigin: "center",
+      });
+
+      gsap.to(imageContent, {
+        rotateY: -tiltY,
+        rotateX: -tiltX,
+        transformPerspective: 100,
+        transformOrigin: "center",
+      });
+    });
+
+    window.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  });
+
+  return (
+    <section
+      id="narrative"
+      className="min-h-screen w-full bg-black text-blue-50"
+    >
+      <div className="flex size-full flex-col items-center pb-24 pt-10">
+        <AnimatedTitle
+          caption="the open ip universe"
+          titleLrg="the st<b>o</b>ry of<br />a hidden real<b>m</b>"
+          titleSml="the st<b>o</b>ry of<br />a hidden real<b>m</b>"
+          scrollTriggerOffset={pinnedIntroElementHeight}
+          containerClassName="mix-blend-difference z-10"
+        />
+
+        <div
+          className="relative flex size-full min-h-screen justify-center"
+          style={{ filter: "url(#flt_tag)" }}
+        >
+          <div
+            ref={imageClipPathRef}
+            className="absolute -top-24 h-2/3 w-[80vw] max-w-[60%] overflow-hidden"
+            style={{
+              clipPath: "polygon(4% 0%, 93% 20%, 100% 73%, 10% 100%)",
+            }}
+          >
+            <div
+              ref={imageContentRef}
+              className="story-img-content absolute inset-0 size-full"
+            >
+              <Image
+                src="/img/entrance.webp"
+                alt="entrance"
+                fill
+                className="scale-150"
+              />
+            </div>
+          </div>
+          <RoundedCorners />
+        </div>
+      </div>
+    </section>
+  );
+}

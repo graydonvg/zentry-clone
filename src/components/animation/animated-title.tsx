@@ -13,6 +13,7 @@ type Props = {
   titleSml: string;
   caption?: string;
   containerClassName?: string;
+  scrollTriggerOffset?: number;
 };
 
 export default function AnimatedTitle({
@@ -20,6 +21,7 @@ export default function AnimatedTitle({
   titleSml,
   containerClassName,
   caption,
+  scrollTriggerOffset,
 }: Props) {
   const titleContainerRef = useRef<HTMLDivElement>(null);
 
@@ -32,8 +34,12 @@ export default function AnimatedTitle({
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: titleContainerRef.current,
-          start: "70% bottom",
+          start: scrollTriggerOffset
+            ? `70%+=${scrollTriggerOffset} bottom`
+            : "70% bottom",
           onEnter: () => {
+            tl.clear();
+
             tl.fromTo(
               ".caption .animated-word",
               { autoAlpha: 0 },
@@ -142,10 +148,10 @@ export default function AnimatedTitle({
   return (
     <div
       ref={titleContainerRef}
-      className="flex flex-col items-center justify-center gap-4 sm:gap-6 md:gap-8"
+      className="flex flex-col items-center justify-center gap-4 space-y-5 sm:gap-6 md:gap-8"
     >
       {caption && (
-        <p className="caption font-general text-[clamp(0.75rem,0.7262rem+0.119vw,0.875rem)] font-medium uppercase leading-none">
+        <p className="caption font-general text-[clamp(0.625rem,0.5074rem+0.2941vw,0.875rem)] font-medium uppercase leading-none">
           {caption.split(" ").map((word, index) => (
             <Fragment key={index}>
               <span
@@ -184,30 +190,32 @@ export default function AnimatedTitle({
           </div>
         ))}
       </h2>
-      <h2
-        className={cn(
-          "flex flex-col gap-1 text-[clamp(2.5rem,0rem+12.5vw,5rem)] uppercase leading-[.8] text-white sm:hidden",
-          containerClassName,
-        )}
-        style={{
-          transform:
-            "perspective(1000px)  translate3d(-110px, 50px, -60px) rotateY(-50deg) rotateX(-20deg)",
-          transformOrigin: "50% 50% -150px",
-          willChange: "transform, opacity",
-        }}
-      >
-        {titleSml.split("<br />").map((line, index) => (
-          <div key={index} className="flex-center max-w-full flex-wrap px-4">
-            {line.split(" ").map((word, index) => (
-              <span
-                key={index}
-                className="special-font mr-2 font-zentry font-black"
-                dangerouslySetInnerHTML={{ __html: word }}
-              />
-            ))}
-          </div>
-        ))}
-      </h2>
+      {titleSml && (
+        <h2
+          className={cn(
+            "flex flex-col gap-1 text-[clamp(2.5rem,0rem+12.5vw,5rem)] uppercase leading-[.8] text-white sm:hidden",
+            containerClassName,
+          )}
+          style={{
+            transform:
+              "perspective(1000px)  translate3d(-110px, 50px, -60px) rotateY(-50deg) rotateX(-20deg)",
+            transformOrigin: "50% 50% -150px",
+            willChange: "transform, opacity",
+          }}
+        >
+          {titleSml.split("<br />").map((line, index) => (
+            <div key={index} className="flex-center max-w-full flex-wrap px-4">
+              {line.split(" ").map((word, index) => (
+                <span
+                  key={index}
+                  className="special-font mr-2 font-zentry font-black"
+                  dangerouslySetInnerHTML={{ __html: word }}
+                />
+              ))}
+            </div>
+          ))}
+        </h2>
+      )}
     </div>
   );
 }

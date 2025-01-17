@@ -103,7 +103,7 @@ export default function Intro() {
         titleLrg="Disc<b>o</b>ver the world's<br />largest shared <b>a</b>dventure"
         titleSml="Disc<b>o</b>ver the<br />world's largest<br />shared <b>a</b>dventure"
         caption="Welcom to Zentry"
-        containerClassName="mt-5 text-black"
+        containerClassName="text-black"
       />
 
       <div

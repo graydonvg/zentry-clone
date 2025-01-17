@@ -67,21 +67,6 @@ body {
     @apply flex items-center justify-center;
   }
 
-  .story-img-container {
-    @apply relative h-[90vh] w-full md:h-dvh;
-    filter: url("#flt_tag");
-  }
-
-  .story-img-mask {
-    @apply absolute left-0 top-0 size-full overflow-hidden md:left-[20%] md:top-[-10%] md:size-4/5;
-    clip-path: polygon(4% 0, 83% 21%, 100% 73%, 0% 100%);
-  }
-
-  .story-img-content {
-    @apply absolute left-10 top-16 h-[50dvh] w-full opacity-100 md:left-0 md:top-10 md:h-dvh lg:left-[-300px] lg:top-[-100px];
-    transform: translate3d(0, 0, 0) rotateX(0) rotateY(0) rotateZ(0) scale(1);
-  }
-
   .gallery-img-container {
     @apply size-64 overflow-hidden bg-violet-300;
   }
