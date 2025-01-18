@@ -59,7 +59,7 @@ function getHeroVideos(heroVideosBlob: ListBlobResultBlob[]) {
   const heroVideos = [
     {
       initialZIndex: 10,
-      autoPlay: false,
+      autoPlay: true,
       src: videoMap.get("hero-1.mp4"),
     },
     {
@@ -119,6 +119,7 @@ export default function Hero({ heroVideosBlob }: Props) {
   });
   const heroRef = useRef<HTMLDivElement>(null);
   const hitAreaRef = useRef<HTMLDivElement>(null);
+  const fakeHitAreaRef = useRef<HTMLDivElement>(null);
   const heroBorderRef = useRef<SVGPathElement>(null);
   const videoItemContainerRefs = useRef<(HTMLDivElement | null)[]>([]);
   const videoItemContentRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -161,12 +162,114 @@ export default function Hero({ heroVideosBlob }: Props) {
 
   useGSAP(
     () => {
+      gsap.set(videoItemContentRefs.current[nextVideoNumber], {
+        clipPath: `path("${hiddenVideoClipPath}")`,
+      });
+      gsap.set(videoItemBorderRefs.current[nextVideoNumber], {
+        attr: {
+          d: hiddenVideoClipPath,
+        },
+      });
+    },
+    { dependencies: [hiddenVideoClipPath] },
+  );
+
+  useGSAP(
+    (_context, contextSafe) => {
+      const nextVideoClipPath = videoItemContentRefs.current[nextVideoNumber];
+      const nextVideo = videoRefs.current[nextVideoNumber];
+      const hitArea = hitAreaRef.current;
+      const fakeHitArea = fakeHitAreaRef.current;
+
+      if (
+        !nextVideoClipPath ||
+        !nextVideo ||
+        !hitArea ||
+        !fakeHitArea ||
+        !contextSafe
+      )
+        return;
+
+      function getElementReact(element: HTMLElement) {
+        return element.getBoundingClientRect();
+      }
+
+      const handleMouseMove = contextSafe((e: MouseEvent) => {
+        const fakeHitAreaRect = getElementReact(fakeHitArea);
+
+        const centerX = fakeHitAreaRect.left + fakeHitAreaRect.width / 2;
+        const centerY = fakeHitAreaRect.top + fakeHitAreaRect.height / 2;
+
+        const translateIntensity = 0.2;
+
+        const translateX = (e.clientX - centerX) * translateIntensity;
+        const translateY = (e.clientY - centerY) * translateIntensity;
+
+        gsap.to(hitArea, {
+          translateX,
+          translateY,
+        });
+
+        gsap.to(nextVideoClipPath, {
+          translateX,
+          translateY,
+        });
+
+        gsap.to(nextVideo, {
+          translateX: -translateX,
+          translateY: -translateY,
+        });
+
+        const relativeX =
+          (e.clientX - fakeHitAreaRect.left) / fakeHitAreaRect.width;
+        const relativeY =
+          (e.clientY - fakeHitAreaRect.top) / fakeHitAreaRect.height;
+
+        const tiltIntensity = 3;
+
+        let tiltX = (relativeY - 0.5) * -tiltIntensity;
+        let tiltY = (relativeX - 0.5) * tiltIntensity;
+
+        // Clamp the values between -7 and 7
+        tiltX = Math.max(-7, Math.min(7, tiltX));
+        tiltY = Math.max(-7, Math.min(7, tiltY));
+
+        gsap.to(hitArea, {
+          rotateX: tiltX,
+          rotateY: tiltY,
+        });
+
+        gsap.to(nextVideoClipPath, {
+          rotateX: tiltX,
+          rotateY: tiltY,
+        });
+
+        gsap.to(nextVideo, {
+          rotateY: -tiltY,
+          rotateX: -tiltX,
+        });
+      });
+
+      window.addEventListener("mousemove", handleMouseMove);
+
+      return () => {
+        window.removeEventListener("mousemove", handleMouseMove);
+      };
+    },
+    {
+      dependencies: [nextVideoNumber],
+      revertOnUpdate: true,
+    },
+  );
+
+  useGSAP(
+    () => {
       if (isTransitioning) return;
 
       if (isMouseMoving && isScrolledToTop && !isMouseOverHitArea) {
-        gsap.to(hitAreaRef.current, {
-          scale: 1,
-        });
+        // gsap.to(hitAreaRef.current, {
+        //   scale: 1,
+        // });
         gsap.to(videoItemContentRefs.current[nextVideoNumber], {
           clipPath: `path("${nextVideoClipPath}")`,
           duration: 1,
@@ -182,9 +285,9 @@ export default function Hero({ heroVideosBlob }: Props) {
       } else {
         if (isMouseOverHitArea && isScrolledToTop) return;
 
-        gsap.to(hitAreaRef.current, {
-          scale: 0,
-        });
+        // gsap.to(hitAreaRef.current, {
+        //   scale: 0,
+        // });
         gsap.to(videoItemContentRefs.current[nextVideoNumber], {
           clipPath: `path("${hiddenVideoClipPath}")`,
           duration: 1,
@@ -452,7 +555,7 @@ export default function Hero({ heroVideosBlob }: Props) {
   );
 
   return (
-    <section className="relative h-screen w-full overflow-hidden">
+    <section className="relative min-h-screen w-full overflow-hidden">
       <div
         ref={heroRef}
         id="hero-slides"
@@ -471,13 +574,28 @@ export default function Hero({ heroVideosBlob }: Props) {
           ></path>
         </svg>
         <div
+          ref={fakeHitAreaRef}
+          className="pointer-events-none absolute left-1/2 top-1/2 z-50 aspect-square cursor-pointer select-none rounded-lg"
+          style={{
+            width: hitAreaSideLength,
+            height: hitAreaSideLength,
+            transform: "perspective(100px) translateX(-50%) translateY(-50%)",
+          }}
+        />
+
+        <div
           ref={hitAreaRef}
           onMouseEnter={() => setIsMouseOverHitArea(true)}
           onMouseLeave={() => setIsMouseOverHitArea(false)}
           onClick={handleHitAreaClicked}
-          className="absolute left-1/2 top-1/2 z-50 aspect-square -translate-x-1/2 -translate-y-1/2 scale-0 cursor-pointer rounded-lg"
-          style={{ width: hitAreaSideLength, height: hitAreaSideLength }}
-        ></div>
+          className="absolute left-1/2 top-1/2 z-50 aspect-square scale-100 cursor-pointer rounded-lg"
+          style={{
+            width: hitAreaSideLength,
+            height: hitAreaSideLength,
+            transform: "perspective(100px) translateX(-50%) translateY(-50%)",
+            willChange: "transform",
+          }}
+        />
 
         {heroVideos.map((video, index) => {
           const clipPath =
@@ -503,9 +621,11 @@ export default function Hero({ heroVideosBlob }: Props) {
                 ref={(el) => {
                   videoItemContentRefs.current[index] = el;
                 }}
-                className="absolute left-0 top-0 z-10 size-full bg-violet-300"
+                className="absolute left-0 top-0 z-10 size-full overflow-hidden bg-violet-300"
                 style={{
                   clipPath: `path("${clipPath}")`,
+                  transform: "perspective(100px)",
+                  willChange: "transform",
                 }}
               >
                 <svg
@@ -534,6 +654,10 @@ export default function Hero({ heroVideosBlob }: Props) {
                     loop
                     preload="metadata"
                     className="absolute left-0 top-0 size-full object-cover"
+                    style={{
+                      transform: "perspective(100px)",
+                      willChange: "transform",
+                    }}
                   />
                 </div>
               </div>
