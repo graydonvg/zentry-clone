@@ -1,8 +1,8 @@
+import { list } from "@vercel/blob";
+import Navbar from "@/components/navbar";
+import Hero from "@/components/hero";
 import Intro from "@/components/intro";
 import Products from "@/components/products/products";
-import Hero from "@/components/hero";
-import Navbar from "@/components/navbar";
-import { list } from "@vercel/blob";
 import Narrative from "@/components/narrative";
 
 export default async function Home() {

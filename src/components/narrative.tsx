@@ -38,7 +38,7 @@ export default function Narrative() {
       const relativeY =
         (e.clientY - imageClipPathRect.top) / imageClipPathRect.height;
 
-      const tiltIntensity = 1;
+      const tiltIntensity = 2;
 
       const tiltX = (relativeY - 0.5) * -tiltIntensity;
       const tiltY = (relativeX - 0.5) * tiltIntensity;

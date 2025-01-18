@@ -17,11 +17,12 @@ export default function Intro() {
   const windowDimensions = useWindowDimensions();
   const [imageClipPath, setImageClipPath] = useState("");
   const [fullScreenClipPath, setFullScreenClipPath] = useState("");
-  const clipPathContainerRef = useRef<HTMLDivElement>(null);
-  const imageContainerRef = useRef<HTMLDivElement>(null);
+  const pinnedElementRef = useRef<HTMLDivElement>(null);
+  const imageClipPathPathRef = useRef<HTMLDivElement>(null);
   const imageBorderPathRef = useRef<SVGPathElement>(null);
-  const imageContentWrapperRef = useRef<HTMLImageElement>(null);
+  const imageContentRef = useRef<HTMLImageElement>(null);
   const stonesImageRef = useRef<HTMLImageElement>(null);
+  const [allowTilt, setAllowTilt] = useState(true);
 
   useEffect(() => {
     setImageClipPath(getIntroImageClipPath(windowDimensions));
@@ -33,7 +34,7 @@ export default function Intro() {
       gsap
         .timeline({
           scrollTrigger: {
-            trigger: clipPathContainerRef.current,
+            trigger: pinnedElementRef.current,
             start: "top top",
             end: "bottom top",
             scrub: 0.5,
@@ -42,22 +43,24 @@ export default function Intro() {
               gsap.set(imageBorderPathRef.current, {
                 display: "none",
               });
-              gsap.set(clipPathContainerRef.current, {
+              gsap.set(pinnedElementRef.current, {
                 backgroundColor: "black",
               });
+              setAllowTilt(false);
             },
             onEnterBack: () => {
               gsap.set(imageBorderPathRef.current, {
                 display: "block",
               });
-              gsap.set(clipPathContainerRef.current, {
+              gsap.set(pinnedElementRef.current, {
                 backgroundColor: "unset",
               });
+              setAllowTilt(true);
             },
           },
         })
         .fromTo(
-          imageContainerRef.current,
+          imageClipPathPathRef.current,
           {
             clipPath: `path("${imageClipPath}")`,
           },
@@ -82,7 +85,7 @@ export default function Intro() {
           0,
         )
         .fromTo(
-          imageContentWrapperRef.current,
+          imageContentRef.current,
           { scale: 1.2 },
           { scale: 1, ease: "power1.inOut" },
           0,
@@ -97,6 +100,86 @@ export default function Intro() {
     { dependencies: [imageClipPath, fullScreenClipPath], revertOnUpdate: true },
   );
 
+  useGSAP(
+    (_context, contextSafe) => {
+      if (!allowTilt) return;
+
+      const imageClipPath = imageClipPathPathRef.current;
+      const imageContent = imageContentRef.current;
+      const stonesImage = stonesImageRef.current;
+
+      if (!imageClipPath || !imageContent || !stonesImage || !contextSafe)
+        return;
+
+      function getElementReact(element: HTMLElement) {
+        return element.getBoundingClientRect();
+      }
+
+      const maxTiltIntensity = 3;
+      let tiltIntensity = maxTiltIntensity;
+
+      const maxTranslateIntensity = 0.02;
+      let translateIntensity = maxTranslateIntensity;
+
+      ScrollTrigger.create({
+        trigger: pinnedElementRef.current,
+        start: "top top",
+        end: "bottom top",
+        scrub: 0.5,
+        onUpdate: (self) => {
+          tiltIntensity = maxTiltIntensity * (1 - self.progress);
+          translateIntensity = maxTranslateIntensity * (1 - self.progress);
+        },
+      });
+
+      const handleMouseMove = contextSafe((e: MouseEvent) => {
+        const imageClipPathRect = getElementReact(imageClipPath);
+        const imageContentRect = getElementReact(imageContent);
+
+        const centerX = imageContentRect.left + imageContentRect.width / 2;
+        const centerY = imageContentRect.top + imageContentRect.height / 2;
+
+        const translateX = (e.clientX - centerX) * translateIntensity;
+        const translateY = (e.clientY - centerY) * translateIntensity;
+
+        gsap.to(imageContent, {
+          translateX,
+          translateY,
+        });
+
+        gsap.to(stonesImage, {
+          translateX,
+          translateY,
+        });
+
+        const relativeX =
+          (e.clientX - imageClipPathRect.left) / imageClipPathRect.width;
+        const relativeY =
+          (e.clientY - imageClipPathRect.top) / imageClipPathRect.height;
+
+        const tiltX = (relativeY - 0.5) * -tiltIntensity;
+        const tiltY = (relativeX - 0.5) * tiltIntensity;
+
+        gsap.to(imageClipPath, {
+          rotateX: tiltX,
+          rotateY: tiltY,
+        });
+
+        gsap.to(imageContent, {
+          rotateY: -tiltY,
+          rotateX: -tiltX,
+        });
+      });
+
+      window.addEventListener("mousemove", handleMouseMove);
+
+      return () => {
+        window.removeEventListener("mousemove", handleMouseMove);
+      };
+    },
+    { dependencies: [allowTilt], revertOnUpdate: true },
+  );
+
   return (
     <section id="intro" className="mt-16 sm:mt-[7.5rem]">
       <AnimatedTitle
@@ -108,14 +191,16 @@ export default function Intro() {
 
       <div
         id="pinned-intro-element"
-        ref={clipPathContainerRef}
+        ref={pinnedElementRef}
         className="relative flex size-full min-h-screen w-full flex-col items-center gap-5 overflow-hidden pb-16"
       >
         <div
-          ref={imageContainerRef}
+          ref={imageClipPathPathRef}
           className="absolute left-0 top-0 z-10 size-full"
           style={{
             clipPath: `path("${imageClipPath}")`,
+            transform: "perspective(100px)",
+            willChange: "transform",
           }}
         >
           <svg
@@ -131,9 +216,13 @@ export default function Intro() {
             ></path>
           </svg>
           <div
-            ref={imageContentWrapperRef}
+            ref={imageContentRef}
             className="absolute left-0 top-0 size-full"
-            style={{ scale: 1.2 }}
+            style={{
+              scale: 1.2,
+              transform: "perspective(100px)",
+              willChange: "transform",
+            }}
           >
             <Image
               src="/img/intro.webp"
