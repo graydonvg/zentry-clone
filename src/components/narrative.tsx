@@ -80,7 +80,7 @@ export default function Narrative() {
       >
         <div
           ref={imageClipPathRef}
-          className="absolute top-24 aspect-[3/2] w-[90vw] max-w-screen-xl overflow-hidden sm:top-20 md:top-28 md:w-[60vw]"
+          className="absolute top-20 aspect-[3/2] w-[90vw] max-w-screen-xl overflow-hidden sm:top-20 md:top-28 md:w-[60vw]"
           style={{
             clipPath: "polygon(0% 0%, 83% 20%, 100% 73%, 10% 100%)",
             transform: "perspective(100px)",
