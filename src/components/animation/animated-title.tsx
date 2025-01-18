@@ -148,7 +148,10 @@ export default function AnimatedTitle({
   return (
     <div
       ref={titleContainerRef}
-      className="flex flex-col items-center justify-center gap-4 space-y-5 sm:gap-6 md:gap-8"
+      className={cn(
+        "flex flex-col items-center justify-center gap-4 space-y-5 sm:gap-6 md:gap-8",
+        containerClassName,
+      )}
     >
       {caption && (
         <p className="caption font-general text-[clamp(0.625rem,0.5074rem+0.2941vw,0.875rem)] font-medium uppercase leading-none">
@@ -165,10 +168,7 @@ export default function AnimatedTitle({
       )}
 
       <h2
-        className={cn(
-          "hidden flex-col gap-1 text-[clamp(3.125rem,1.0662rem+5.1471vw,7.5rem)] uppercase leading-[.8] text-white sm:flex sm:px-32",
-          containerClassName,
-        )}
+        className="hidden flex-col gap-1 text-[clamp(3.125rem,1.0662rem+5.1471vw,7.5rem)] uppercase leading-[.8] sm:flex sm:px-32"
         style={{
           transformOrigin: "50% 50% -150px",
           willChange: "transform, opacity",

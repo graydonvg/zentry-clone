@@ -46,15 +46,11 @@ export default function Narrative() {
       gsap.to(imageClipPath, {
         rotateX: tiltX,
         rotateY: tiltY,
-        transformPerspective: 100,
-        transformOrigin: "center",
       });
 
       gsap.to(imageContent, {
         rotateY: -tiltY,
         rotateX: -tiltX,
-        transformPerspective: 100,
-        transformOrigin: "center",
       });
     });
 
@@ -68,42 +64,46 @@ export default function Narrative() {
   return (
     <section
       id="narrative"
-      className="min-h-screen w-full bg-black text-blue-50"
+      className="relative flex size-full min-h-screen flex-col items-center overflow-hidden bg-black pt-10 text-blue-50"
     >
-      <div className="flex size-full flex-col items-center pb-24 pt-10">
-        <AnimatedTitle
-          caption="the open ip universe"
-          titleLrg="the st<b>o</b>ry of<br />a hidden real<b>m</b>"
-          titleSml="the st<b>o</b>ry of<br />a hidden real<b>m</b>"
-          scrollTriggerOffset={pinnedIntroElementHeight}
-          containerClassName="mix-blend-difference z-10"
-        />
+      <AnimatedTitle
+        caption="the open ip universe"
+        titleLrg="the st<b>o</b>ry of<br />a hidden real<b>m</b>"
+        titleSml="the st<b>o</b>ry of<br />a hidden real<b>m</b>"
+        scrollTriggerOffset={pinnedIntroElementHeight}
+        containerClassName="mix-blend-difference z-10"
+      />
 
+      <div
+        className="absolute flex h-fit w-full justify-center"
+        style={{ filter: "url(#flt_tag)" }}
+      >
         <div
-          className="relative flex size-full min-h-screen justify-center"
-          style={{ filter: "url(#flt_tag)" }}
+          ref={imageClipPathRef}
+          className="absolute top-24 aspect-[3/2] w-[90vw] max-w-screen-xl overflow-hidden sm:top-20 md:top-28 md:w-[60vw]"
+          style={{
+            clipPath: "polygon(0% 0%, 83% 20%, 100% 73%, 10% 100%)",
+            transform: "perspective(100px)",
+            willChange: "transform",
+          }}
         >
           <div
-            ref={imageClipPathRef}
-            className="absolute -top-24 h-2/3 w-[80vw] max-w-[60%] overflow-hidden"
+            ref={imageContentRef}
+            className="story-img-content absolute inset-0 size-full"
             style={{
-              clipPath: "polygon(4% 0%, 93% 20%, 100% 73%, 10% 100%)",
+              transform: "perspective(100px)",
+              willChange: "transform",
             }}
           >
-            <div
-              ref={imageContentRef}
-              className="story-img-content absolute inset-0 size-full"
-            >
-              <Image
-                src="/img/entrance.webp"
-                alt="entrance"
-                fill
-                className="scale-150"
-              />
-            </div>
+            <Image
+              src="/img/entrance.webp"
+              alt="entrance"
+              fill
+              className="scale-[1.5]"
+            />
           </div>
-          <RoundedCorners />
         </div>
+        <RoundedCorners />
       </div>
     </section>
   );
