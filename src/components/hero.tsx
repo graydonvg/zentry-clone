@@ -205,21 +205,6 @@ export default function Hero({ heroVideosBlob }: Props) {
         const translateX = (e.clientX - centerX) * translateIntensity;
         const translateY = (e.clientY - centerY) * translateIntensity;
 
-        gsap.to(hitArea, {
-          translateX,
-          translateY,
-        });
-
-        gsap.to(nextVideoClipPath, {
-          translateX,
-          translateY,
-        });
-
-        gsap.to(nextVideo, {
-          translateX: -translateX,
-          translateY: -translateY,
-        });
-
         const relativeX =
           (e.clientX - fakeHitAreaRect.left) / fakeHitAreaRect.width;
         const relativeY =
@@ -227,26 +212,34 @@ export default function Hero({ heroVideosBlob }: Props) {
 
         const tiltIntensity = 3;
 
-        let tiltX = (relativeY - 0.5) * -tiltIntensity;
-        let tiltY = (relativeX - 0.5) * tiltIntensity;
+        let rotateX = (relativeY - 0.5) * -tiltIntensity;
+        let rotateY = (relativeX - 0.5) * tiltIntensity;
 
         // Clamp the values between -7 and 7
-        tiltX = Math.max(-7, Math.min(7, tiltX));
-        tiltY = Math.max(-7, Math.min(7, tiltY));
+        rotateX = Math.max(-7, Math.min(7, rotateX));
+        rotateY = Math.max(-7, Math.min(7, rotateY));
 
         gsap.to(hitArea, {
-          rotateX: tiltX,
-          rotateY: tiltY,
+          translateX,
+          translateY,
+          rotateX,
+          rotateY,
         });
 
         gsap.to(nextVideoClipPath, {
-          rotateX: tiltX,
-          rotateY: tiltY,
+          translateX,
+          translateY,
+          rotateX,
+          rotateY,
+          transformPerspective: 100,
         });
 
         gsap.to(nextVideo, {
-          rotateY: -tiltY,
-          rotateX: -tiltX,
+          translateX: -translateX,
+          translateY: -translateY,
+          rotateX: -rotateX,
+          rotateY: -rotateY,
+          transformPerspective: 100,
         });
       });
 
@@ -267,9 +260,9 @@ export default function Hero({ heroVideosBlob }: Props) {
       if (isTransitioning) return;
 
       if (isMouseMoving && isScrolledToTop && !isMouseOverHitArea) {
-        // gsap.to(hitAreaRef.current, {
-        //   scale: 1,
-        // });
+        gsap.to(hitAreaRef.current, {
+          scale: 1,
+        });
         gsap.to(videoItemContentRefs.current[nextVideoNumber], {
           clipPath: `path("${nextVideoClipPath}")`,
           duration: 1,
@@ -285,9 +278,9 @@ export default function Hero({ heroVideosBlob }: Props) {
       } else {
         if (isMouseOverHitArea && isScrolledToTop) return;
 
-        // gsap.to(hitAreaRef.current, {
-        //   scale: 0,
-        // });
+        gsap.to(hitAreaRef.current, {
+          scale: 0,
+        });
         gsap.to(videoItemContentRefs.current[nextVideoNumber], {
           clipPath: `path("${hiddenVideoClipPath}")`,
           duration: 1,
@@ -588,7 +581,7 @@ export default function Hero({ heroVideosBlob }: Props) {
           onMouseEnter={() => setIsMouseOverHitArea(true)}
           onMouseLeave={() => setIsMouseOverHitArea(false)}
           onClick={handleHitAreaClicked}
-          className="absolute left-1/2 top-1/2 z-50 aspect-square scale-100 cursor-pointer rounded-lg"
+          className="absolute left-1/2 top-1/2 z-50 aspect-square scale-0 cursor-pointer rounded-lg"
           style={{
             width: hitAreaSideLength,
             height: hitAreaSideLength,
@@ -624,7 +617,7 @@ export default function Hero({ heroVideosBlob }: Props) {
                 className="absolute left-0 top-0 z-10 size-full overflow-hidden bg-violet-300"
                 style={{
                   clipPath: `path("${clipPath}")`,
-                  transform: "perspective(100px)",
+                  // transform: "perspective(100px)",
                   willChange: "transform",
                 }}
               >
@@ -655,7 +648,7 @@ export default function Hero({ heroVideosBlob }: Props) {
                     preload="metadata"
                     className="absolute left-0 top-0 size-full object-cover"
                     style={{
-                      transform: "perspective(100px)",
+                      // transform: "perspective(100px)",
                       willChange: "transform",
                     }}
                   />

@@ -17,12 +17,13 @@ export default function Intro() {
   const windowDimensions = useWindowDimensions();
   const [imageClipPath, setImageClipPath] = useState("");
   const [fullScreenClipPath, setFullScreenClipPath] = useState("");
+  const [allowTilt, setAllowTilt] = useState(true);
   const pinnedElementRef = useRef<HTMLDivElement>(null);
   const imageClipPathPathRef = useRef<HTMLDivElement>(null);
   const imageBorderPathRef = useRef<SVGPathElement>(null);
   const imageContentRef = useRef<HTMLImageElement>(null);
   const stonesImageRef = useRef<HTMLImageElement>(null);
-  const [allowTilt, setAllowTilt] = useState(true);
+  const isTouchDevice = navigator.maxTouchPoints > 0;
 
   useEffect(() => {
     setImageClipPath(getIntroImageClipPath(windowDimensions));
@@ -102,7 +103,7 @@ export default function Intro() {
 
   useGSAP(
     (_context, contextSafe) => {
-      if (!allowTilt) return;
+      if (!allowTilt || isTouchDevice) return;
 
       const imageClipPath = imageClipPathPathRef.current;
       const imageContent = imageContentRef.current;
@@ -142,32 +143,29 @@ export default function Intro() {
         const translateX = (e.clientX - centerX) * translateIntensity;
         const translateY = (e.clientY - centerY) * translateIntensity;
 
-        gsap.to(imageContent, {
-          translateX,
-          translateY,
-        });
-
-        gsap.to(stonesImage, {
-          translateX,
-          translateY,
-        });
-
         const relativeX =
           (e.clientX - imageClipPathRect.left) / imageClipPathRect.width;
         const relativeY =
           (e.clientY - imageClipPathRect.top) / imageClipPathRect.height;
 
-        const tiltX = (relativeY - 0.5) * -tiltIntensity;
-        const tiltY = (relativeX - 0.5) * tiltIntensity;
+        const rotateX = (relativeY - 0.5) * -tiltIntensity;
+        const rotateY = (relativeX - 0.5) * tiltIntensity;
 
         gsap.to(imageClipPath, {
-          rotateX: tiltX,
-          rotateY: tiltY,
+          rotateX,
+          rotateY,
         });
 
         gsap.to(imageContent, {
-          rotateY: -tiltY,
-          rotateX: -tiltX,
+          translateX,
+          translateY,
+          rotateX: -rotateX,
+          rotateY: -rotateY,
+        });
+
+        gsap.to(stonesImage, {
+          translateX,
+          translateY,
         });
       });
 

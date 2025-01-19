@@ -23,7 +23,7 @@ export default async function Home() {
       <header>
         <Navbar audioBlob={audioBlob} />
       </header>
-      <main className="relative min-h-screen w-full overflow-x-hidden">
+      <main className="relative w-full overflow-x-hidden">
         <Hero heroVideosBlob={heroVideosBlob} />
         <Intro />
         <Products productVideosBlob={productVideosBlob} />

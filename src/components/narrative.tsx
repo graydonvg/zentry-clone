@@ -4,11 +4,12 @@ import Image from "next/image";
 import AnimatedTitle from "./animation/animated-title";
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import gsap from "gsap";
 import RoundedCorners from "./rounded-corners";
 
 if (typeof window !== "undefined") {
-  gsap.registerPlugin(useGSAP);
+  gsap.registerPlugin(useGSAP, ScrollTrigger);
 }
 
 export default function Narrative() {
@@ -17,10 +18,39 @@ export default function Narrative() {
       ? document.getElementById("pinned-intro-element")
       : null;
   const pinnedIntroElementHeight = pinnedIntroElement?.clientHeight ?? 0;
+  const narrativeSectionRef = useRef<HTMLElement>(null);
   const imageClipPathRef = useRef<HTMLDivElement>(null);
   const imageContentRef = useRef<HTMLDivElement>(null);
 
   useGSAP((_context, contextSafe) => {
+    ScrollTrigger.create({
+      trigger: narrativeSectionRef.current,
+      start: `top+=${pinnedIntroElementHeight} bottom`,
+      end: `bottom+=${pinnedIntroElementHeight} bottom`,
+      onEnter: () => {
+        gsap.set(imageClipPath, {
+          rotateX: 0,
+          rotateY: 0,
+        });
+
+        gsap.set(imageContent, {
+          rotateX: 0,
+          rotateY: 0,
+        });
+      },
+      onEnterBack: () => {
+        gsap.set(imageClipPath, {
+          rotateX: 0,
+          rotateY: 0,
+        });
+
+        gsap.set(imageContent, {
+          rotateX: 0,
+          rotateY: 0,
+        });
+      },
+    });
+
     const imageClipPath = imageClipPathRef.current;
     const imageContent = imageContentRef.current;
 
@@ -40,17 +70,17 @@ export default function Narrative() {
 
       const tiltIntensity = 2;
 
-      const tiltX = (relativeY - 0.5) * -tiltIntensity;
-      const tiltY = (relativeX - 0.5) * tiltIntensity;
+      const rotateX = (relativeY - 0.5) * -tiltIntensity;
+      const rotateY = (relativeX - 0.5) * tiltIntensity;
 
       gsap.to(imageClipPath, {
-        rotateX: tiltX,
-        rotateY: tiltY,
+        rotateX,
+        rotateY,
       });
 
       gsap.to(imageContent, {
-        rotateY: -tiltY,
-        rotateX: -tiltX,
+        rotateX: -rotateX,
+        rotateY: -rotateY,
       });
     });
 
@@ -63,7 +93,7 @@ export default function Narrative() {
 
   return (
     <section
-      id="narrative"
+      ref={narrativeSectionRef}
       className="relative flex size-full min-h-screen flex-col items-center overflow-hidden bg-black pt-10 text-blue-50"
     >
       <AnimatedTitle
