@@ -176,6 +176,7 @@ export default function Hero({ heroVideosBlob }: Props) {
 
   useGSAP(
     (_context, contextSafe) => {
+      const controller = new AbortController();
       const nextVideoClipPath = videoItemContentRefs.current[nextVideoNumber];
       const nextVideo = videoRefs.current[nextVideoNumber];
       const hitArea = hitAreaRef.current;
@@ -243,10 +244,12 @@ export default function Hero({ heroVideosBlob }: Props) {
         });
       });
 
-      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mousemove", handleMouseMove, {
+        signal: controller.signal,
+      });
 
       return () => {
-        window.removeEventListener("mousemove", handleMouseMove);
+        controller.abort();
       };
     },
     {

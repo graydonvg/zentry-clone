@@ -23,6 +23,7 @@ export default function TiltOnHover({
   const tiltItemRef = useRef<HTMLDivElement>(null);
 
   useGSAP((_context, contextSafe) => {
+    const controller = new AbortController();
     const tiltItem = tiltItemRef.current;
 
     if (!tiltItem || !contextSafe) return;
@@ -56,12 +57,15 @@ export default function TiltOnHover({
       });
     });
 
-    tiltItem.addEventListener("mousemove", handleMouseMove);
-    tiltItem.addEventListener("mouseleave", handleMouseLeave);
+    tiltItem.addEventListener("mousemove", handleMouseMove, {
+      signal: controller.signal,
+    });
+    tiltItem.addEventListener("mouseleave", handleMouseLeave, {
+      signal: controller.signal,
+    });
 
     return () => {
-      tiltItem.removeEventListener("mousemove", handleMouseMove);
-      tiltItem.removeEventListener("mouseleave", handleMouseLeave);
+      controller.abort();
     };
   });
 

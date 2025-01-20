@@ -105,6 +105,7 @@ export default function Intro() {
     (_context, contextSafe) => {
       if (!allowTilt || isTouchDevice) return;
 
+      const controller = new AbortController();
       const imageClipPath = imageClipPathPathRef.current;
       const imageContent = imageContentRef.current;
       const stonesImage = stonesImageRef.current;
@@ -169,10 +170,12 @@ export default function Intro() {
         });
       });
 
-      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mousemove", handleMouseMove, {
+        signal: controller.signal,
+      });
 
       return () => {
-        window.removeEventListener("mousemove", handleMouseMove);
+        controller.abort();
       };
     },
     { dependencies: [allowTilt], revertOnUpdate: true },

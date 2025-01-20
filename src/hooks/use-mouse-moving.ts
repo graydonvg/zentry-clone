@@ -7,6 +7,8 @@ export default function useMouseMoving() {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     function handleMouseMove() {
       setIsMouseMoving(true);
 
@@ -19,10 +21,13 @@ export default function useMouseMoving() {
       }, 300);
     }
 
-    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove, {
+      signal: controller.signal,
+    });
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
+      controller.abort();
+
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }

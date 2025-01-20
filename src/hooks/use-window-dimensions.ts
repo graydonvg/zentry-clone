@@ -15,6 +15,8 @@ export default function useWindowDimensions() {
   });
 
   useEffect(() => {
+    const controller = new AbortController();
+
     function handleResize() {
       setWindowDimensions({
         width: window.innerWidth,
@@ -22,10 +24,12 @@ export default function useWindowDimensions() {
       });
     }
 
-    window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", handleResize, {
+      signal: controller.signal,
+    });
     handleResize(); // Call on mount to ensure state is updated with the initial size.
 
-    return () => window.removeEventListener("resize", handleResize);
+    return () => controller.abort();
   }, [viewportHeight]);
 
   return windowDimensions;

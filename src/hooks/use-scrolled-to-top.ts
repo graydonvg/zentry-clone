@@ -6,14 +6,18 @@ export default function useScrolledToTop() {
   const [isScrolledToTop, setIsScrolledToTop] = useState(true);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     function handleScroll() {
       setIsScrolledToTop(window.scrollY === 0);
     }
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, {
+      signal: controller.signal,
+    });
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      controller.abort();
     };
   }, []);
   return isScrolledToTop;

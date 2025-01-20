@@ -8,6 +8,8 @@ export default function useCursorPosition() {
   const windowDimensions = useWindowDimensions();
 
   useEffect(() => {
+    const controller = new AbortController();
+
     function handleMouseMove(e: MouseEvent) {
       setCursorPosition({
         x: (e.clientX / windowDimensions.width) * 2 - 1,
@@ -15,9 +17,11 @@ export default function useCursorPosition() {
       });
     }
 
-    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove, {
+      signal: controller.signal,
+    });
 
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    return () => controller.abort();
   }, [windowDimensions]);
 
   return cursorPosition;

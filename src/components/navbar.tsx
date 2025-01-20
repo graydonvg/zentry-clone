@@ -111,6 +111,7 @@ export default function Navbar({ audioBlob }: Props) {
   }
 
   useGSAP((_, contextSafe) => {
+    const controller = new AbortController();
     const nav = navRef.current;
     const navLinksContainer = navLinksContainerRef.current;
     const navLinks = linkRefs.current;
@@ -201,25 +202,24 @@ export default function Navbar({ audioBlob }: Props) {
       });
     });
 
-    navLinksContainer.addEventListener("mouseleave", handleContainerMouseLeave);
+    navLinksContainer.addEventListener(
+      "mouseleave",
+      handleContainerMouseLeave,
+      { signal: controller.signal },
+    );
     navLinks.forEach((link) => {
-      link?.addEventListener("mouseenter", handleMouseEnter);
+      link?.addEventListener("mouseenter", handleMouseEnter, {
+        signal: controller.signal,
+      });
     });
     navLinks.forEach((link) => {
-      link?.addEventListener("mouseleave", handleMouseLeave);
+      link?.addEventListener("mouseleave", handleMouseLeave, {
+        signal: controller.signal,
+      });
     });
 
     return () => {
-      navLinksContainer.removeEventListener(
-        "mouseleave",
-        handleContainerMouseLeave,
-      );
-      navLinks.forEach((link) => {
-        link?.removeEventListener("mouseenter", handleMouseEnter);
-      });
-      navLinks.forEach((link) => {
-        link?.removeEventListener("mouseleave", handleMouseLeave);
-      });
+      controller.abort();
     };
   });
 

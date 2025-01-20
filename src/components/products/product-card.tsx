@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -24,26 +24,30 @@ export default function ProductCard({
   autoplay = false,
   containerClassName,
 }: Props) {
-  const [isHovering, setIsHovering] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  useEffect(() => {
+  function handleMouseEnter() {
     const video = videoRef.current;
+
     if (!video || autoplay) return;
 
-    if (isHovering) {
-      video.play();
-    } else {
-      video.pause();
-      video.currentTime = 0;
-    }
-  }, [isHovering, autoplay]);
+    video.play();
+  }
+
+  function handleMouseLeave() {
+    const video = videoRef.current;
+
+    if (!video || autoplay) return;
+
+    video.pause();
+    video.currentTime = 0;
+  }
 
   return (
     <TiltInOutOnScroll containerClassName={containerClassName}>
       <TiltOnHover
-        onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={() => setIsHovering(false)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         className="border-border relative size-full overflow-hidden rounded-lg"
       >
         <video

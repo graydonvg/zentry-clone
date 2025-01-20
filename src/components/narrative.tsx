@@ -23,6 +23,8 @@ export default function Narrative() {
   const imageContentRef = useRef<HTMLDivElement>(null);
 
   useGSAP((_context, contextSafe) => {
+    const controller = new AbortController();
+
     ScrollTrigger.create({
       trigger: narrativeSectionRef.current,
       start: `top+=${pinnedIntroElementHeight} bottom`,
@@ -84,10 +86,12 @@ export default function Narrative() {
       });
     });
 
-    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove, {
+      signal: controller.signal,
+    });
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
+      controller.abort();
     };
   });
 
