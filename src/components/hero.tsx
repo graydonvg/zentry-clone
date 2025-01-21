@@ -59,7 +59,7 @@ function getHeroVideos(heroVideosBlob: ListBlobResultBlob[]) {
   const heroVideos = [
     {
       initialZIndex: 10,
-      autoPlay: true,
+      autoPlay: false,
       src: videoMap.get("hero-1.mp4"),
     },
     {
@@ -101,7 +101,6 @@ export default function Hero({ heroVideosBlob }: Props) {
   const windowDimensions = useWindowDimensions();
   const [currentVideoNumber, setCurrentVideoNumber] = useState(0);
   const [hasClickedHitArea, setHasClickedHitArea] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const [hitAreaSideLength, setHitAreaSideLength] = useState<string | number>(
     "20%",
   );
@@ -112,11 +111,12 @@ export default function Hero({ heroVideosBlob }: Props) {
     useState("");
   const [secondTransformedHeroClipPath, setSecondTransformedHeroClipPath] =
     useState("");
-  const [isMouseOverHitArea, setIsMouseOverHitArea] = useState(false);
-  const [animateTitleIndex, setAnimateTitleIndex] = useState({
+  const animatedTitleIndexRef = useRef({
     exit: 0,
     enter: 1,
   });
+  const isTransitioningRef = useRef(false);
+  const isMouseOverHitAreaRef = useRef(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const hitAreaRef = useRef<HTMLDivElement>(null);
   const fakeHitAreaRef = useRef<HTMLDivElement>(null);
@@ -135,6 +135,7 @@ export default function Hero({ heroVideosBlob }: Props) {
     MAX_HIT_AREA_SIDE_LENGTH,
     windowDimensions,
   );
+  const isTouchDevice = navigator.maxTouchPoints > 0;
 
   useEffect(() => {
     setNextVideoClipPath(
@@ -152,28 +153,47 @@ export default function Hero({ heroVideosBlob }: Props) {
   }, [windowDimensions, minMaxHitAreaSideLength]);
 
   function handleHitAreaClicked() {
-    if (isTransitioning || !isScrolledToTop) return;
+    if (isTransitioningRef.current || !isScrolledToTop) return;
 
-    setIsTransitioning(true);
+    isTransitioningRef.current = true;
     setHasClickedHitArea(true);
-    setAnimateTitleIndex({ exit: currentVideoNumber, enter: nextVideoNumber });
+    animatedTitleIndexRef.current = {
+      exit: currentVideoNumber,
+      enter: nextVideoNumber,
+    };
     setCurrentVideoNumber((prevIndex) => (prevIndex + 1) % totalVideos);
   }
 
+  // Hidden video initial position
   useGSAP(
     () => {
-      gsap.set(videoItemContentRefs.current[nextVideoNumber], {
-        clipPath: `path("${hiddenVideoClipPath}")`,
-      });
-      gsap.set(videoItemBorderRefs.current[nextVideoNumber], {
-        attr: {
-          d: hiddenVideoClipPath,
-        },
-      });
+      if (!isTouchDevice) {
+        gsap.set(videoItemContentRefs.current[nextVideoNumber], {
+          clipPath: `path("${hiddenVideoClipPath}")`,
+        });
+        gsap.set(videoItemBorderRefs.current[nextVideoNumber], {
+          attr: {
+            d: hiddenVideoClipPath,
+          },
+        });
+      } else {
+        gsap.set(hitAreaRef.current, {
+          scale: 1,
+        });
+        gsap.set(videoItemContentRefs.current[nextVideoNumber], {
+          clipPath: `path("${nextVideoClipPath}")`,
+        });
+        gsap.set(videoItemBorderRefs.current[nextVideoNumber], {
+          attr: {
+            d: nextVideoClipPath,
+          },
+        });
+      }
     },
-    { dependencies: [hiddenVideoClipPath] },
+    { dependencies: [nextVideoClipPath] },
   );
 
+  // Parallax tilt and translate on mouse move
   useGSAP(
     (_context, contextSafe) => {
       const controller = new AbortController();
@@ -187,6 +207,7 @@ export default function Hero({ heroVideosBlob }: Props) {
         !nextVideo ||
         !hitArea ||
         !fakeHitArea ||
+        isTouchDevice ||
         !contextSafe
       )
         return;
@@ -220,11 +241,12 @@ export default function Hero({ heroVideosBlob }: Props) {
         rotateX = Math.max(-7, Math.min(7, rotateX));
         rotateY = Math.max(-7, Math.min(7, rotateY));
 
+        const hitAreaTranslateIntensity = 0.8;
+
         gsap.to(hitArea, {
-          translateX,
-          translateY,
-          rotateX,
-          rotateY,
+          // Reduce hit area translation to prevent to prevent it from travelling outside of the next video clip path
+          translateX: translateX * hitAreaTranslateIntensity,
+          translateY: translateY * hitAreaTranslateIntensity,
         });
 
         gsap.to(nextVideoClipPath, {
@@ -232,7 +254,6 @@ export default function Hero({ heroVideosBlob }: Props) {
           translateY,
           rotateX,
           rotateY,
-          transformPerspective: 100,
         });
 
         gsap.to(nextVideo, {
@@ -240,7 +261,6 @@ export default function Hero({ heroVideosBlob }: Props) {
           translateY: -translateY,
           rotateX: -rotateX,
           rotateY: -rotateY,
-          transformPerspective: 100,
         });
       });
 
@@ -258,13 +278,16 @@ export default function Hero({ heroVideosBlob }: Props) {
     },
   );
 
+  // Grow/shrink on mouse move
   useGSAP(
     () => {
-      if (isTransitioning) return;
+      if (isTransitioningRef.current || isTouchDevice) return;
 
-      if (isMouseMoving && isScrolledToTop && !isMouseOverHitArea) {
+      if (isMouseMoving && isScrolledToTop && !isMouseOverHitAreaRef.current) {
         gsap.to(hitAreaRef.current, {
           scale: 1,
+          duration: 1,
+          ease: "power1.inOut",
         });
         gsap.to(videoItemContentRefs.current[nextVideoNumber], {
           clipPath: `path("${nextVideoClipPath}")`,
@@ -279,10 +302,11 @@ export default function Hero({ heroVideosBlob }: Props) {
           ease: "power1.inOut",
         });
       } else {
-        if (isMouseOverHitArea && isScrolledToTop) return;
-
+        if (isMouseOverHitAreaRef.current && isScrolledToTop) return;
         gsap.to(hitAreaRef.current, {
           scale: 0,
+          duration: 1,
+          ease: "power1.inOut",
         });
         gsap.to(videoItemContentRefs.current[nextVideoNumber], {
           clipPath: `path("${hiddenVideoClipPath}")`,
@@ -302,15 +326,21 @@ export default function Hero({ heroVideosBlob }: Props) {
       dependencies: [
         isMouseMoving,
         isScrolledToTop,
-        isTransitioning,
+        isTransitioningRef.current,
         hiddenVideoClipPath,
       ],
     },
   );
 
+  // Cycle vids on click
   useGSAP(
     () => {
       if (hasClickedHitArea) {
+        //Ensure the hit area remains at full scale
+        gsap.set(hitAreaRef.current, {
+          scale: 1,
+        });
+
         // Keep past videos hidden
         const hiddenVideoNumbers = getHiddenHeroVideoNumbers(
           currentVideoNumber,
@@ -382,7 +412,7 @@ export default function Hero({ heroVideosBlob }: Props) {
             const currentVideo = videoRefs.current[currentVideoNumber];
 
             if (currentVideo) {
-              currentVideo.play();
+              // currentVideo.play();
             }
           },
           onComplete: () => {
@@ -397,7 +427,7 @@ export default function Hero({ heroVideosBlob }: Props) {
               previousVideo.pause();
               previousVideo.currentTime = 0;
             }
-            setIsTransitioning(false);
+            isTransitioningRef.current = false;
             setHasClickedHitArea(false);
           },
         });
@@ -423,6 +453,7 @@ export default function Hero({ heroVideosBlob }: Props) {
     },
   );
 
+  // Animated title on click
   useGSAP(
     () => {
       if (hasClickedHitArea) {
@@ -481,6 +512,7 @@ export default function Hero({ heroVideosBlob }: Props) {
     { dependencies: [hasClickedHitArea] },
   );
 
+  // Hero clip path on scroll
   useGSAP(
     () => {
       gsap
@@ -571,24 +603,22 @@ export default function Hero({ heroVideosBlob }: Props) {
         </svg>
         <div
           ref={fakeHitAreaRef}
-          className="pointer-events-none absolute left-1/2 top-1/2 z-50 aspect-square cursor-pointer select-none rounded-lg"
+          className="pointer-events-none invisible absolute left-1/2 top-1/2 -z-50 aspect-square -translate-x-1/2 -translate-y-1/2 select-none rounded-lg"
           style={{
             width: hitAreaSideLength,
             height: hitAreaSideLength,
-            transform: "perspective(100px) translateX(-50%) translateY(-50%)",
           }}
         />
 
         <div
           ref={hitAreaRef}
-          onMouseEnter={() => setIsMouseOverHitArea(true)}
-          onMouseLeave={() => setIsMouseOverHitArea(false)}
+          onMouseOver={() => (isMouseOverHitAreaRef.current = true)}
+          onMouseLeave={() => (isMouseOverHitAreaRef.current = false)}
           onClick={handleHitAreaClicked}
-          className="absolute left-1/2 top-1/2 z-50 aspect-square scale-0 cursor-pointer rounded-lg"
+          className="absolute left-1/2 top-1/2 z-50 aspect-square -translate-x-1/2 -translate-y-1/2 scale-0 cursor-pointer rounded-lg"
           style={{
             width: hitAreaSideLength,
             height: hitAreaSideLength,
-            transform: "perspective(100px) translateX(-50%) translateY(-50%)",
             willChange: "transform",
           }}
         />
@@ -620,7 +650,7 @@ export default function Hero({ heroVideosBlob }: Props) {
                 className="absolute left-0 top-0 z-10 size-full overflow-hidden bg-violet-300"
                 style={{
                   clipPath: `path("${clipPath}")`,
-                  // transform: "perspective(100px)",
+                  transform: "perspective(100px)",
                   willChange: "transform",
                 }}
               >
@@ -651,7 +681,7 @@ export default function Hero({ heroVideosBlob }: Props) {
                     preload="metadata"
                     className="absolute left-0 top-0 size-full object-cover"
                     style={{
-                      // transform: "perspective(100px)",
+                      transform: "perspective(100px)",
                       willChange: "transform",
                     }}
                   />
@@ -687,7 +717,7 @@ export default function Hero({ heroVideosBlob }: Props) {
           }}
         >
           {splitAndMapTextWithTags(
-            animatedTitles[animateTitleIndex.exit],
+            animatedTitles[animatedTitleIndexRef.current.exit],
             "animate-tile-char-exit opacity-100",
           )}
         </h1>
@@ -701,7 +731,7 @@ export default function Hero({ heroVideosBlob }: Props) {
           }}
         >
           {splitAndMapTextWithTags(
-            animatedTitles[animateTitleIndex.enter],
+            animatedTitles[animatedTitleIndexRef.current.enter],
             "animate-tile-char-enter opacity-0",
           )}
         </h1>
@@ -717,7 +747,7 @@ export default function Hero({ heroVideosBlob }: Props) {
         }}
       >
         {splitAndMapTextWithTags(
-          animatedTitles[animateTitleIndex.exit],
+          animatedTitles[animatedTitleIndexRef.current.exit],
           "animate-tile-char-exit opacity-100",
         )}
       </h1>
@@ -731,7 +761,7 @@ export default function Hero({ heroVideosBlob }: Props) {
         }}
       >
         {splitAndMapTextWithTags(
-          animatedTitles[animateTitleIndex.enter],
+          animatedTitles[animatedTitleIndexRef.current.enter],
           "animate-tile-char-enter opacity-0",
         )}
       </h1>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useLayoutEffect } from "react";
 
 export default function useWindowDimensions() {
   const measurementElement =
@@ -9,28 +9,30 @@ export default function useWindowDimensions() {
       : null;
   const viewportHeight =
     measurementElement?.getBoundingClientRect().height ?? 0;
+  const viewportWidth = measurementElement?.getBoundingClientRect().width ?? 0;
   const [windowDimensions, setWindowDimensions] = useState({
-    width: typeof window !== "undefined" ? window.innerWidth : 0,
+    width: viewportWidth,
     height: viewportHeight,
   });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const controller = new AbortController();
 
     function handleResize() {
       setWindowDimensions({
-        width: window.innerWidth,
+        width: viewportWidth,
         height: viewportHeight,
       });
     }
 
+    handleResize();
+
     window.addEventListener("resize", handleResize, {
       signal: controller.signal,
     });
-    handleResize(); // Call on mount to ensure state is updated with the initial size.
 
     return () => controller.abort();
-  }, [viewportHeight]);
+  }, [viewportWidth, viewportHeight]);
 
   return windowDimensions;
 }

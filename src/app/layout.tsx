@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Suspense } from "react";
+import MeasurementElement from "@/components/measurement-element";
 
 export const metadata: Metadata = {
   title: "Zentry clone",
@@ -26,11 +27,7 @@ export default function RootLayout({
         >
           {children}
         </Suspense>
-        {/* measurement-element used to get the viewport height including mobile browser bars to prevent layout shift when bars hide/show */}
-        <div
-          id="measurement-element"
-          className="pointer-events-auto invisible absolute inset-0 -z-50 h-screen w-full select-none"
-        />
+        <MeasurementElement />
       </body>
     </html>
   );

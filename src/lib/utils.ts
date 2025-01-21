@@ -11,8 +11,9 @@ export function getHitAreaSideLength(
   maxHitAreaSideLength: number,
   windowDimensions: WindowDimensions,
 ) {
+  const scale = 0.2;
   const hitAreaMinSideLength = Math.max(
-    Math.min(windowDimensions.width * 0.25, windowDimensions.height * 0.25),
+    Math.min(windowDimensions.width * scale, windowDimensions.height * scale),
     minHitAreaSideLength,
   );
 
