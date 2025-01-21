@@ -59,7 +59,7 @@ function getHeroVideos(heroVideosBlob: ListBlobResultBlob[]) {
   const heroVideos = [
     {
       initialZIndex: 10,
-      autoPlay: false,
+      autoPlay: true,
       src: videoMap.get("hero-1.mp4"),
     },
     {
@@ -164,7 +164,7 @@ export default function Hero({ heroVideosBlob }: Props) {
     setCurrentVideoNumber((prevIndex) => (prevIndex + 1) % totalVideos);
   }
 
-  // Hidden video initial position
+  // Set next video and hit area initial clip path and scale
   useGSAP(
     () => {
       if (!isTouchDevice) {
@@ -412,7 +412,7 @@ export default function Hero({ heroVideosBlob }: Props) {
             const currentVideo = videoRefs.current[currentVideoNumber];
 
             if (currentVideo) {
-              // currentVideo.play();
+              currentVideo.play();
             }
           },
           onComplete: () => {
