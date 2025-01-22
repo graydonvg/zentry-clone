@@ -28,52 +28,47 @@ export default function Intro() {
     setFullScreenClipPath(getFullScreenClipPath(windowDimensions));
   }, [windowDimensions]);
 
-  // useGSAP(() => {
-  //   // gsap.set(imageClipPathPathRef.current, {
-  //   //   y: 100,
-  //   // });
+  useGSAP(() => {
+    gsap.set(imageClipPathRef.current, {
+      y: "20%",
+    });
 
-  //   // gsap.set(stonesImageRef.current, {
-  //   //   autoAlpha: 0,
-  //   //   scale: 1.4,
-  //   // });
+    gsap.set(stonesImageRef.current, {
+      autoAlpha: 0,
+      scale: 1.3,
+    });
 
-  //   const tl = gsap.timeline({
-  //     defaults: { duration: 0.5, ease: "power1.out" },
-  //     scrollTrigger: {
-  //       trigger: pinnedElementRef.current,
-  //       start: "top 70%",
-  //       end: "top 70%",
-  //       // markers: true,
-  //       toggleActions: "play none none reverse",
-  //     },
-  //   });
-
-  //   // tl.fromTo(
-  //   //   imageClipPathPathRef.current,
-
-  //   //   {
-  //   //     y: 100,
-  //   //   },
-  //   //   {
-  //   //     y: 0,
-  //   //   },
-  //   //   0,
-  //   // );
-
-  //   // tl.fromTo(
-  //   //   stonesImageRef.current,
-  //   //   {
-  //   //     autoAlpha: 0,
-  //   //     scale: 1.4,
-  //   //   },
-  //   //   {
-  //   //     autoAlpha: 1,
-  //   //     scale: 1.2,
-  //   //   },
-  //   //   0,
-  //   // );
-  // });
+    gsap
+      .timeline({
+        defaults: { duration: 0.7, ease: "power1.out" },
+        scrollTrigger: {
+          trigger: pinnedElementRef.current,
+          start: "top 70%",
+          end: "top 70%",
+          toggleActions: "play none none reverse",
+        },
+      })
+      .fromTo(
+        imageClipPathRef.current,
+        { y: "20%" },
+        {
+          y: 0,
+        },
+        0,
+      )
+      .fromTo(
+        stonesImageRef.current,
+        {
+          autoAlpha: 0,
+          scale: 1.3,
+        },
+        {
+          autoAlpha: 1,
+          scale: 1.2,
+        },
+        0,
+      );
+  });
 
   useGSAP(
     () => {
@@ -289,11 +284,7 @@ export default function Intro() {
         </div>
 
         <div className="absolute left-0 top-0 z-10 size-full">
-          <div
-            ref={stonesImageRef}
-            className="absolute left-0 top-0 size-full"
-            style={{ scale: 1.2 }}
-          >
+          <div ref={stonesImageRef} className="absolute left-0 top-0 size-full">
             <Image
               src="/img/stones.webp"
               alt="background"

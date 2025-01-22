@@ -184,13 +184,13 @@ export default function Navbar({ audioBlob }: Props) {
 
       if (linkMouseEnterTl.time() < setTextBlackTime) {
         // The text gets set to black with a 0.15s delay in the mouse enter event.
-        // If the mouse leaves before this, the text will get set to white (below) and then to black after the delay.
+        // If the mouse leaves before this, the text will get set to the original color (below) and then to black after the delay.
         // Therefore, clear the timeline if the linkMouseEnterTl has not completed.
         linkMouseEnterTl.clear();
       }
 
       gsap.set(target, {
-        color: "white",
+        color: "#dfdff0",
       });
     });
 
