@@ -59,7 +59,7 @@ function getHeroVideos(heroVideosBlob: ListBlobResultBlob[]) {
   const heroVideos = [
     {
       initialZIndex: 10,
-      autoPlay: false,
+      autoPlay: true,
       src: videoMap.get("hero-1.mp4"),
     },
     {

@@ -39,7 +39,6 @@ export default function AnimatedTitle({
           end: scrollTriggerOffset
             ? () => `70%+=${scrollTriggerOffset} bottom`
             : "70% bottom",
-          markers: true,
           onEnter: () => {
             tl.clear();
 
