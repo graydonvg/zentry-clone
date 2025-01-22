@@ -89,12 +89,6 @@ export default function AnimatedTitle({
                 "<",
               );
           },
-          // onEnterBack: () => {
-          //   tl.clear();
-
-          //   gsap.set(".animated-word", { autoAlpha: 1 });
-          //   gsap.set("h2", { autoAlpha: 1 });
-          // },
           onLeaveBack: () => {
             tl.fromTo(
               "p .animated-word",

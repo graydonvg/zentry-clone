@@ -88,7 +88,7 @@ const animatedTitles = [
   "g<b>a</b>ming",
   "ide<b>n</b>tity",
   "re<b>a</b>lity",
-  "lif<b>e</b>style",
+  "ag<b>e</b>ntic ai",
 ];
 
 type Props = {
