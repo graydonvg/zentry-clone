@@ -59,7 +59,7 @@ function getHeroVideos(heroVideosBlob: ListBlobResultBlob[]) {
   const heroVideos = [
     {
       initialZIndex: 10,
-      autoPlay: true,
+      autoPlay: false,
       src: videoMap.get("hero-1.mp4"),
     },
     {
@@ -216,30 +216,30 @@ export default function Hero({ heroVideosBlob }: Props) {
         return element.getBoundingClientRect();
       }
 
+      const translateIntensity = 0.2;
+      const rotateIntensity = 20;
+
       const handleMouseMove = contextSafe((e: MouseEvent) => {
         const fakeHitAreaRect = getElementReact(fakeHitArea);
 
         const centerX = fakeHitAreaRect.left + fakeHitAreaRect.width / 2;
         const centerY = fakeHitAreaRect.top + fakeHitAreaRect.height / 2;
 
-        const translateIntensity = 0.2;
-
         const translateX = (e.clientX - centerX) * translateIntensity;
         const translateY = (e.clientY - centerY) * translateIntensity;
 
-        const relativeX =
-          (e.clientX - fakeHitAreaRect.left) / fakeHitAreaRect.width;
-        const relativeY =
-          (e.clientY - fakeHitAreaRect.top) / fakeHitAreaRect.height;
+        const relativeX = e.clientX / window.innerWidth; // Horizontal position (0 to 1)
+        const relativeY = e.clientY / window.innerHeight; // Vertical position (0 to 1)
 
-        const tiltIntensity = 3;
+        const rotateOffsetX = relativeX - 0.5; // Horizontal offset (-0.5 to 0.5)
+        const rotateOffsetY = relativeY - 0.5; // Vertical offset (-0.5 to 0.5)
 
-        let rotateX = (relativeY - 0.5) * -tiltIntensity;
-        let rotateY = (relativeX - 0.5) * tiltIntensity;
+        let rotateX = rotateOffsetY * -rotateIntensity; // Vertical tilt
+        let rotateY = rotateOffsetX * rotateIntensity; // Horizontal til
 
         // Clamp the values between -7 and 7
-        rotateX = Math.max(-7, Math.min(7, rotateX));
-        rotateY = Math.max(-7, Math.min(7, rotateY));
+        rotateX = Math.max(-5, Math.min(5, rotateX));
+        rotateY = Math.max(-5, Math.min(5, rotateY));
 
         const hitAreaTranslateIntensity = 0.8;
 

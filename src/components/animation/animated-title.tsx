@@ -27,9 +27,8 @@ export default function AnimatedTitle({
 
   useGSAP(
     () => {
-      gsap.set(".caption .animated-word", { autoAlpha: 0 });
+      gsap.set(".animated-word", { autoAlpha: 0 });
       gsap.set("h2", { autoAlpha: 0 });
-      gsap.set("h2 .animated-word", { autoAlpha: 0 });
 
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -37,11 +36,13 @@ export default function AnimatedTitle({
           start: scrollTriggerOffset
             ? `70%+=${scrollTriggerOffset} bottom`
             : "70% bottom",
+          invalidateOnRefresh: true,
+          markers: true,
           onEnter: () => {
             tl.clear();
 
             tl.fromTo(
-              ".caption .animated-word",
+              "p .animated-word",
               { autoAlpha: 0 },
               {
                 autoAlpha: 1,
@@ -51,7 +52,6 @@ export default function AnimatedTitle({
                 },
               },
             )
-
               .fromTo(
                 "h2",
                 { autoAlpha: 0 },
@@ -88,10 +88,15 @@ export default function AnimatedTitle({
                 "<",
               );
           },
+          // onEnterBack: () => {
+          //   tl.clear();
 
+          //   gsap.set(".animated-word", { autoAlpha: 1 });
+          //   gsap.set("h2", { autoAlpha: 1 });
+          // },
           onLeaveBack: () => {
             tl.fromTo(
-              ".caption .animated-word",
+              "p .animated-word",
               { autoAlpha: 1 },
               {
                 autoAlpha: 0,
@@ -101,7 +106,6 @@ export default function AnimatedTitle({
                 },
               },
             )
-
               .fromTo(
                 "h2",
                 {
@@ -154,7 +158,7 @@ export default function AnimatedTitle({
       )}
     >
       {caption && (
-        <p className="caption font-general text-[clamp(0.625rem,0.5074rem+0.2941vw,0.875rem)] font-medium uppercase leading-none">
+        <p className="font-general text-[clamp(0.625rem,0.5074rem+0.2941vw,0.875rem)] font-medium uppercase leading-none">
           {caption.split(" ").map((word, index) => (
             <Fragment key={index}>
               <span

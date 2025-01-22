@@ -17,18 +17,63 @@ export default function Intro() {
   const windowDimensions = useWindowDimensions();
   const [imageClipPath, setImageClipPath] = useState("");
   const [fullScreenClipPath, setFullScreenClipPath] = useState("");
-  const [allowTilt, setAllowTilt] = useState(true);
   const pinnedElementRef = useRef<HTMLDivElement>(null);
-  const imageClipPathPathRef = useRef<HTMLDivElement>(null);
+  const imageClipPathRef = useRef<HTMLDivElement>(null);
   const imageBorderPathRef = useRef<SVGPathElement>(null);
   const imageContentRef = useRef<HTMLImageElement>(null);
   const stonesImageRef = useRef<HTMLImageElement>(null);
-  const isTouchDevice = navigator.maxTouchPoints > 0;
 
   useEffect(() => {
     setImageClipPath(getIntroImageClipPath(windowDimensions));
     setFullScreenClipPath(getFullScreenClipPath(windowDimensions));
   }, [windowDimensions]);
+
+  // useGSAP(() => {
+  //   // gsap.set(imageClipPathPathRef.current, {
+  //   //   y: 100,
+  //   // });
+
+  //   // gsap.set(stonesImageRef.current, {
+  //   //   autoAlpha: 0,
+  //   //   scale: 1.4,
+  //   // });
+
+  //   const tl = gsap.timeline({
+  //     defaults: { duration: 0.5, ease: "power1.out" },
+  //     scrollTrigger: {
+  //       trigger: pinnedElementRef.current,
+  //       start: "top 70%",
+  //       end: "top 70%",
+  //       // markers: true,
+  //       toggleActions: "play none none reverse",
+  //     },
+  //   });
+
+  //   // tl.fromTo(
+  //   //   imageClipPathPathRef.current,
+
+  //   //   {
+  //   //     y: 100,
+  //   //   },
+  //   //   {
+  //   //     y: 0,
+  //   //   },
+  //   //   0,
+  //   // );
+
+  //   // tl.fromTo(
+  //   //   stonesImageRef.current,
+  //   //   {
+  //   //     autoAlpha: 0,
+  //   //     scale: 1.4,
+  //   //   },
+  //   //   {
+  //   //     autoAlpha: 1,
+  //   //     scale: 1.2,
+  //   //   },
+  //   //   0,
+  //   // );
+  // });
 
   useGSAP(
     () => {
@@ -47,7 +92,6 @@ export default function Intro() {
               gsap.set(pinnedElementRef.current, {
                 backgroundColor: "black",
               });
-              setAllowTilt(false);
             },
             onEnterBack: () => {
               gsap.set(imageBorderPathRef.current, {
@@ -56,18 +100,16 @@ export default function Intro() {
               gsap.set(pinnedElementRef.current, {
                 backgroundColor: "unset",
               });
-              setAllowTilt(true);
             },
           },
         })
         .fromTo(
-          imageClipPathPathRef.current,
+          imageClipPathRef.current,
           {
             clipPath: `path("${imageClipPath}")`,
           },
           {
             clipPath: `path("${fullScreenClipPath}")`,
-            ease: "power1.inOut",
           },
         )
         .fromTo(
@@ -81,108 +123,119 @@ export default function Intro() {
             attr: {
               d: fullScreenClipPath,
             },
-            ease: "power1.inOut",
           },
           0,
         )
-        .fromTo(
-          imageContentRef.current,
-          { scale: 1.2 },
-          { scale: 1, ease: "power1.inOut" },
-          0,
-        )
-        .fromTo(
-          stonesImageRef.current,
-          { scale: 1.2 },
-          { scale: 1, ease: "power1.inOut" },
-          0,
-        );
+        .fromTo(imageContentRef.current, { scale: 1.2 }, { scale: 1 }, 0)
+        .fromTo(stonesImageRef.current, { scale: 1.2 }, { scale: 1 }, 0);
     },
     { dependencies: [imageClipPath, fullScreenClipPath], revertOnUpdate: true },
   );
 
-  useGSAP(
-    (_context, contextSafe) => {
-      if (!allowTilt || isTouchDevice) return;
+  useGSAP((_context, contextSafe) => {
+    const controller = new AbortController();
+    const imageClipPath = imageClipPathRef.current;
+    const imageContent = imageContentRef.current;
+    const stonesImage = stonesImageRef.current;
 
-      const controller = new AbortController();
-      const imageClipPath = imageClipPathPathRef.current;
-      const imageContent = imageContentRef.current;
-      const stonesImage = stonesImageRef.current;
+    if (!imageClipPath || !imageContent || !stonesImage || !contextSafe) return;
 
-      if (!imageClipPath || !imageContent || !stonesImage || !contextSafe)
-        return;
+    function getElementReact(element: HTMLElement) {
+      return element.getBoundingClientRect();
+    }
 
-      function getElementReact(element: HTMLElement) {
-        return element.getBoundingClientRect();
-      }
+    const maxRotateIntensity = 3;
+    let rotateIntensity = maxRotateIntensity;
 
-      const maxTiltIntensity = 3;
-      let tiltIntensity = maxTiltIntensity;
+    const maxTranslateIntensity = 0.02;
+    let translateIntensity = maxTranslateIntensity;
 
-      const maxTranslateIntensity = 0.02;
-      let translateIntensity = maxTranslateIntensity;
+    ScrollTrigger.create({
+      trigger: pinnedElementRef.current,
+      start: "top top",
+      end: "bottom top",
+      scrub: 0.5,
+      onUpdate: (self) => {
+        rotateIntensity = Math.max(
+          maxRotateIntensity * (1 - self.progress * 1.5),
+          0,
+        );
+        translateIntensity = Math.max(
+          maxTranslateIntensity * (1 - self.progress * 1.5),
+          0,
+        );
+      },
+    });
 
-      ScrollTrigger.create({
-        trigger: pinnedElementRef.current,
-        start: "top top",
-        end: "bottom top",
-        scrub: 0.5,
-        onUpdate: (self) => {
-          tiltIntensity = maxTiltIntensity * (1 - self.progress);
-          translateIntensity = maxTranslateIntensity * (1 - self.progress);
-        },
+    const cursor = { x: 0, y: 0 };
+
+    const handleTransform = contextSafe(() => {
+      const imageContentRect = getElementReact(imageContent);
+
+      const centerX = imageContentRect.left + imageContentRect.width / 2;
+      const centerY = imageContentRect.top + imageContentRect.height / 2;
+
+      const translateOffsetX = cursor.x - centerX; // Horizontal offset from element center
+      const translateOffsetY = cursor.y - centerY; // Vertical offset from element center
+
+      const translateX = translateOffsetX * translateIntensity;
+      const translateY = translateOffsetY * translateIntensity;
+
+      const relativeX = cursor.x / window.innerWidth; // Horizontal position (0 to 1)
+      const relativeY = cursor.y / window.innerHeight; // Vertical position (0 to 1)
+
+      const rotateOffsetX = relativeX - 0.5; // Horizontal offset (-0.5 to 0.5)
+      const rotateOffsetY = relativeY - 0.5; // Vertical offset (-0.5 to 0.5)
+
+      const rotateX = rotateOffsetY * -rotateIntensity; // Vertical tilt
+      const rotateY = rotateOffsetX * rotateIntensity; // Horizontal tilt
+
+      gsap.to(imageClipPath, {
+        rotateX,
+        rotateY,
       });
 
-      const handleMouseMove = contextSafe((e: MouseEvent) => {
-        const imageClipPathRect = getElementReact(imageClipPath);
-        const imageContentRect = getElementReact(imageContent);
-
-        const centerX = imageContentRect.left + imageContentRect.width / 2;
-        const centerY = imageContentRect.top + imageContentRect.height / 2;
-
-        const translateX = (e.clientX - centerX) * translateIntensity;
-        const translateY = (e.clientY - centerY) * translateIntensity;
-
-        const relativeX =
-          (e.clientX - imageClipPathRect.left) / imageClipPathRect.width;
-        const relativeY =
-          (e.clientY - imageClipPathRect.top) / imageClipPathRect.height;
-
-        const rotateX = (relativeY - 0.5) * -tiltIntensity;
-        const rotateY = (relativeX - 0.5) * tiltIntensity;
-
-        gsap.to(imageClipPath, {
-          rotateX,
-          rotateY,
-        });
-
-        gsap.to(imageContent, {
-          translateX,
-          translateY,
-          rotateX: -rotateX,
-          rotateY: -rotateY,
-        });
-
-        gsap.to(stonesImage, {
-          translateX,
-          translateY,
-        });
+      gsap.to(imageContent, {
+        translateX,
+        translateY,
+        rotateX: -rotateX,
+        rotateY: -rotateY,
       });
 
-      window.addEventListener("mousemove", handleMouseMove, {
+      gsap.to(stonesImage, {
+        translateX,
+        translateY,
+      });
+    });
+
+    window.addEventListener(
+      "mousemove",
+      (e) => {
+        cursor.x = e.clientX;
+        cursor.y = e.clientY;
+
+        handleTransform();
+      },
+      {
         signal: controller.signal,
-      });
+      },
+    );
 
-      return () => {
-        controller.abort();
-      };
-    },
-    { dependencies: [allowTilt], revertOnUpdate: true },
-  );
+    window.addEventListener(
+      "scroll",
+      () => {
+        handleTransform();
+      },
+      {
+        signal: controller.signal,
+      },
+    );
+
+    return () => controller.abort();
+  });
 
   return (
-    <section id="intro" className="mt-16 sm:mt-[7.5rem]">
+    <section className="mt-16 sm:mt-[7.5rem]">
       <AnimatedTitle
         titleLrg="Disc<b>o</b>ver the world's<br />largest shared <b>a</b>dventure"
         titleSml="Disc<b>o</b>ver the<br />world's largest<br />shared <b>a</b>dventure"
@@ -196,7 +249,7 @@ export default function Intro() {
         className="relative flex size-full min-h-screen w-full flex-col items-center gap-5 overflow-hidden pb-16"
       >
         <div
-          ref={imageClipPathPathRef}
+          ref={imageClipPathRef}
           className="absolute left-0 top-0 z-10 size-full"
           style={{
             clipPath: `path("${imageClipPath}")`,

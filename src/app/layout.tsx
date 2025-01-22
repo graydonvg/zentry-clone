@@ -15,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body suppressHydrationWarning className="antialiased">
+      <body className="antialiased">
         <Suspense
           fallback={
             <div className="special-font fixed inset-0 flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-violet-300 font-zentry text-[clamp(1rem,10vw+2rem,10rem)] uppercase text-white">

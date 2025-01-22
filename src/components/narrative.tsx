@@ -58,22 +58,17 @@ export default function Narrative() {
 
     if (!imageClipPath || !imageContent || !contextSafe) return;
 
-    function getElementReact(element: HTMLElement) {
-      return element.getBoundingClientRect();
-    }
+    const rotateIntensity = 2;
 
     const handleMouseMove = contextSafe((e: MouseEvent) => {
-      const imageClipPathRect = getElementReact(imageClipPath);
+      const relativeX = e.clientX / window.innerWidth; // Horizontal position (0 to 1)
+      const relativeY = e.clientY / window.innerHeight; // Vertical position (0 to 1)
 
-      const relativeX =
-        (e.clientX - imageClipPathRect.left) / imageClipPathRect.width;
-      const relativeY =
-        (e.clientY - imageClipPathRect.top) / imageClipPathRect.height;
+      const rotateOffsetX = relativeX - 0.5; // Horizontal offset (-0.5 to 0.5)
+      const rotateOffsetY = relativeY - 0.5; // Vertical offset (-0.5 to 0.5)
 
-      const tiltIntensity = 2;
-
-      const rotateX = (relativeY - 0.5) * -tiltIntensity;
-      const rotateY = (relativeX - 0.5) * tiltIntensity;
+      const rotateX = rotateOffsetY * -rotateIntensity; // Vertical tilt
+      const rotateY = rotateOffsetX * rotateIntensity; // Horizontal tilt
 
       gsap.to(imageClipPath, {
         rotateX,
