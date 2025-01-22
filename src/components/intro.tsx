@@ -30,7 +30,7 @@ export default function Intro() {
 
   useGSAP(() => {
     gsap.set(imageClipPathRef.current, {
-      y: "20%",
+      y: "25%",
     });
 
     gsap.set(stonesImageRef.current, {
@@ -40,7 +40,7 @@ export default function Intro() {
 
     gsap
       .timeline({
-        defaults: { duration: 0.7, ease: "power1.out" },
+        defaults: { duration: 1, ease: "power1.out" },
         scrollTrigger: {
           trigger: pinnedElementRef.current,
           start: "top 70%",
@@ -50,7 +50,7 @@ export default function Intro() {
       })
       .fromTo(
         imageClipPathRef.current,
-        { y: "20%" },
+        { y: "25%" },
         {
           y: 0,
         },
