@@ -84,11 +84,11 @@ body {
   }
 }
 
-.indicator-line.active {
-  animation: indicator-line 0.5s ease infinite;
+.audio-indicator-line.active {
+  animation: audio-indicator-line 0.5s ease infinite;
 }
 
-@keyframes indicator-line {
+@keyframes audio-indicator-line {
   0%,
   100% {
     height: 4px;

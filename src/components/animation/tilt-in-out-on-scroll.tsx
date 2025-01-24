@@ -44,8 +44,8 @@ export default function TiltInOutOnScroll({
         transform: "perspective(1000px) translateY(0px) rotateX(0deg)",
         scrollTrigger: {
           trigger: container,
-          start: `top+=${pinnedIntroElementHeight + 80} bottom`,
-          end: `bottom+=${pinnedIntroElementHeight} bottom`,
+          start: () => `top+=${pinnedIntroElementHeight + 80} bottom`,
+          end: () => `bottom+=${pinnedIntroElementHeight} bottom`,
           toggleActions: "play none none reverse",
         },
       },

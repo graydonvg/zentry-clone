@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import AnimatedTitle from "./animation/animated-title";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import gsap from "gsap";
@@ -17,78 +17,97 @@ export default function Narrative() {
     typeof window !== "undefined"
       ? document.getElementById("pinned-intro-element")
       : null;
-  const pinnedIntroElementHeight = pinnedIntroElement?.clientHeight ?? 0;
   const narrativeSectionRef = useRef<HTMLElement>(null);
   const imageClipPathRef = useRef<HTMLDivElement>(null);
   const imageContentRef = useRef<HTMLDivElement>(null);
+  const [scrollTriggerOffset, setScrollTriggerOffset] = useState(
+    pinnedIntroElement?.clientHeight ?? 0,
+  );
 
-  useGSAP((_context, contextSafe) => {
+  useEffect(() => {
     const controller = new AbortController();
 
-    ScrollTrigger.create({
-      trigger: narrativeSectionRef.current,
-      start: `top+=${pinnedIntroElementHeight} bottom`,
-      end: `bottom+=${pinnedIntroElementHeight} bottom`,
-      onEnter: () => {
-        gsap.set(imageClipPath, {
-          rotateX: 0,
-          rotateY: 0,
-        });
-
-        gsap.set(imageContent, {
-          rotateX: 0,
-          rotateY: 0,
-        });
+    window.addEventListener(
+      "resize",
+      () => {
+        setScrollTriggerOffset(pinnedIntroElement?.clientHeight ?? 0);
       },
-      onEnterBack: () => {
-        gsap.set(imageClipPath, {
-          rotateX: 0,
-          rotateY: 0,
-        });
+      { signal: controller.signal },
+    );
 
-        gsap.set(imageContent, {
-          rotateX: 0,
-          rotateY: 0,
-        });
-      },
-    });
+    return () => controller.abort();
+  }, [pinnedIntroElement]);
 
-    const imageClipPath = imageClipPathRef.current;
-    const imageContent = imageContentRef.current;
+  useGSAP(
+    (_context, contextSafe) => {
+      const controller = new AbortController();
 
-    if (!imageClipPath || !imageContent || !contextSafe) return;
+      ScrollTrigger.create({
+        trigger: narrativeSectionRef.current,
+        start: () => `top+=${scrollTriggerOffset} bottom`,
+        end: () => `bottom+=${scrollTriggerOffset} bottom`,
+        onEnter: () => {
+          gsap.set(imageClipPath, {
+            rotateX: 0,
+            rotateY: 0,
+          });
 
-    const rotateIntensity = 2;
+          gsap.set(imageContent, {
+            rotateX: 0,
+            rotateY: 0,
+          });
+        },
+        onEnterBack: () => {
+          gsap.set(imageClipPath, {
+            rotateX: 0,
+            rotateY: 0,
+          });
 
-    const handleMouseMove = contextSafe((e: MouseEvent) => {
-      const relativeX = e.clientX / window.innerWidth; // Horizontal position (0 to 1)
-      const relativeY = e.clientY / window.innerHeight; // Vertical position (0 to 1)
-
-      const rotateOffsetX = relativeX - 0.5; // Horizontal offset (-0.5 to 0.5)
-      const rotateOffsetY = relativeY - 0.5; // Vertical offset (-0.5 to 0.5)
-
-      const rotateX = rotateOffsetY * -rotateIntensity; // Vertical tilt
-      const rotateY = rotateOffsetX * rotateIntensity; // Horizontal tilt
-
-      gsap.to(imageClipPath, {
-        rotateX,
-        rotateY,
+          gsap.set(imageContent, {
+            rotateX: 0,
+            rotateY: 0,
+          });
+        },
       });
 
-      gsap.to(imageContent, {
-        rotateX: -rotateX,
-        rotateY: -rotateY,
+      const imageClipPath = imageClipPathRef.current;
+      const imageContent = imageContentRef.current;
+
+      if (!imageClipPath || !imageContent || !contextSafe) return;
+
+      const rotateIntensity = 2;
+
+      const handleMouseMove = contextSafe((e: MouseEvent) => {
+        const relativeX = e.clientX / window.innerWidth; // Horizontal position (0 to 1)
+        const relativeY = e.clientY / window.innerHeight; // Vertical position (0 to 1)
+
+        const rotateOffsetX = relativeX - 0.5; // Horizontal offset (-0.5 to 0.5)
+        const rotateOffsetY = relativeY - 0.5; // Vertical offset (-0.5 to 0.5)
+
+        const rotateX = rotateOffsetY * -rotateIntensity; // Vertical tilt
+        const rotateY = rotateOffsetX * rotateIntensity; // Horizontal tilt
+
+        gsap.to(imageClipPath, {
+          rotateX,
+          rotateY,
+        });
+
+        gsap.to(imageContent, {
+          rotateX: -rotateX,
+          rotateY: -rotateY,
+        });
       });
-    });
 
-    window.addEventListener("mousemove", handleMouseMove, {
-      signal: controller.signal,
-    });
+      window.addEventListener("mousemove", handleMouseMove, {
+        signal: controller.signal,
+      });
 
-    return () => {
-      controller.abort();
-    };
-  });
+      return () => {
+        controller.abort();
+      };
+    },
+    { dependencies: [scrollTriggerOffset], revertOnUpdate: true },
+  );
 
   return (
     <section
@@ -99,7 +118,7 @@ export default function Narrative() {
         caption="the open ip universe"
         titleLrg="the st<b>o</b>ry of<br />a hidden real<b>m</b>"
         titleSml="the st<b>o</b>ry of<br />a hidden real<b>m</b>"
-        scrollTriggerOffset={pinnedIntroElementHeight}
+        scrollTriggerOffset={scrollTriggerOffset}
         containerClassName="mix-blend-difference z-10"
       />
 

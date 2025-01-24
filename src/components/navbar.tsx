@@ -285,7 +285,6 @@ export default function Navbar({ audioBlob }: Props) {
                 <audio
                   ref={audioElementRef}
                   src={audioBlob[0].url}
-                  // src="/audio/loop.mp3"
                   loop
                   className="hidden"
                 />
@@ -293,7 +292,7 @@ export default function Navbar({ audioBlob }: Props) {
                   <div
                     key={index}
                     className={cn(
-                      "indicator-line h-1 w-px rounded-full bg-white transition-all duration-200 ease-in-out",
+                      "audio-indicator-line h-1 w-px rounded-full bg-white transition-all duration-200 ease-in-out",
                       {
                         active: isIndicatorActive,
                       },

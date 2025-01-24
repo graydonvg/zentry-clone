@@ -44,7 +44,7 @@ export default function Intro() {
         scrollTrigger: {
           trigger: pinnedElementRef.current,
           start: "top 70%",
-          end: "top 70%",
+          end: "bottom bottom",
           toggleActions: "play none none reverse",
         },
       })

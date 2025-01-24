@@ -34,11 +34,11 @@ export default function AnimatedTitle({
         scrollTrigger: {
           trigger: titleContainerRef.current,
           start: scrollTriggerOffset
-            ? () => `70%+=${scrollTriggerOffset} bottom`
+            ? `70%+=${scrollTriggerOffset} bottom`
             : "70% bottom",
           end: scrollTriggerOffset
-            ? () => `70%+=${scrollTriggerOffset} bottom`
-            : "70% bottom",
+            ? `bottom+=${scrollTriggerOffset} bottom`
+            : "bottom bottom",
           onEnter: () => {
             tl.clear();
 
@@ -141,7 +141,11 @@ export default function AnimatedTitle({
         },
       });
     },
-    { scope: titleContainerRef },
+    {
+      scope: titleContainerRef,
+      dependencies: [scrollTriggerOffset],
+      revertOnUpdate: true,
+    },
   );
 
   return (
