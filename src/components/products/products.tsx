@@ -117,7 +117,7 @@ export default function Products({ productVideosBlob }: Props) {
                   className="size-[10vw] md:size-[3.5vw]"
                   fill="black"
                 >
-                  <use href="/arrows-icon.svg#arrows-icon"></use>
+                  <use href="/icons/arrows-icon.svg#arrows-icon"></use>
                 </svg>
               </div>
             </TiltOnHover>

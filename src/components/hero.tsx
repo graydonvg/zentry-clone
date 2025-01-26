@@ -15,9 +15,8 @@ import {
   getFirstTransformedHeroClipPath,
   getSecondTransformedHeroClipPath,
 } from "@/lib/utils";
-import useMouseMoving from "@/hooks/use-mouse-moving";
-import useScrolledToTop from "@/hooks/use-scrolled-to-top";
 import { ListBlobResultBlob } from "@vercel/blob";
+import { useIsTouchOnlyDevice } from "@/hooks/use-is-touch-only-device";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -59,7 +58,7 @@ function getHeroVideos(heroVideosBlob: ListBlobResultBlob[]) {
   const heroVideos = [
     {
       initialZIndex: 10,
-      autoPlay: true,
+      autoPlay: false,
       src: videoMap.get("hero-1.mp4"),
     },
     {
@@ -96,8 +95,7 @@ type Props = {
 };
 
 export default function Hero({ heroVideosBlob }: Props) {
-  const isMouseMoving = useMouseMoving();
-  const isScrolledToTop = useScrolledToTop();
+  const isTouchOnlyDevice = useIsTouchOnlyDevice();
   const windowDimensions = useWindowDimensions();
   const [currentVideoNumber, setCurrentVideoNumber] = useState(0);
   const [hasClickedHitArea, setHasClickedHitArea] = useState(false);
@@ -106,7 +104,7 @@ export default function Hero({ heroVideosBlob }: Props) {
   );
   const [hiddenVideoClipPath, setHiddenVideoClipPath] = useState("");
   const [nextVideoClipPath, setNextVideoClipPath] = useState("");
-  const [currentVideoClipPath, setCurrentVideoClipPath] = useState("");
+  const [fullScreenClipPath, setFullScreenClipPath] = useState("");
   const [firstTransformedHeroClipPath, setFirstTransformedHeroClipPath] =
     useState("");
   const [secondTransformedHeroClipPath, setSecondTransformedHeroClipPath] =
@@ -135,13 +133,12 @@ export default function Hero({ heroVideosBlob }: Props) {
     MAX_HIT_AREA_SIDE_LENGTH,
     windowDimensions,
   );
-  const isTouchDevice = navigator.maxTouchPoints > 0;
 
   useEffect(() => {
     setNextVideoClipPath(
       getNextVideoClipPath(minMaxHitAreaSideLength, windowDimensions),
     );
-    setCurrentVideoClipPath(getFullScreenClipPath(windowDimensions));
+    setFullScreenClipPath(getFullScreenClipPath(windowDimensions));
     setHiddenVideoClipPath(getNextVideoClipPath(0, windowDimensions));
     setHitAreaSideLength(minMaxHitAreaSideLength);
     setFirstTransformedHeroClipPath(
@@ -153,7 +150,7 @@ export default function Hero({ heroVideosBlob }: Props) {
   }, [windowDimensions, minMaxHitAreaSideLength]);
 
   function handleHitAreaClicked() {
-    if (isTransitioningRef.current || !isScrolledToTop) return;
+    if (isTransitioningRef.current) return;
 
     isTransitioningRef.current = true;
     setHasClickedHitArea(true);
@@ -167,7 +164,7 @@ export default function Hero({ heroVideosBlob }: Props) {
   // Set next video and hit area initial clip path and scale
   useGSAP(
     () => {
-      if (!isTouchDevice) {
+      if (!isTouchOnlyDevice) {
         gsap.set(videoItemContentRefs.current[nextVideoNumber], {
           clipPath: `path("${hiddenVideoClipPath}")`,
         });
@@ -190,146 +187,235 @@ export default function Hero({ heroVideosBlob }: Props) {
         });
       }
     },
-    { dependencies: [nextVideoClipPath] },
+    {
+      dependencies: [nextVideoClipPath, hiddenVideoClipPath, isTouchOnlyDevice],
+      revertOnUpdate: true,
+    },
   );
 
-  // Parallax tilt and translate on mouse move
+  // Grow/shrink, parallax tilt and translate next video option on mouse move
   useGSAP(
     (_context, contextSafe) => {
       const controller = new AbortController();
-      const nextVideoClipPath = videoItemContentRefs.current[nextVideoNumber];
+      const nextVideoItemContent =
+        videoItemContentRefs.current[nextVideoNumber];
       const nextVideo = videoRefs.current[nextVideoNumber];
+      const nextVideoBorder = videoItemBorderRefs.current[nextVideoNumber];
       const hitArea = hitAreaRef.current;
       const fakeHitArea = fakeHitAreaRef.current;
 
       if (
-        !nextVideoClipPath ||
+        !nextVideoItemContent ||
         !nextVideo ||
+        !nextVideoBorder ||
         !hitArea ||
         !fakeHitArea ||
-        isTouchDevice ||
+        isTouchOnlyDevice ||
         !contextSafe
       )
         return;
 
-      function getElementReact(element: HTMLElement) {
-        return element.getBoundingClientRect();
-      }
+      let isScrolledToTop = true;
+      let isMouseOverHitArea = false;
+      let timeout: NodeJS.Timeout | null = null;
 
-      const translateIntensity = 0.2;
-      const rotateIntensity = 20;
+      ScrollTrigger.create({
+        start: "top",
+        end: "bottom top",
+        onUpdate: (self) => {
+          if (self.progress === 0) {
+            isScrolledToTop = true;
+          } else {
+            isScrolledToTop = false;
+
+            gsap.to(hitArea, {
+              scale: 0,
+              duration: 1,
+            });
+            gsap.to(nextVideoItemContent, {
+              clipPath: `path("${hiddenVideoClipPath}")`,
+              duration: 1,
+            });
+            gsap.to(nextVideoBorder, {
+              attr: {
+                d: hiddenVideoClipPath,
+              },
+              duration: 1,
+            });
+          }
+        },
+      });
+
+      const shrink = contextSafe(() => {
+        if (isScrolledToTop && isMouseOverHitArea) return;
+
+        gsap
+          .timeline({ defaults: { duration: 1 } })
+          .to(
+            hitArea,
+            {
+              scale: 0,
+              translateX: 0,
+              translateY: 0,
+            },
+            0,
+          )
+          .to(
+            nextVideoItemContent,
+            {
+              clipPath: `path("${hiddenVideoClipPath}")`,
+            },
+            0,
+          )
+          .to(
+            nextVideoBorder,
+            {
+              attr: {
+                d: hiddenVideoClipPath,
+              },
+            },
+            0,
+          );
+      });
 
       const handleMouseMove = contextSafe((e: MouseEvent) => {
-        const fakeHitAreaRect = getElementReact(fakeHitArea);
+        if (timeout) {
+          clearTimeout(timeout);
+        }
 
-        const centerX = fakeHitAreaRect.left + fakeHitAreaRect.width / 2;
-        const centerY = fakeHitAreaRect.top + fakeHitAreaRect.height / 2;
+        timeout = setTimeout(() => {
+          shrink();
+        }, 300);
 
-        const translateX = (e.clientX - centerX) * translateIntensity;
-        const translateY = (e.clientY - centerY) * translateIntensity;
+        if (!isScrolledToTop) return;
 
-        const relativeX = e.clientX / window.innerWidth; // Horizontal position (0 to 1)
-        const relativeY = e.clientY / window.innerHeight; // Vertical position (0 to 1)
+        const rotateIntensity = 20;
+        const translateHitAreaIntensity = 0.25;
+
+        const fakeHitAreaRect = fakeHitArea.getBoundingClientRect();
+
+        const hitAreaCenterX = fakeHitAreaRect.left + fakeHitAreaRect.width / 2;
+        const hitAreaCenterY = fakeHitAreaRect.top + fakeHitAreaRect.height / 2;
+
+        const translateHitAreaX =
+          (e.clientX - hitAreaCenterX) * translateHitAreaIntensity;
+        const translateHitAreaY =
+          (e.clientY - hitAreaCenterY) * translateHitAreaIntensity;
+
+        const relativeX = e.clientX / windowDimensions.width; // Horizontal position (0 to 1)
+        const relativeY = e.clientY / windowDimensions.height; // Vertical position (0 to 1)
 
         const rotateOffsetX = relativeX - 0.5; // Horizontal offset (-0.5 to 0.5)
         const rotateOffsetY = relativeY - 0.5; // Vertical offset (-0.5 to 0.5)
 
         let rotateX = rotateOffsetY * -rotateIntensity; // Vertical tilt
-        let rotateY = rotateOffsetX * rotateIntensity; // Horizontal til
+        let rotateY = rotateOffsetX * rotateIntensity; // Horizontal tilt
 
         // Clamp the values between -7 and 7
         rotateX = Math.max(-5, Math.min(5, rotateX));
         rotateY = Math.max(-5, Math.min(5, rotateY));
 
-        const hitAreaTranslateIntensity = 0.8;
+        const translateClipPathX =
+          ((e.clientX - fakeHitAreaRect.left) / fakeHitAreaRect.width - 0.5) *
+          0.5;
+        const translateClipPathY =
+          ((e.clientY - fakeHitAreaRect.top) / fakeHitAreaRect.height - 0.5) *
+          0.5;
 
-        gsap.to(hitArea, {
-          // Reduce hit area translation to prevent to prevent it from travelling outside of the next video clip path
-          translateX: translateX * hitAreaTranslateIntensity,
-          translateY: translateY * hitAreaTranslateIntensity,
-        });
-
-        gsap.to(nextVideoClipPath, {
-          translateX,
-          translateY,
-          rotateX,
-          rotateY,
-        });
-
-        gsap.to(nextVideo, {
-          translateX: -translateX,
-          translateY: -translateY,
-          rotateX: -rotateX,
-          rotateY: -rotateY,
-        });
+        gsap
+          .timeline({ defaults: { duration: 1 } })
+          .to(
+            hitArea,
+            {
+              scale: 1,
+              translateX: translateHitAreaX,
+              translateY: translateHitAreaY,
+            },
+            0,
+          )
+          .to(
+            nextVideoItemContent,
+            {
+              rotateX,
+              rotateY,
+              clipPath: `path("${getNextVideoClipPath(
+                minMaxHitAreaSideLength,
+                windowDimensions,
+                { x: translateClipPathX, y: translateClipPathY },
+              )}")`,
+            },
+            0,
+          )
+          .to(
+            nextVideoBorder,
+            {
+              attr: {
+                d: getNextVideoClipPath(
+                  minMaxHitAreaSideLength,
+                  windowDimensions,
+                  {
+                    x: translateClipPathX,
+                    y: translateClipPathY,
+                  },
+                ),
+              },
+            },
+            0,
+          )
+          .to(
+            nextVideo,
+            {
+              rotateX: -rotateX,
+              rotateY: -rotateY,
+            },
+            0,
+          );
       });
+
+      function handleHitAreaMouseMove() {
+        if (isMouseOverHitArea) return;
+        isMouseOverHitArea = true;
+      }
+
+      function handleHitAreaMouseLeave() {
+        isMouseOverHitArea = false;
+      }
 
       window.addEventListener("mousemove", handleMouseMove, {
         signal: controller.signal,
       });
+      hitAreaRef.current?.addEventListener(
+        "mousemove",
+        handleHitAreaMouseMove,
+        {
+          signal: controller.signal,
+        },
+      );
+      hitAreaRef.current?.addEventListener(
+        "mouseleave",
+        handleHitAreaMouseLeave,
+        {
+          signal: controller.signal,
+        },
+      );
 
       return () => {
         controller.abort();
+
+        if (timeout) {
+          clearTimeout(timeout);
+        }
       };
     },
     {
-      dependencies: [nextVideoNumber],
-      revertOnUpdate: true,
-    },
-  );
-
-  // Grow/shrink on mouse move
-  useGSAP(
-    () => {
-      if (isTransitioningRef.current || isTouchDevice) return;
-
-      if (isMouseMoving && isScrolledToTop && !isMouseOverHitAreaRef.current) {
-        gsap.to(hitAreaRef.current, {
-          scale: 1,
-          duration: 1,
-          ease: "power1.inOut",
-        });
-        gsap.to(videoItemContentRefs.current[nextVideoNumber], {
-          clipPath: `path("${nextVideoClipPath}")`,
-          duration: 1,
-          ease: "power1.inOut",
-        });
-        gsap.to(videoItemBorderRefs.current[nextVideoNumber], {
-          attr: {
-            d: nextVideoClipPath,
-          },
-          duration: 1,
-          ease: "power1.inOut",
-        });
-      } else {
-        if (isMouseOverHitAreaRef.current && isScrolledToTop) return;
-        gsap.to(hitAreaRef.current, {
-          scale: 0,
-          duration: 1,
-          ease: "power1.inOut",
-        });
-        gsap.to(videoItemContentRefs.current[nextVideoNumber], {
-          clipPath: `path("${hiddenVideoClipPath}")`,
-          duration: 1,
-          ease: "power1.inOut",
-        });
-        gsap.to(videoItemBorderRefs.current[nextVideoNumber], {
-          attr: {
-            d: hiddenVideoClipPath,
-          },
-          duration: 1,
-          ease: "power1.inOut",
-        });
-      }
-    },
-
-    {
       dependencies: [
-        isMouseMoving,
-        isScrolledToTop,
-        isTransitioningRef.current,
+        // currentVideoNumber,
+        nextVideoNumber,
         hiddenVideoClipPath,
+        minMaxHitAreaSideLength,
+        windowDimensions,
       ],
+      revertOnUpdate: true,
     },
   );
 
@@ -337,7 +423,7 @@ export default function Hero({ heroVideosBlob }: Props) {
   useGSAP(
     () => {
       if (hasClickedHitArea) {
-        //Ensure the hit area remains at full scale
+        // Ensure hit area remains at full scale
         gsap.set(hitAreaRef.current, {
           scale: 1,
         });
@@ -361,7 +447,7 @@ export default function Hero({ heroVideosBlob }: Props) {
           zIndex: -10,
         });
         gsap.set(videoItemContentRefs.current[previousVideoNumber], {
-          clipPath: `path("${currentVideoClipPath}")`,
+          clipPath: `path("${fullScreenClipPath}")`,
         });
 
         // Set the new current video behind the next video option before it grows
@@ -390,7 +476,7 @@ export default function Hero({ heroVideosBlob }: Props) {
         // Animate the new current video border to expand to the size of the screen
         gsap.to(videoItemBorderRefs.current[currentVideoNumber], {
           attr: {
-            d: currentVideoClipPath,
+            d: fullScreenClipPath,
           },
           duration: 1,
           ease: "power2.out",
@@ -406,7 +492,7 @@ export default function Hero({ heroVideosBlob }: Props) {
 
         // Animate the new current video to expand to the size of the screen
         gsap.to(videoItemContentRefs.current[currentVideoNumber], {
-          clipPath: `path("${currentVideoClipPath}")`,
+          clipPath: `path("${fullScreenClipPath}")`,
           duration: 1,
           ease: "power2.out",
           onStart: () => {
@@ -520,26 +606,39 @@ export default function Hero({ heroVideosBlob }: Props) {
         .timeline({
           scrollTrigger: {
             trigger: heroRef.current,
-            start: "center center",
+            start: "top top",
             end: "bottom top",
             scrub: 0.5,
+            onUpdate: (self) => {
+              if (self.progress === 0) {
+                gsap.to(heroBorderRef.current, {
+                  autoAlpha: 0,
+                });
+              } else {
+                gsap.to(heroBorderRef.current, {
+                  autoAlpha: 1,
+                });
+              }
+            },
           },
         })
         .fromTo(
           heroRef.current,
           {
-            clipPath: `path("${currentVideoClipPath}")`,
+            clipPath: `path("${fullScreenClipPath}")`,
           },
           {
             clipPath: `path("${firstTransformedHeroClipPath}")`,
             ease: "power1.inOut",
           },
+          0,
         )
         .fromTo(
           heroBorderRef.current,
           {
+            autoAlpha: 0,
             attr: {
-              d: isScrolledToTop ? "" : currentVideoClipPath,
+              d: fullScreenClipPath,
             },
           },
           {
@@ -548,7 +647,6 @@ export default function Hero({ heroVideosBlob }: Props) {
             },
             ease: "power1.inOut",
           },
-          // Start at the beginning of the timeline
           0,
         )
         .to(
@@ -557,7 +655,6 @@ export default function Hero({ heroVideosBlob }: Props) {
             clipPath: `path("${secondTransformedHeroClipPath}")`,
             ease: "power1.inOut",
           },
-          // Insert at the END of the previous animation
           ">",
         )
         .to(
@@ -568,14 +665,12 @@ export default function Hero({ heroVideosBlob }: Props) {
             },
             ease: "power1.inOut",
           },
-          // Insert at the START of the  previous animation
           "<",
         );
     },
     {
       dependencies: [
-        isScrolledToTop,
-        currentVideoClipPath,
+        fullScreenClipPath,
         firstTransformedHeroClipPath,
         secondTransformedHeroClipPath,
       ],
@@ -627,7 +722,7 @@ export default function Hero({ heroVideosBlob }: Props) {
         {heroVideos.map((video, index) => {
           const clipPath =
             index === currentVideoNumber
-              ? currentVideoClipPath
+              ? fullScreenClipPath
               : hiddenVideoClipPath;
           const borderPath =
             index == nextVideoNumber ? hiddenVideoClipPath : undefined;

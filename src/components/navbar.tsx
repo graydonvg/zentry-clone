@@ -241,7 +241,7 @@ export default function Navbar({ audioBlob }: Props) {
         >
           <div className="flex items-center gap-8">
             <svg aria-hidden="true" className="size-8" fill="white">
-              <use href="/arrows-icon.svg#arrows-icon"></use>
+              <use href="/icons/arrows-icon.svg#arrows-icon"></use>
             </svg>
             <Button
               id="product-button"
