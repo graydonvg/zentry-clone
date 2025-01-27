@@ -58,7 +58,7 @@ function getHeroVideos(heroVideosBlob: ListBlobResultBlob[]) {
   const heroVideos = [
     {
       initialZIndex: 10,
-      autoPlay: true,
+      autoPlay: false,
       src: videoMap.get("hero-1.mp4"),
     },
     {
@@ -311,7 +311,7 @@ export default function Hero({ heroVideosBlob }: Props) {
         let rotateX = rotateOffsetY * -rotateIntensity; // Vertical tilt
         let rotateY = rotateOffsetX * rotateIntensity; // Horizontal tilt
 
-        // Clamp the values between -7 and 7
+        // Clamp the values
         rotateX = Math.max(-5, Math.min(5, rotateX));
         rotateY = Math.max(-5, Math.min(5, rotateY));
 
@@ -384,20 +384,12 @@ export default function Hero({ heroVideosBlob }: Props) {
       window.addEventListener("mousemove", handleMouseMove, {
         signal: controller.signal,
       });
-      hitAreaRef.current?.addEventListener(
-        "mousemove",
-        handleHitAreaMouseMove,
-        {
-          signal: controller.signal,
-        },
-      );
-      hitAreaRef.current?.addEventListener(
-        "mouseleave",
-        handleHitAreaMouseLeave,
-        {
-          signal: controller.signal,
-        },
-      );
+      hitArea.addEventListener("mousemove", handleHitAreaMouseMove, {
+        signal: controller.signal,
+      });
+      hitArea.addEventListener("mouseleave", handleHitAreaMouseLeave, {
+        signal: controller.signal,
+      });
 
       return () => {
         controller.abort();
@@ -409,7 +401,6 @@ export default function Hero({ heroVideosBlob }: Props) {
     },
     {
       dependencies: [
-        // currentVideoNumber,
         nextVideoNumber,
         hiddenVideoClipPath,
         minMaxHitAreaSideLength,
