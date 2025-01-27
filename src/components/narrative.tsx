@@ -42,21 +42,45 @@ export default function Narrative() {
   useGSAP(
     (_context, contextSafe) => {
       const controller = new AbortController();
+      const imageClipPath = imageClipPathRef.current;
+      const imageContent = imageContentRef.current;
+
+      if (!imageClipPath || !imageContent || !contextSafe) return;
+
+      gsap.set(imageClipPath, {
+        translateY: "30%",
+      });
+
+      gsap.set(imageContent, {
+        translateY: "-30%",
+      });
 
       ScrollTrigger.create({
         trigger: narrativeSectionRef.current,
-        start: () => `top+=${scrollTriggerOffset} bottom`,
+        start: () => `20%+=${scrollTriggerOffset} bottom`,
         end: () => `bottom+=${scrollTriggerOffset} bottom`,
         onEnter: () => {
-          gsap.set(imageClipPath, {
-            rotateX: 0,
-            rotateY: 0,
-          });
+          gsap.fromTo(
+            imageClipPath,
+            {
+              translateY: "30%",
+            },
+            {
+              translateY: 0,
+              duration: 1,
+            },
+          );
 
-          gsap.set(imageContent, {
-            rotateX: 0,
-            rotateY: 0,
-          });
+          gsap.fromTo(
+            imageContent,
+            {
+              translateY: "-30%",
+            },
+            {
+              translateY: 0,
+              duration: 1,
+            },
+          );
         },
         onEnterBack: () => {
           gsap.set(imageClipPath, {
@@ -69,12 +93,16 @@ export default function Narrative() {
             rotateY: 0,
           });
         },
+        onLeaveBack: () => {
+          gsap.to(imageClipPath, {
+            translateY: "30%",
+          });
+
+          gsap.to(imageContent, {
+            translateY: "-30%",
+          });
+        },
       });
-
-      const imageClipPath = imageClipPathRef.current;
-      const imageContent = imageContentRef.current;
-
-      if (!imageClipPath || !imageContent || !contextSafe) return;
 
       const rotateIntensity = 2;
 
@@ -113,7 +141,7 @@ export default function Narrative() {
   return (
     <section
       ref={narrativeSectionRef}
-      className="relative flex size-full h-fit flex-col items-center overflow-hidden bg-black pb-24 pt-10 text-blue-50"
+      className="relative flex size-full h-fit flex-col items-center overflow-hidden bg-black py-24 text-blue-50"
     >
       <AnimatedTitle
         caption="the open ip universe"
