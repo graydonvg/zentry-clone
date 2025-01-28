@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { TiLocationArrow } from "react-icons/ti";
-import { Button } from "./ui/button";
+import Button from "./ui/button";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import gsap from "gsap";
@@ -17,6 +17,8 @@ import {
 } from "@/lib/utils";
 import { ListBlobResultBlob } from "@vercel/blob";
 import { useIsTouchOnlyDevice } from "@/hooks/use-is-touch-only-device";
+import useAssetsStore from "@/lib/store/use-assets-store";
+import useIsClient from "@/hooks/use-is-client";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -97,6 +99,7 @@ type Props = {
 export default function Hero({ heroVideosBlob }: Props) {
   const isTouchOnlyDevice = useIsTouchOnlyDevice();
   const windowDimensions = useWindowDimensions();
+  const isClient = useIsClient();
   const [currentVideoNumber, setCurrentVideoNumber] = useState(0);
   const [hasClickedHitArea, setHasClickedHitArea] = useState(false);
   const [hitAreaSideLength, setHitAreaSideLength] = useState<string | number>(
@@ -133,6 +136,23 @@ export default function Hero({ heroVideosBlob }: Props) {
     MAX_HIT_AREA_SIDE_LENGTH,
     windowDimensions,
   );
+  const [loadedVideos, setLoadedVideos] = useState(0);
+  const toggleHeroVideoAssetsLoaded = useAssetsStore(
+    (state) => state.toggleHeroVideoAssetsLoaded,
+  );
+  const heroVideoAssetsLoaded = useAssetsStore(
+    (state) => state.heroVideoAssetsLoaded,
+  );
+  const leftIcon = useMemo(
+    () => <TiLocationArrow className="size-4 rotate-45" />,
+    [],
+  );
+
+  useEffect(() => {
+    if (loadedVideos === totalVideos) {
+      toggleHeroVideoAssetsLoaded();
+    }
+  }, [loadedVideos, totalVideos, toggleHeroVideoAssetsLoaded]);
 
   useEffect(() => {
     setNextVideoClipPath(
@@ -147,7 +167,7 @@ export default function Hero({ heroVideosBlob }: Props) {
     setSecondTransformedHeroClipPath(
       getSecondTransformedHeroClipPath(windowDimensions),
     );
-  }, [windowDimensions, minMaxHitAreaSideLength]);
+  }, [windowDimensions, minMaxHitAreaSideLength, heroVideoAssetsLoaded]);
 
   function handleHitAreaClicked() {
     if (isTransitioningRef.current) return;
@@ -405,6 +425,7 @@ export default function Hero({ heroVideosBlob }: Props) {
         hiddenVideoClipPath,
         minMaxHitAreaSideLength,
         windowDimensions,
+        isTouchOnlyDevice,
       ],
       revertOnUpdate: true,
     },
@@ -756,22 +777,25 @@ export default function Hero({ heroVideosBlob }: Props) {
                   ></path>
                 </svg>
                 <div className="visible absolute left-0 top-0 size-full">
-                  <video
-                    ref={(el) => {
-                      videoRefs.current[index] = el;
-                    }}
-                    src={video.src}
-                    autoPlay={video.autoPlay}
-                    muted
-                    playsInline
-                    loop
-                    preload="metadata"
-                    className="absolute left-0 top-0 size-full object-cover"
-                    style={{
-                      transform: "perspective(100px)",
-                      willChange: "transform",
-                    }}
-                  />
+                  {isClient && (
+                    <video
+                      ref={(el) => {
+                        videoRefs.current[index] = el;
+                      }}
+                      src={video.src}
+                      autoPlay={video.autoPlay}
+                      muted
+                      playsInline
+                      loop
+                      preload="metadata"
+                      className="absolute left-0 top-0 size-full object-cover"
+                      style={{
+                        transform: "perspective(100px)",
+                        willChange: "transform",
+                      }}
+                      onLoadedData={() => setLoadedVideos((prev) => prev + 1)}
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -785,11 +809,7 @@ export default function Hero({ heroVideosBlob }: Props) {
           <p className="mb-5 font-robert-regular text-blue-100">
             Enter the Metagame Layer <br /> Unleash the Play Economy
           </p>
-          <Button
-            id="watch-trailer"
-            leftIcon={<TiLocationArrow className="size-4 rotate-45" />}
-            className="bg-yellow-300"
-          >
+          <Button leftIcon={leftIcon} className="bg-yellow-300">
             Watch Trailer
           </Button>
         </div>

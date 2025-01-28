@@ -3,8 +3,8 @@
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import gsap from "gsap";
-import { useEffect, useRef, useState } from "react";
-import { Button } from "./ui/button";
+import { useEffect, useMemo, useRef, useState } from "react";
+import Button from "./ui/button";
 import { TiLocationArrow } from "react-icons/ti";
 import { cn } from "@/lib/utils";
 import { ListBlobResultBlob } from "@vercel/blob";
@@ -50,6 +50,10 @@ export default function Navbar({ audioBlob }: Props) {
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [isScrollYTop, setScrollYTop] = useState(true);
   const isFirstMouseEnterRef = useRef(true);
+  const rightIcon = useMemo(
+    () => <TiLocationArrow className="rotate-[135deg]" />,
+    [],
+  );
 
   useEffect(() => {
     if (!audioElementRef.current) return;
@@ -245,7 +249,7 @@ export default function Navbar({ audioBlob }: Props) {
             </svg>
             <Button
               id="product-button"
-              rightIcon={<TiLocationArrow className="rotate-[135deg]" />}
+              rightIcon={rightIcon}
               className="bg-blue-50 px-4 py-2"
             >
               Products

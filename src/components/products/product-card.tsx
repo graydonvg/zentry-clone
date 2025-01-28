@@ -57,6 +57,7 @@ export default function ProductCard({
           loop
           muted
           playsInline
+          preload="metadata"
           className="absolute left-0 top-0 size-full object-cover object-center"
         />
 
@@ -66,7 +67,7 @@ export default function ProductCard({
               {title}
             </h2>
             {description && (
-              <p className="mt-3 max-w-56 text-xs md:text-base/none">
+              <p className="mt-3 max-w-56 text-[clamp(0.75rem,0.5714rem+0.8929vw,1rem)]/[1] font-medium md:text-[clamp(0.75rem,0.5rem+0.5208vw,1rem)]/[1.2]">
                 {description}
               </p>
             )}
