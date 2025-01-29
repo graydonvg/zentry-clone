@@ -230,7 +230,7 @@ export default function Intro() {
   });
 
   return (
-    <section className="mt-16 sm:mt-[7.5rem]">
+    <section className="pt-16 sm:pt-24 lg:pt-32">
       <AnimatedTitle
         titleLrg="Disc<b>o</b>ver the world's<br />largest shared <b>a</b>dventure"
         titleSml="Disc<b>o</b>ver the<br />world's largest<br />shared <b>a</b>dventure"
@@ -241,7 +241,7 @@ export default function Intro() {
       <div
         id="pinned-intro-element"
         ref={pinnedElementRef}
-        className="relative flex size-full min-h-screen w-full flex-col items-center gap-5 overflow-hidden pb-16"
+        className="relative flex size-full min-h-screen w-full flex-col items-center gap-5 overflow-hidden"
       >
         <div
           ref={imageClipPathRef}
@@ -295,11 +295,13 @@ export default function Intro() {
           </div>
         </div>
 
-        <div className="absolute bottom-16 flex w-full flex-col items-center justify-end text-center font-circular-web text-[clamp(0.5rem,3vw,1rem)] leading-tight tracking-tight">
-          <p>The Game of Games begins&mdash;your life, now and epic MMORPG</p>
+        <div className="text-body-lg/[1.2] absolute bottom-16 flex w-full flex-col items-center justify-end text-center font-circular-web tracking-tight">
+          <p>The Metagame begins—your life, now an epic MMORPG</p>
           <p className="text-black/40">
-            Zentry unites every player from countless games and platforms,
-            <br /> both digital and physical, into a unified Play Economy
+            Zentry is the unified play layer that bridges players, agentic AI,
+            and
+            <br />
+            blockchains, creating a new economic paradigm.
           </p>
         </div>
       </div>

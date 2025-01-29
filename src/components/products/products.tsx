@@ -42,16 +42,16 @@ export default function Products({ productVideosBlob }: Props) {
   const productVideos = getProductVideos(productVideosBlob);
 
   return (
-    <section className="min-h-screen bg-black">
-      <div className="mx-auto max-w-screen-2xl space-y-32 overflow-hidden px-3 py-32 sm:px-8 md:px-24">
-        <div>
-          <p className="font-circular-web text-lg/none text-blue-50">
-            Explore the Zentry Universe
-          </p>
-          <p className="max-w-md font-circular-web text-lg/none text-blue-50/50">
-            Immerse yourself in an IP-rich product universe where AI-driven
-            gamification and hyper-personalization lead humans & AI into a
-            global play economy.
+    <section className="min-h-screen bg-black px-3 py-16 sm:px-8 sm:py-24 md:px-24 lg:py-32">
+      <div className="mx-auto max-w-screen-2xl space-y-16 overflow-hidden sm:space-y-24 lg:space-y-32">
+        <div className="md:text-body-lg text-body-sm font-circular-web leading-[1.2]">
+          <p className="text-blue-50">Explore the Zentry Universe</p>
+          <p className="text-blue-50/50">
+            Immerse yourself in an IP-rich product universe where
+            <br />
+            AI-driven gamification and hyper-personalization lead
+            <br />
+            humans & AI into a global play economy.
           </p>
         </div>
 
@@ -103,13 +103,13 @@ export default function Products({ productVideosBlob }: Props) {
           <TiltInOutOnScroll containerClassName="order-5 col-span-2 aspect-square w-1/2 md:col-span-1 md:aspect-[630/400] md:w-full">
             <TiltOnHover className="flex size-full overflow-hidden rounded-lg bg-violet-300 p-5">
               <div className="flex-1">
-                <h2 className="special-font font-zentry text-[clamp(1.875rem,1.0227rem+4.2614vw,3.75rem)]/[0.82]">
+                <h3 className="special-font text-h3/[0.82] font-zentry">
                   m<b>o</b>re
                   <br />
                   co<b>m</b>ing
                   <br />s<b>o</b>on.
                   <br />
-                </h2>
+                </h3>
               </div>
               <div className="bottom-0 right-0 mt-auto">
                 <svg

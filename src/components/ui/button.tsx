@@ -16,7 +16,7 @@ const Button = memo(
           ref={ref}
           {...props}
           className={cn(
-            "group relative z-10 flex w-fit cursor-pointer items-center justify-center overflow-hidden rounded-full bg-violet-50 px-7 py-3",
+            "group relative flex w-fit shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-violet-50 px-7 py-3",
             className,
           )}
         >

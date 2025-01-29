@@ -8,6 +8,7 @@ import Button from "./ui/button";
 import { TiLocationArrow } from "react-icons/ti";
 import { cn } from "@/lib/utils";
 import { ListBlobResultBlob } from "@vercel/blob";
+import { useIsTouchOnlyDevice } from "@/hooks/use-is-touch-only-device";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -38,6 +39,7 @@ type Props = {
 };
 
 export default function Navbar({ audioBlob }: Props) {
+  const isTouchOnlyDevice = useIsTouchOnlyDevice();
   const navContainerRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLElement>(null);
   const navBackgroundRef = useRef<HTMLDivElement>(null);
@@ -45,6 +47,7 @@ export default function Navbar({ audioBlob }: Props) {
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const audioElementRef = useRef<HTMLAudioElement>(null);
   const navLinkBackgroundRef = useRef<HTMLDivElement>(null);
+  const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [isIndicatorActive, setIsIndicatorActive] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(true);
@@ -115,6 +118,8 @@ export default function Navbar({ audioBlob }: Props) {
   }
 
   useGSAP((_, contextSafe) => {
+    if (isTouchOnlyDevice) return;
+
     const controller = new AbortController();
     const nav = navRef.current;
     const navLinksContainer = navLinksContainerRef.current;
@@ -243,21 +248,44 @@ export default function Navbar({ audioBlob }: Props) {
           ref={navRef}
           className="relative flex size-full items-center justify-between p-4"
         >
-          <div className="flex items-center gap-8">
+          <div className="flex w-full items-center justify-between md:justify-start md:gap-8">
             <svg aria-hidden="true" className="size-8" fill="white">
               <use href="/icons/arrows-icon.svg#arrows-icon"></use>
             </svg>
-            <Button
-              id="product-button"
-              rightIcon={rightIcon}
-              className="bg-blue-50 px-4 py-2"
-            >
-              Products
-            </Button>
+            <div className="flex items-center justify-center gap-6">
+              <Button
+                id="product-button"
+                rightIcon={rightIcon}
+                className="bg-blue-50 px-4 py-2"
+              >
+                Products
+              </Button>
+              {!isNavMenuOpen ? (
+                <button
+                  onClick={() => setIsNavMenuOpen(true)}
+                  className="size-6 md:hidden"
+                >
+                  <span className="sr-only">Toggle Menu</span>
+                  <svg aria-hidden="true" className="size-full fill-blue-50">
+                    <use href="/icons/burger-icon.svg#burger-icon"></use>
+                  </svg>
+                </button>
+              ) : (
+                <button
+                  onClick={() => setIsNavMenuOpen(false)}
+                  className="size-6 md:hidden"
+                >
+                  <span className="sr-only">Toggle Menu</span>
+                  <svg aria-hidden="true" className="size-full">
+                    <use href="/icons/close-icon.svg#close-icon"></use>
+                  </svg>
+                </button>
+              )}
+            </div>
           </div>
           <div
             ref={navLinkBackgroundRef}
-            className="pointer-events-none absolute z-40 rounded-3xl bg-blue-50"
+            className="pointer-events-none absolute z-40 hidden rounded-3xl bg-blue-50 md:block"
             style={{ willChange: "opacity, transform" }}
           />
           <ul className="z-50 hidden items-center md:flex">

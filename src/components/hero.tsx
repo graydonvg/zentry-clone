@@ -60,7 +60,7 @@ function getHeroVideos(heroVideosBlob: ListBlobResultBlob[]) {
   const heroVideos = [
     {
       initialZIndex: 10,
-      autoPlay: true,
+      autoPlay: false,
       src: videoMap.get("hero-1.mp4"),
     },
     {
@@ -555,57 +555,91 @@ export default function Hero({ heroVideosBlob }: Props) {
   // Animated title on click
   useGSAP(
     () => {
-      if (hasClickedHitArea) {
-        gsap
-          .timeline()
-          .fromTo(
-            ".animate-tile-exit",
-            {
-              transform:
-                "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
-            },
-            {
-              transform:
-                "perspective(1000px) translate3d(100px, 30px, 20px) rotateY(60deg) rotateX(-20deg)",
-            },
-          )
-          .fromTo(
-            ".animate-tile-char-exit",
-            { opacity: 1 },
-            {
-              opacity: 0,
-              duration: 0.01,
-              stagger: {
-                amount: 0.4,
+      const mm = gsap.matchMedia();
+      const breakPoint = 768;
+
+      if (!hasClickedHitArea) return;
+
+      mm.add(
+        {
+          isAboveMedium: `(min-width: ${breakPoint}px) `,
+          isBelowMedium: `(max-width: ${breakPoint - 0.01}px) `,
+        },
+        (context) => {
+          if (!context.conditions) return;
+          const { isAboveMedium } = context.conditions;
+
+          const hiddenExitTarget = isAboveMedium
+            ? ".animate-tile-top-exit"
+            : ".animate-tile-bottom-exit";
+          const hiddenEnterTarget = isAboveMedium
+            ? ".animate-tile-top-enter"
+            : ".animate-tile-bottom-enter";
+          const visibleExitTarget = isAboveMedium
+            ? ".animate-tile-bottom-exit"
+            : ".animate-tile-top-exit";
+          const visibleEnterTarget = isAboveMedium
+            ? ".animate-tile-bottom-enter"
+            : ".animate-tile-top-enter";
+
+          gsap
+            .timeline()
+            .set(hiddenExitTarget, { display: "none" }, 0)
+            .set(hiddenEnterTarget, { display: "none" }, 0)
+            .fromTo(
+              visibleExitTarget,
+              {
+                display: "block",
+                transform:
+                  "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
               },
-            },
-            0.2,
-          )
-          .fromTo(
-            ".animate-tile-enter",
-            {
-              transform:
-                "perspective(1000px) translate3d(0px, -150px, 20px) rotateZ(-20deg) rotateX(60deg)",
-            },
-            {
-              transform:
-                "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
-            },
-            0.4,
-          )
-          .fromTo(
-            ".animate-tile-char-enter",
-            { opacity: 0 },
-            {
-              opacity: 1,
-              duration: 0.01,
-              stagger: {
-                amount: 0.6,
+              {
+                display: "none",
+                transform:
+                  "perspective(1000px) translate3d(50%, 30px, 20px) rotateY(60deg) rotateX(-20deg)",
               },
-            },
-            0.4,
-          );
-      }
+            )
+            .fromTo(
+              ".animate-tile-char-exit",
+              { opacity: 1 },
+              {
+                opacity: 0,
+                duration: 0.01,
+                stagger: {
+                  amount: 0.4,
+                },
+              },
+              0.2,
+            )
+            .fromTo(
+              visibleEnterTarget,
+              {
+                display: "none",
+                transform: isAboveMedium
+                  ? "perspective(1000px) translate3d(0px, -150px, 20px) rotateZ(-20deg) rotateX(60deg)"
+                  : "perspective(1000px) translate3d(-110px, 50px, -60px) rotateY(-50deg) rotateX(-20deg)",
+              },
+              {
+                display: "block",
+                transform:
+                  "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
+              },
+              0.4,
+            )
+            .fromTo(
+              ".animate-tile-char-enter",
+              { opacity: 0 },
+              {
+                opacity: 1,
+                duration: 0.01,
+                stagger: {
+                  amount: 0.6,
+                },
+              },
+              0.4,
+            );
+        },
+      );
     },
 
     { dependencies: [hasClickedHitArea] },
@@ -802,50 +836,95 @@ export default function Hero({ heroVideosBlob }: Props) {
           );
         })}
 
-        <div className="absolute left-0 top-0 z-20 size-full px-8">
-          <h1 className="hero-heading mt-24 text-blue-75">
+        <div className="absolute left-0 top-0 z-20 size-full px-[clamp(1rem,6vw,3rem)]">
+          <h1 className="hero-heading-sml md:hero-heading-lrg mt-24 text-blue-75">
             redefi<b>n</b>e
+            <span className="inline-flex md:hidden">
+              <span
+                className="hero-heading-sml animate-tile-top-exit absolute right-[clamp(1rem,6vw,3rem)] text-blue-75"
+                style={{
+                  transform:
+                    "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
+                  transformOrigin: "140px 80px",
+                  willChange: "transform",
+                }}
+              >
+                {splitAndMapTextWithTags(
+                  animatedTitles[animatedTitleIndexRef.current.exit],
+                  "animate-tile-char-exit opacity-100",
+                )}
+              </span>
+              <span
+                className="hero-heading-sml animate-tile-top-enter absolute right-[clamp(1rem,6vw,3rem)] hidden text-blue-75"
+                style={{
+                  transform:
+                    "perspective(1000px) translate3d(-110px, 50px, -60px) rotateY(-50deg) rotateX(-20deg)",
+                  transformOrigin: "140px 80px",
+                  willChange: "transform",
+                }}
+              >
+                {splitAndMapTextWithTags(
+                  animatedTitles[animatedTitleIndexRef.current.enter],
+                  "animate-tile-char-enter opacity-0",
+                )}
+              </span>
+            </span>
           </h1>
-          <p className="mb-5 font-robert-regular text-blue-100">
-            Enter the Metagame Layer <br /> Unleash the Play Economy
+
+          <p className="text-body-lg/[1.2] mb-5 hidden font-robert-regular text-blue-100 md:block">
+            Enter the Metagame
+            <br />
+            Unleash the Play Economy
           </p>
-          <Button leftIcon={leftIcon} className="bg-yellow-300">
+          <Button leftIcon={leftIcon} className="hidden bg-yellow-300 md:flex">
             Watch Trailer
           </Button>
         </div>
 
-        <h1
-          className="hero-heading animate-tile-exit absolute bottom-6 right-8 z-20 text-blue-75"
-          style={{
-            transform:
-              "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
-            transformOrigin: "250px 140px",
-            willChange: "transform",
-          }}
-        >
-          {splitAndMapTextWithTags(
-            animatedTitles[animatedTitleIndexRef.current.exit],
-            "animate-tile-char-exit opacity-100",
-          )}
-        </h1>
-        <h1
-          className="hero-heading animate-tile-enter absolute bottom-6 right-8 z-20 text-blue-75"
-          style={{
-            transform:
-              "perspective(1000px) translate3d(0px, -150px, 20px) rotateZ(-20deg) rotateX(60deg)",
-            transformOrigin: "250px 140px",
-            willChange: "transform",
-          }}
-        >
-          {splitAndMapTextWithTags(
-            animatedTitles[animatedTitleIndexRef.current.enter],
-            "animate-tile-char-enter opacity-0",
-          )}
-        </h1>
+        <div className="absolute inset-0 z-10 h-svh w-full">
+          <h1
+            className="hero-heading-lrg animate-tile-bottom-exit absolute bottom-6 right-8 hidden text-blue-75 md:block"
+            style={{
+              transform:
+                "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
+              transformOrigin: "250px 140px",
+              willChange: "transform",
+            }}
+          >
+            {splitAndMapTextWithTags(
+              animatedTitles[animatedTitleIndexRef.current.exit],
+              "animate-tile-char-exit opacity-100",
+            )}
+          </h1>
+          <h1
+            className="hero-heading-lrg animate-tile-bottom-enter absolute bottom-6 right-8 hidden text-blue-75 md:block"
+            style={{
+              transform:
+                "perspective(1000px) translate3d(0px, -150px, 20px) rotateZ(-20deg) rotateX(60deg)",
+              transformOrigin: "250px 140px",
+              willChange: "transform",
+            }}
+          >
+            {splitAndMapTextWithTags(
+              animatedTitles[animatedTitleIndexRef.current.enter],
+              "animate-tile-char-enter opacity-0",
+            )}
+          </h1>
+          <div className="absolute bottom-0 right-0 flex w-full items-center justify-between px-[clamp(1rem,6vw,3rem)] pb-[clamp(1rem,6vw,3rem)] md:hidden">
+            <p className="text-body-sm/[1.2] font-robert-regular text-blue-100">
+              Enter the Metagame
+              <br />
+              Unleash the Play Economy
+            </p>
+            <Button leftIcon={leftIcon} className="bg-yellow-300">
+              Trailer
+            </Button>
+          </div>
+        </div>
       </div>
 
       <h1
-        className="hero-heading animate-tile-exit absolute bottom-6 right-8 -z-10 text-black"
+        className="hero-heading-lrg animate-tile-bottom-exit absolute bottom-6 right-8 -z-10 hidden text-black md:block"
         style={{
           transform:
             "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
@@ -859,7 +938,7 @@ export default function Hero({ heroVideosBlob }: Props) {
         )}
       </h1>
       <h1
-        className="hero-heading animate-tile-enter absolute bottom-6 right-8 -z-10 text-black"
+        className="hero-heading-lrg animate-tile-bottom-enter absolute bottom-6 right-8 -z-10 hidden text-black md:block"
         style={{
           transform:
             "perspective(1000px) translate3d(0px, -150px, 20px) rotateZ(-20deg) rotateX(60deg)",

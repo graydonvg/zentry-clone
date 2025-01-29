@@ -63,11 +63,11 @@ export default function ProductCard({
 
         <div className="relative z-10 flex size-full flex-col justify-between p-5 text-blue-50">
           <div>
-            <h2 className="special-font font-zentry text-[clamp(1.875rem,1.0227rem+4.2614vw,3.75rem)]/[0.82] font-black uppercase">
+            <h3 className="special-font text-h3/[0.82] font-zentry font-black uppercase">
               {title}
-            </h2>
+            </h3>
             {description && (
-              <p className="mt-3 max-w-56 text-[clamp(0.75rem,0.5714rem+0.8929vw,1rem)]/[1] font-medium md:text-[clamp(0.75rem,0.5rem+0.5208vw,1rem)]/[1.2]">
+              <p className="text-caption/[1.2] mt-3 max-w-44 text-pretty font-medium">
                 {description}
               </p>
             )}

@@ -11,6 +11,21 @@ body {
 }
 
 @layer base {
+  :root {
+    /* Utopia: https://utopia.fyi */
+
+    --h1-lg: clamp(6rem, 0.3896rem + 11.6883vw, 15rem);
+    --h1-sm: clamp(4.5rem, -0.1429rem + 23.2143vw, 11rem);
+    --h2-lg: clamp(3.125rem, 1.0662rem + 5.1471vw, 7.5rem);
+    --h2-sm: clamp(2.5rem, 0rem + 12.5vw, 5rem);
+    --h3: clamp(1.875rem, 1.0227rem + 4.2614vw, 3.75rem);
+    --body-lg: clamp(0.625rem, 0.4583rem + 0.8333vw, 1.5rem);
+    --body-sm: clamp(0.75rem, 0.2143rem + 2.6786vw, 1.5rem);
+    --caption: clamp(0.625rem, 0.5074rem + 0.2941vw, 0.875rem);
+  }
+}
+
+@layer base {
   @font-face {
     font-family: "circular-web";
     src: url("/fonts/circularweb-book.woff2") format("woff2");
@@ -42,8 +57,12 @@ body {
     @apply border border-white/20;
   }
 
-  .hero-heading {
-    @apply special-font font-zentry text-[clamp(1rem,10vw+2rem,10rem)] font-black uppercase leading-none;
+  .hero-heading-lrg {
+    @apply special-font text-h1-lg font-zentry font-black uppercase leading-none;
+  }
+
+  .hero-heading-sml {
+    @apply special-font text-h1-sm font-zentry font-black uppercase leading-none;
   }
 
   .special-font b {

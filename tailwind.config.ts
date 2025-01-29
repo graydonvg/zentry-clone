@@ -15,6 +15,16 @@ export default {
         "robert-regular": ["robert-regular", "sans-serif"],
         zentry: ["zentry", "sans-serif"],
       },
+      fontSize: {
+        "h1-lg": "var(--h1-lg)",
+        "h1-sm": "var(--h1-sm)",
+        "h2-lg": "var(--h2-lg)",
+        "h2-sm": "var(--h2-sm)",
+        h3: "var(--h3)",
+        "body-lg": "var(--body-lg)",
+        "body-sm": "var(--body-sm)",
+        caption: "var(--caption)",
+      },
       colors: {
         blue: {
           50: "#DFDFF0",

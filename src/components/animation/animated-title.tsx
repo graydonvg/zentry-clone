@@ -157,7 +157,7 @@ export default function AnimatedTitle({
       )}
     >
       {caption && (
-        <p className="font-general text-[clamp(0.625rem,0.5074rem+0.2941vw,0.875rem)] font-medium uppercase leading-none">
+        <p className="text-caption/none font-general font-medium uppercase">
           {caption.split(" ").map((word, index) => (
             <Fragment key={index}>
               <span
@@ -171,7 +171,7 @@ export default function AnimatedTitle({
       )}
 
       <h2
-        className="hidden flex-col gap-1 text-[clamp(3.125rem,1.0662rem+5.1471vw,7.5rem)] uppercase leading-[.8] sm:flex sm:px-32"
+        className="text-h2-lg/[0.8] hidden flex-col gap-1 uppercase sm:flex sm:px-32"
         style={{
           transformOrigin: "50% 50% -150px",
           willChange: "transform, opacity",
@@ -195,10 +195,7 @@ export default function AnimatedTitle({
       </h2>
       {titleSml && (
         <h2
-          className={cn(
-            "flex flex-col gap-1 text-[clamp(2.5rem,0rem+12.5vw,5rem)] uppercase leading-[.8] text-white sm:hidden",
-            containerClassName,
-          )}
+          className="text-h2-sm/[0.8] flex flex-col gap-1 uppercase sm:hidden"
           style={{
             transform:
               "perspective(1000px)  translate3d(-110px, 50px, -60px) rotateY(-50deg) rotateX(-20deg)",
