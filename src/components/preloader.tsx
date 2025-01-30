@@ -26,7 +26,7 @@ export default function Preloader() {
   return (
     <>
       {!heroVideoAssetsLoaded && (
-        <div className="special-font fixed inset-0 z-[60] flex min-h-screen w-full flex-col items-center justify-center bg-violet-300 font-zentry text-[clamp(1rem,10vw+2rem,10rem)] uppercase text-white">
+        <div className="special-font fixed inset-0 z-[60] flex min-h-screen w-full flex-col items-center justify-center bg-primary font-zentry text-[clamp(1rem,10vw+2rem,10rem)] uppercase text-primary-foreground">
           <span>
             Lo<b>a</b>ding...
           </span>

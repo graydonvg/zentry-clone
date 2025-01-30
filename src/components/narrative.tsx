@@ -141,7 +141,7 @@ export default function Narrative() {
   return (
     <section
       ref={narrativeSectionRef}
-      className="relative flex size-full h-fit flex-col items-center overflow-hidden bg-black py-16 text-blue-50 sm:py-24 lg:py-32"
+      className="relative flex size-full h-fit flex-col items-center overflow-hidden bg-black py-16 text-foreground sm:py-24 lg:py-32"
     >
       <AnimatedTitle
         caption="the open ip universe"
@@ -184,14 +184,14 @@ export default function Narrative() {
       </div>
       <div className="relative mx-auto mt-[clamp(10rem,50vw+6rem,40rem)] flex w-full max-w-screen-2xl justify-center md:mt-[clamp(16rem,25.5vw+6rem,40rem)] md:w-[72vw] md:justify-end">
         <div className="flex h-full w-fit flex-col items-center gap-8 text-center md:items-start md:text-start">
-          <p className="md:text-body-lg text-body-sm font-medium leading-[1.2]">
+          <p className="text-body-sm font-medium leading-[1.2] md:text-body-lg">
             Where realms converge, lies Zentry and the
             <br />
             boundless pillar. Discover its secrets and shape
             <br />
             your fate amidst infinite opportunities.
           </p>
-          <Button>discover prologue</Button>
+          <Button variant="secondary">discover prologue</Button>
         </div>
       </div>
     </section>

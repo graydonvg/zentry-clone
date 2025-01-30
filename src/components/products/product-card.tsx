@@ -48,7 +48,7 @@ export default function ProductCard({
       <TiltOnHover
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className="border-border relative size-full overflow-hidden rounded-lg"
+        className="relative size-full overflow-hidden rounded-lg border-border"
       >
         <video
           src={src}
@@ -61,17 +61,15 @@ export default function ProductCard({
           className="absolute left-0 top-0 size-full object-cover object-center"
         />
 
-        <div className="relative z-10 flex size-full flex-col justify-between p-5 text-blue-50">
-          <div>
-            <h3 className="special-font text-h3/[0.82] font-zentry font-black uppercase">
-              {title}
-            </h3>
-            {description && (
-              <p className="text-caption/[1.2] mt-3 max-w-44 text-pretty font-medium">
-                {description}
-              </p>
-            )}
-          </div>
+        <div className="relative z-10 flex size-full flex-col p-5 text-foreground">
+          <h3 className="special-font font-zentry text-h3/[0.82] font-black uppercase">
+            {title}
+          </h3>
+          {description && (
+            <p className="mt-3 max-w-44 text-pretty text-caption/[1.2] font-medium">
+              {description}
+            </p>
+          )}
         </div>
       </TiltOnHover>
     </TiltInOutOnScroll>

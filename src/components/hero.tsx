@@ -789,7 +789,7 @@ export default function Hero({ heroVideosBlob }: Props) {
                 ref={(el) => {
                   videoItemContentRefs.current[index] = el;
                 }}
-                className="absolute left-0 top-0 z-10 size-full overflow-hidden bg-violet-300"
+                className="absolute left-0 top-0 z-10 size-full overflow-hidden bg-accent"
                 style={{
                   clipPath: `path("${clipPath}")`,
                   transform: "perspective(100px)",
@@ -837,11 +837,11 @@ export default function Hero({ heroVideosBlob }: Props) {
         })}
 
         <div className="absolute left-0 top-0 z-20 size-full px-[clamp(1rem,6vw,3rem)]">
-          <h1 className="hero-heading-sml md:hero-heading-lrg mt-24 text-blue-75">
+          <h1 className="hero-heading-sml md:hero-heading-lrg mt-24 text-foreground">
             redefi<b>n</b>e
             <span className="inline-flex md:hidden">
               <span
-                className="hero-heading-sml animate-tile-top-exit absolute right-[clamp(1rem,6vw,3rem)] text-blue-75"
+                className="hero-heading-sml animate-tile-top-exit absolute right-[clamp(1rem,6vw,3rem)] text-foreground"
                 style={{
                   transform:
                     "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
@@ -855,7 +855,7 @@ export default function Hero({ heroVideosBlob }: Props) {
                 )}
               </span>
               <span
-                className="hero-heading-sml animate-tile-top-enter absolute right-[clamp(1rem,6vw,3rem)] hidden text-blue-75"
+                className="hero-heading-sml animate-tile-top-enter absolute right-[clamp(1rem,6vw,3rem)] hidden text-foreground"
                 style={{
                   transform:
                     "perspective(1000px) translate3d(-110px, 50px, -60px) rotateY(-50deg) rotateX(-20deg)",
@@ -871,19 +871,19 @@ export default function Hero({ heroVideosBlob }: Props) {
             </span>
           </h1>
 
-          <p className="text-body-lg/[1.2] mb-5 hidden font-robert-regular text-blue-100 md:block">
+          <p className="mb-5 hidden font-robert-regular text-body-lg/[1.2] text-foreground md:block">
             Enter the Metagame
             <br />
             Unleash the Play Economy
           </p>
-          <Button leftIcon={leftIcon} className="hidden bg-yellow-300 md:flex">
+          <Button leftIcon={leftIcon} className="hidden md:flex">
             Watch Trailer
           </Button>
         </div>
 
         <div className="absolute inset-0 z-10 h-svh w-full">
           <h1
-            className="hero-heading-lrg animate-tile-bottom-exit absolute bottom-6 right-8 hidden text-blue-75 md:block"
+            className="hero-heading-lrg animate-tile-bottom-exit absolute bottom-6 right-8 hidden text-foreground md:block"
             style={{
               transform:
                 "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
@@ -897,7 +897,7 @@ export default function Hero({ heroVideosBlob }: Props) {
             )}
           </h1>
           <h1
-            className="hero-heading-lrg animate-tile-bottom-enter absolute bottom-6 right-8 hidden text-blue-75 md:block"
+            className="hero-heading-lrg animate-tile-bottom-enter absolute bottom-6 right-8 hidden text-foreground md:block"
             style={{
               transform:
                 "perspective(1000px) translate3d(0px, -150px, 20px) rotateZ(-20deg) rotateX(60deg)",
@@ -911,14 +911,12 @@ export default function Hero({ heroVideosBlob }: Props) {
             )}
           </h1>
           <div className="absolute bottom-0 right-0 flex w-full items-center justify-between px-[clamp(1rem,6vw,3rem)] pb-[clamp(1rem,6vw,3rem)] md:hidden">
-            <p className="text-body-sm/[1.2] font-robert-regular text-blue-100">
+            <p className="font-robert-regular text-body-sm/[1.2] text-foreground">
               Enter the Metagame
               <br />
               Unleash the Play Economy
             </p>
-            <Button leftIcon={leftIcon} className="bg-yellow-300">
-              Trailer
-            </Button>
+            <Button leftIcon={leftIcon}>Trailer</Button>
           </div>
         </div>
       </div>

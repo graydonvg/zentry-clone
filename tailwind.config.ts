@@ -26,20 +26,37 @@ export default {
         caption: "var(--caption)",
       },
       colors: {
-        blue: {
-          50: "#DFDFF0",
-          75: "#dfdff2",
-          100: "#F0F2FA",
-          200: "#010101",
-          300: "#4FB7DD",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
         },
-        violet: {
-          300: "#5724ff",
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
         },
-        yellow: {
-          100: "#8e983f",
-          300: "#edff66",
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
         },
+        border: "hsl(var(--border))",
+        // blue: {
+        //   50: "#DFDFF0",
+        //   75: "#dfdff2",
+        //   100: "#F0F2FA",
+        //   200: "#010101",
+        //   300: "#4FB7DD",
+        // },
+        // violet: {
+        //   // accent
+        //   300: "#5724ff",
+        // },
+        // yellow: {
+        //   100: "#8e983f",
+
+        //   // primary
+        //   300: "#edff66",
+        // },
       },
     },
   },

@@ -198,8 +198,14 @@ export default function Navbar({ audioBlob }: Props) {
         linkMouseEnterTl.clear();
       }
 
+      const linkLabelColor = `hsl(${getComputedStyle(document.documentElement)
+        .getPropertyValue("--foreground")
+        .trim()
+        .split(" ")
+        .join(", ")})`;
+
       gsap.set(target, {
-        color: "#dfdff0",
+        color: linkLabelColor,
       });
     });
 
@@ -241,7 +247,7 @@ export default function Navbar({ audioBlob }: Props) {
       <div className="relative mt-2 overflow-hidden rounded-lg">
         <div
           ref={navBackgroundRef}
-          className="border-border absolute inset-0 rounded-lg border bg-black opacity-0"
+          className="absolute inset-0 rounded-lg border border-border bg-black opacity-0"
           style={{ willChange: "opacity" }}
         />
         <nav
@@ -249,14 +255,15 @@ export default function Navbar({ audioBlob }: Props) {
           className="relative flex size-full items-center justify-between p-4"
         >
           <div className="flex w-full items-center justify-between md:justify-start md:gap-8">
-            <svg aria-hidden="true" className="size-8" fill="white">
+            <svg aria-hidden="true" className="size-8 fill-secondary">
               <use href="/icons/arrows-icon.svg#arrows-icon"></use>
             </svg>
             <div className="flex items-center justify-center gap-6">
               <Button
                 id="product-button"
+                variant="secondary"
+                size="small"
                 rightIcon={rightIcon}
-                className="bg-blue-50 px-4 py-2"
               >
                 Products
               </Button>
@@ -266,7 +273,7 @@ export default function Navbar({ audioBlob }: Props) {
                   className="size-6 md:hidden"
                 >
                   <span className="sr-only">Toggle Menu</span>
-                  <svg aria-hidden="true" className="size-full fill-blue-50">
+                  <svg aria-hidden="true" className="size-full fill-secondary">
                     <use href="/icons/burger-icon.svg#burger-icon"></use>
                   </svg>
                 </button>
@@ -285,7 +292,7 @@ export default function Navbar({ audioBlob }: Props) {
           </div>
           <div
             ref={navLinkBackgroundRef}
-            className="pointer-events-none absolute z-40 hidden rounded-3xl bg-blue-50 md:block"
+            className="pointer-events-none absolute z-40 hidden rounded-3xl bg-secondary md:block"
             style={{ willChange: "opacity, transform" }}
           />
           <ul className="z-50 hidden items-center md:flex">
@@ -300,7 +307,7 @@ export default function Navbar({ audioBlob }: Props) {
                       ref={(el) => {
                         linkRefs.current[index] = el;
                       }}
-                      className="flex items-center gap-1 px-4 py-2 text-xs font-semibold uppercase text-white"
+                      className="flex items-center gap-1 px-4 py-2 text-xs font-semibold uppercase text-foreground"
                     >
                       {item.label}
                       {Icon && <Icon />}
@@ -324,7 +331,7 @@ export default function Navbar({ audioBlob }: Props) {
                   <div
                     key={index}
                     className={cn(
-                      "audio-indicator-line h-1 w-px rounded-full bg-white transition-all duration-200 ease-in-out",
+                      "audio-indicator-line h-1 w-px rounded-full bg-foreground transition-all duration-200 ease-in-out",
                       {
                         active: isIndicatorActive,
                       },
