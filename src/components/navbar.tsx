@@ -7,7 +7,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Button from "./ui/button";
 import { TiLocationArrow } from "react-icons/ti";
 import { cn } from "@/lib/utils";
-import { ListBlobResultBlob } from "@vercel/blob";
 import { useIsTouchOnlyDevice } from "@/hooks/use-is-touch-only-device";
 
 if (typeof window !== "undefined") {
@@ -34,11 +33,7 @@ const navItems = [
   },
 ];
 
-type Props = {
-  audioBlob: ListBlobResultBlob[];
-};
-
-export default function Navbar({ audioBlob }: Props) {
+export default function Navbar() {
   const isTouchOnlyDevice = useIsTouchOnlyDevice();
   const navContainerRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLElement>(null);
@@ -323,7 +318,7 @@ export default function Navbar({ audioBlob }: Props) {
               >
                 <audio
                   ref={audioElementRef}
-                  src={audioBlob[0].url}
+                  src="/audio/loop.mp3"
                   loop
                   className="hidden"
                 />

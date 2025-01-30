@@ -1,46 +1,8 @@
-"use client";
-
 import ProductCard from "./product-card";
 import TiltOnHover from "../animation/tilt-on-hover";
 import TiltInOutOnScroll from "../animation/tilt-in-out-on-scroll";
-import { ListBlobResultBlob } from "@vercel/blob";
 
-function getProductVideos(productVideosBlob: ListBlobResultBlob[]) {
-  const videoMap = new Map(
-    productVideosBlob.map((video) => [
-      video.pathname.split("/").at(-1),
-      video.url,
-    ]),
-  );
-
-  const productVideos = [
-    {
-      src: videoMap.get("product-1.mp4"),
-    },
-    {
-      src: videoMap.get("product-2.mp4"),
-    },
-    {
-      src: videoMap.get("product-3.mp4"),
-    },
-    {
-      src: videoMap.get("product-4.mp4"),
-    },
-    {
-      src: videoMap.get("product-5.mp4"),
-    },
-  ];
-
-  return productVideos;
-}
-
-type Props = {
-  productVideosBlob: ListBlobResultBlob[];
-};
-
-export default function Products({ productVideosBlob }: Props) {
-  const productVideos = getProductVideos(productVideosBlob);
-
+export default function Products() {
   return (
     <section className="min-h-screen bg-black px-3 py-16 sm:px-8 sm:py-24 md:px-24 lg:py-32">
       <div className="mx-auto max-w-screen-2xl space-y-16 sm:space-y-24 lg:space-y-32">
@@ -57,7 +19,7 @@ export default function Products({ productVideosBlob }: Props) {
 
         <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 md:gap-8">
           <ProductCard
-            src={productVideos[0].src || ""}
+            src="/videos/product-1.mp4"
             title={
               <>
                 radia<b>n</b>t
@@ -68,7 +30,7 @@ export default function Products({ productVideosBlob }: Props) {
           />
 
           <ProductCard
-            src={productVideos[1].src || ""}
+            src="/videos/product-2.mp4"
             title={
               <>
                 zig<b>m</b>a
@@ -79,7 +41,7 @@ export default function Products({ productVideosBlob }: Props) {
           />
 
           <ProductCard
-            src={productVideos[2].src || ""}
+            src="/videos/product-3.mp4"
             title={
               <>
                 n<b>e</b>xus
@@ -90,7 +52,7 @@ export default function Products({ productVideosBlob }: Props) {
           />
 
           <ProductCard
-            src={productVideos[3].src || ""}
+            src="/videos/product-4.mp4"
             title={
               <>
                 az<b>u</b>l
@@ -123,7 +85,7 @@ export default function Products({ productVideosBlob }: Props) {
           </TiltInOutOnScroll>
 
           <ProductCard
-            src={productVideos[4].src || ""}
+            src="/videos/product-5.mp4"
             autoplay
             containerClassName="order-6 col-span-2 row-span-1 mr-auto hidden aspect-[630/400] w-4/5 border-none md:col-span-1 md:block md:w-full"
           />

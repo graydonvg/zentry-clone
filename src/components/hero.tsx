@@ -15,7 +15,6 @@ import {
   getFirstTransformedHeroClipPath,
   getSecondTransformedHeroClipPath,
 } from "@/lib/utils";
-import { ListBlobResultBlob } from "@vercel/blob";
 import { useIsTouchOnlyDevice } from "@/hooks/use-is-touch-only-device";
 import useAssetsStore from "@/lib/store/use-assets-store";
 import useIsClient from "@/hooks/use-is-client";
@@ -49,38 +48,27 @@ function splitAndMapTextWithTags(str: string, className: string) {
   });
 }
 
-function getHeroVideos(heroVideosBlob: ListBlobResultBlob[]) {
-  const videoMap = new Map(
-    heroVideosBlob.map((video) => [
-      video.pathname.split("/").at(-1),
-      video.url,
-    ]),
-  );
-
-  const heroVideos = [
-    {
-      initialZIndex: 10,
-      autoPlay: false,
-      src: videoMap.get("hero-1.mp4"),
-    },
-    {
-      initialZIndex: 20,
-      src: videoMap.get("hero-2.mp4"),
-    },
-    {
-      initialZIndex: -10,
-      initialDisplay: "none",
-      src: videoMap.get("hero-3.mp4"),
-    },
-    {
-      initialZIndex: -10,
-      initialDisplay: "none",
-      src: videoMap.get("hero-4.mp4"),
-    },
-  ];
-
-  return heroVideos;
-}
+const heroVideos = [
+  {
+    initialZIndex: 10,
+    autoPlay: true,
+    src: "/videos/hero-1.mp4",
+  },
+  {
+    initialZIndex: 20,
+    src: "/videos/hero-2.mp4",
+  },
+  {
+    initialZIndex: -10,
+    initialDisplay: "none",
+    src: "/videos/hero-3.mp4",
+  },
+  {
+    initialZIndex: -10,
+    initialDisplay: "none",
+    src: "/videos/hero-4.mp4",
+  },
+];
 
 const MIN_HIT_AREA_SIDE_LENGTH = 100;
 const MAX_HIT_AREA_SIDE_LENGTH = 250;
@@ -92,11 +80,7 @@ const animatedTitles = [
   "ag<b>e</b>ntic ai",
 ];
 
-type Props = {
-  heroVideosBlob: ListBlobResultBlob[];
-};
-
-export default function Hero({ heroVideosBlob }: Props) {
+export default function Hero() {
   const isTouchOnlyDevice = useIsTouchOnlyDevice();
   const windowDimensions = useWindowDimensions();
   const isClient = useIsClient();
@@ -126,7 +110,6 @@ export default function Hero({ heroVideosBlob }: Props) {
   const videoItemContentRefs = useRef<(HTMLDivElement | null)[]>([]);
   const videoItemBorderRefs = useRef<(SVGPathElement | null)[]>([]);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
-  const heroVideos = getHeroVideos(heroVideosBlob);
   const totalVideos = heroVideos.length;
   const previousVideoNumber =
     (currentVideoNumber - 1 + totalVideos) % totalVideos;
@@ -789,7 +772,7 @@ export default function Hero({ heroVideosBlob }: Props) {
                 ref={(el) => {
                   videoItemContentRefs.current[index] = el;
                 }}
-                className="absolute left-0 top-0 z-10 size-full overflow-hidden bg-accent"
+                className="absolute left-0 top-0 z-10 size-full overflow-hidden bg-primary"
                 style={{
                   clipPath: `path("${clipPath}")`,
                   transform: "perspective(100px)",
