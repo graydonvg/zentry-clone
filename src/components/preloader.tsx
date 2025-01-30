@@ -15,6 +15,7 @@ export default function Preloader() {
 
   useGSAP(() => {
     if (heroVideoAssetsLoaded) {
+      window.scrollTo(0, 0);
       gsap.to("#preloader", { autoAlpha: 0 });
       document.body.classList.remove("overflow-hidden");
     }
