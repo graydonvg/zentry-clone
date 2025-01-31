@@ -864,7 +864,7 @@ export default function Hero() {
           </Button>
         </div>
 
-        <div className="absolute inset-0 z-10 h-svh w-full">
+        <div className="absolute inset-0 z-20 h-svh w-full">
           <h1
             className="hero-heading-lrg animate-tile-bottom-exit absolute bottom-6 right-8 hidden text-foreground md:block"
             style={{
