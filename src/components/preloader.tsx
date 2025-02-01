@@ -15,6 +15,7 @@ if (typeof window !== "undefined") {
 export default function Preloader() {
   const windowDimensions = useWindowDimensions();
   const preloaderRef = useRef<HTMLDivElement>(null);
+  const preloaderSvgRef = useRef<SVGSVGElement>(null);
   const topLogoRef = useRef<SVGSVGElement>(null);
   const bottomLogoRef = useRef<SVGSVGElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
@@ -86,12 +87,21 @@ export default function Preloader() {
       if (!heroVideoAssetsLoaded) return;
 
       const preloader = preloaderRef.current;
+      const preloaderSvg = preloaderSvgRef.current;
       const topLogo = topLogoRef.current;
       const bottomLogo = bottomLogoRef.current;
       const path = pathRef.current;
       const timeline = timelineRef.current;
 
-      if (!preloader || !topLogo || !bottomLogo || !path || !timeline) return;
+      if (
+        !preloader ||
+        !preloaderSvg ||
+        !topLogo ||
+        !bottomLogo ||
+        !path ||
+        !timeline
+      )
+        return;
 
       const primaryColor = `hsl(${getComputedStyle(document.documentElement)
         .getPropertyValue("--primary")
@@ -168,6 +178,7 @@ export default function Preloader() {
           },
           ">",
         )
+        .set(preloaderSvg, { display: "none" })
         .to(preloader, { autoAlpha: 0 })
         .then(() => {
           window.scrollTo(0, 0);
@@ -181,39 +192,43 @@ export default function Preloader() {
   );
 
   return (
-    <>
-      <svg className="min-h-screen w-full">
+    <div
+      ref={preloaderRef}
+      className="fixed inset-0 z-[60] flex size-full min-h-screen grow flex-col overflow-hidden bg-black"
+      style={{
+        mask: "url(#diamond-mask)",
+      }}
+    >
+      <svg ref={preloaderSvgRef} aria-hidden="true" width="100%" height="100%">
         <defs>
-          <mask id="diamond-mask" maskContentUnits="userSpaceOnUse">
-            <rect className="size-full fill-white" />
-            <path ref={pathRef} d={hiddenMaskPath} className="fill-black" />
+          <mask id="diamond-mask">
+            <rect width="100%" height="100%" fill="white" />
+            <path
+              ref={pathRef}
+              d={hiddenMaskPath}
+              width="100%"
+              height="100%"
+              fill="black"
+            />
           </mask>
         </defs>
       </svg>
-      <div
-        ref={preloaderRef}
-        className="special-font fixed inset-0 z-[60] flex min-h-screen w-full flex-col overflow-hidden bg-black font-zentry text-[clamp(1rem,10vw+2rem,10rem)] uppercase text-primary-foreground"
-        style={{
-          mask: "url(#diamond-mask)",
-        }}
+      <svg
+        ref={topLogoRef}
+        aria-hidden="true"
+        viewBox="0 0 661 660"
+        className="absolute -left-[30vw] top-1/2 size-1/5 -translate-y-1/2 fill-primary"
       >
-        <svg
-          ref={topLogoRef}
-          aria-hidden="true"
-          viewBox="0 0 661 660"
-          className="absolute -left-[30vw] top-1/2 size-1/5 -translate-y-1/2 fill-primary"
-        >
-          <path d="m338.88,214.91H0L617.26,0l-246.08,384.58-32.32-169.69.02.02Z" />
-        </svg>
-        <svg
-          ref={bottomLogoRef}
-          aria-hidden="true"
-          viewBox="0 0 661 660"
-          className="absolute -right-[30vw] top-1/2 size-1/5 translate-y-[-50%] fill-primary"
-        >
-          <path d="m321.14,444.52h338.87L42.75,659.99l246.07-385.58,32.32,170.13v-.02Z" />
-        </svg>
-      </div>
-    </>
+        <path d="m338.88,214.91H0L617.26,0l-246.08,384.58-32.32-169.69.02.02Z" />
+      </svg>
+      <svg
+        ref={bottomLogoRef}
+        aria-hidden="true"
+        viewBox="0 0 661 660"
+        className="absolute -right-[30vw] top-1/2 size-1/5 translate-y-[-50%] fill-primary"
+      >
+        <path d="m321.14,444.52h338.87L42.75,659.99l246.07-385.58,32.32,170.13v-.02Z" />
+      </svg>
+    </div>
   );
 }

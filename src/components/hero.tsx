@@ -719,8 +719,7 @@ export default function Hero() {
     <section className="relative min-h-screen w-full overflow-hidden">
       <div
         ref={heroRef}
-        id="hero-slides"
-        className="absolute left-0 top-0 z-10 size-full overflow-hidden"
+        className="absolute left-0 top-0 size-full overflow-hidden"
       >
         <svg
           className="pointer-events-none absolute left-0 top-0 z-30 size-full fill-none"
@@ -827,7 +826,7 @@ export default function Hero() {
           );
         })}
 
-        <div className="absolute left-0 top-0 z-20 size-full px-[clamp(1rem,6vw,3rem)]">
+        <div className="absolute left-0 top-0 z-10 size-full px-[clamp(1rem,6vw,3rem)] md:z-20">
           <h1 className="hero-heading-sml md:hero-heading-lrg mt-24 text-foreground">
             redefi<b>n</b>e
             <span className="inline-flex md:hidden">
@@ -872,7 +871,7 @@ export default function Hero() {
           </Button>
         </div>
 
-        <div className="absolute inset-0 z-20 h-svh w-full">
+        <div className="absolute inset-0 z-20 h-svh w-full md:z-10">
           <h1
             className="hero-heading-lrg animate-tile-bottom-exit absolute bottom-6 right-8 hidden text-foreground md:block"
             style={{
