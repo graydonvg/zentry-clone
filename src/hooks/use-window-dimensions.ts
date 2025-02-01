@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useLayoutEffect } from "react";
+import usePreloaderStore from "@/lib/store/use-preloader-store";
+import { useState, useEffect } from "react";
 
 export default function useWindowDimensions() {
   const measurementElement =
@@ -14,8 +15,11 @@ export default function useWindowDimensions() {
     width: viewportWidth,
     height: viewportHeight,
   });
+  const isPreloaderComplete = usePreloaderStore(
+    (state) => state.isPreloaderComplete,
+  );
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const controller = new AbortController();
 
     function handleResize() {
@@ -32,7 +36,7 @@ export default function useWindowDimensions() {
     });
 
     return () => controller.abort();
-  }, [viewportWidth, viewportHeight]);
+  }, [viewportWidth, viewportHeight, isPreloaderComplete]);
 
   return windowDimensions;
 }

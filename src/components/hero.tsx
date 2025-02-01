@@ -18,6 +18,7 @@ import {
 import { useIsTouchOnlyDevice } from "@/hooks/use-is-touch-only-device";
 import useAssetsStore from "@/lib/store/use-assets-store";
 import useIsClient from "@/hooks/use-is-client";
+import usePreloaderStore from "@/lib/store/use-preloader-store";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -51,7 +52,7 @@ function splitAndMapTextWithTags(str: string, className: string) {
 const heroVideos = [
   {
     initialZIndex: 10,
-    autoPlay: true,
+    autoPlay: false,
     src: "/videos/hero-1.mp4",
   },
   {
@@ -123,8 +124,8 @@ export default function Hero() {
   const toggleHeroVideoAssetsLoaded = useAssetsStore(
     (state) => state.toggleHeroVideoAssetsLoaded,
   );
-  const heroVideoAssetsLoaded = useAssetsStore(
-    (state) => state.heroVideoAssetsLoaded,
+  const isPreloaderComplete = usePreloaderStore(
+    (state) => state.isPreloaderComplete,
   );
   const leftIcon = useMemo(
     () => <TiLocationArrow className="size-4 rotate-45" />,
@@ -150,7 +151,7 @@ export default function Hero() {
     setSecondTransformedHeroClipPath(
       getSecondTransformedHeroClipPath(windowDimensions),
     );
-  }, [windowDimensions, minMaxHitAreaSideLength, heroVideoAssetsLoaded]);
+  }, [windowDimensions, minMaxHitAreaSideLength]);
 
   function handleHitAreaClicked() {
     if (isTransitioningRef.current) return;
@@ -167,23 +168,23 @@ export default function Hero() {
   // Set next video and hit area initial clip path and scale
   useGSAP(
     () => {
-      if (!isTouchOnlyDevice) {
-        gsap.set(videoItemContentRefs.current[nextVideoNumber], {
-          clipPath: `path("${hiddenVideoClipPath}")`,
-        });
-        gsap.set(videoItemBorderRefs.current[nextVideoNumber], {
-          attr: {
-            d: hiddenVideoClipPath,
-          },
-        });
-      } else {
-        gsap.set(hitAreaRef.current, {
+      gsap.set(videoItemContentRefs.current[nextVideoNumber], {
+        clipPath: `path("${hiddenVideoClipPath}")`,
+      });
+      gsap.set(videoItemBorderRefs.current[nextVideoNumber], {
+        attr: {
+          d: hiddenVideoClipPath,
+        },
+      });
+
+      if (isTouchOnlyDevice && isPreloaderComplete) {
+        gsap.to(hitAreaRef.current, {
           scale: 1,
         });
-        gsap.set(videoItemContentRefs.current[nextVideoNumber], {
+        gsap.to(videoItemContentRefs.current[nextVideoNumber], {
           clipPath: `path("${nextVideoClipPath}")`,
         });
-        gsap.set(videoItemBorderRefs.current[nextVideoNumber], {
+        gsap.to(videoItemBorderRefs.current[nextVideoNumber], {
           attr: {
             d: nextVideoClipPath,
           },
@@ -191,7 +192,12 @@ export default function Hero() {
       }
     },
     {
-      dependencies: [nextVideoClipPath, hiddenVideoClipPath, isTouchOnlyDevice],
+      dependencies: [
+        nextVideoClipPath,
+        hiddenVideoClipPath,
+        isTouchOnlyDevice,
+        isPreloaderComplete,
+      ],
       revertOnUpdate: true,
     },
   );
@@ -208,6 +214,7 @@ export default function Hero() {
       const fakeHitArea = fakeHitAreaRef.current;
 
       if (
+        !isPreloaderComplete ||
         !nextVideoItemContent ||
         !nextVideo ||
         !nextVideoBorder ||
@@ -404,6 +411,7 @@ export default function Hero() {
     },
     {
       dependencies: [
+        isPreloaderComplete,
         nextVideoNumber,
         hiddenVideoClipPath,
         minMaxHitAreaSideLength,

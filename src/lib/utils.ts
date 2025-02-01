@@ -20,6 +20,89 @@ export function getHitAreaSideLength(
   return Math.min(hitAreaMinSideLength, maxHitAreaSideLength);
 }
 
+export function getPreloaderMaskPath(
+  windowDimensions: WindowDimensions,
+  hidden = false,
+  borderRadius = 8,
+) {
+  // Set maximum dimensions for the clip path
+  const minWidth = 500;
+  const maxWidth = 650;
+
+  // Calculate width as a percentage of both width and height
+  const widthFromHeight = windowDimensions.height * 0.8;
+  const widthFromWidth = windowDimensions.width * 0.8;
+
+  const pathMinWidth = Math.max(
+    Math.min(widthFromHeight, widthFromWidth),
+    minWidth,
+  );
+  const pathMinMaxWidth = Math.min(pathMinWidth, maxWidth);
+
+  // Maintain the aspect ratio
+  const pathHeight = pathMinMaxWidth;
+
+  // Half side lengths for width and height
+  const halfHeight = pathHeight / 2;
+  const halfWidth = pathMinMaxWidth / 2;
+
+  const scalingFactor = pathMinMaxWidth / maxWidth;
+
+  let clampedRadius = 0;
+
+  // Clip path center
+  const centerX = windowDimensions.width / 2;
+  const centerY = windowDimensions.height / 2;
+
+  let topLeftX = centerX;
+  let topLeftY = centerY;
+
+  let topRightX = centerX;
+  let topRightY = centerY;
+
+  let bottomRightX = centerX;
+  let bottomRightY = centerY;
+
+  let bottomLeftX = centerX;
+  let bottomLeftY = centerY;
+
+  if (!hidden) {
+    // Ensure the borderRadius doesn't exceed the minimum of halfWidth and halfHeight
+    clampedRadius = Math.min(
+      borderRadius * scalingFactor,
+      halfWidth,
+      halfHeight,
+    );
+
+    topLeftX = centerX - halfWidth - 50 * scalingFactor;
+    topLeftY = centerY - halfHeight + 100 * scalingFactor;
+
+    topRightX = centerX + halfWidth - 50 * scalingFactor;
+    topRightY = topLeftY - 125 * scalingFactor;
+
+    bottomRightX = topRightX + 75 * scalingFactor;
+    bottomRightY = centerY + halfHeight + 25 * scalingFactor;
+
+    bottomLeftX = topLeftX + 50 * scalingFactor;
+    bottomLeftY = bottomRightY - 75 * scalingFactor;
+  }
+
+  const clipPath = `
+    M ${topLeftX + clampedRadius} ${topLeftY}
+    L ${topRightX - clampedRadius} ${topRightY}
+    Q ${topRightX} ${topRightY} ${topRightX} ${topRightY + clampedRadius}
+    L ${bottomRightX} ${bottomRightY - clampedRadius}
+    Q ${bottomRightX} ${bottomRightY} ${bottomRightX - clampedRadius} ${bottomRightY}
+    L ${bottomLeftX + clampedRadius} ${bottomLeftY}
+    Q ${bottomLeftX} ${bottomLeftY} ${bottomLeftX} ${bottomLeftY - clampedRadius}
+    L ${topLeftX} ${topLeftY + clampedRadius}
+    Q ${topLeftX} ${topLeftY} ${topLeftX + clampedRadius} ${topLeftY}
+    Z
+  `.replace(/\s+/g, " "); // Remove extra spaces for a single-line path
+
+  return clipPath;
+}
+
 export function getNextVideoClipPath(
   hitAreaWidth: number,
   windowDimensions: WindowDimensions,
@@ -82,7 +165,6 @@ export function getIntroImageClipPath(
   const widthFromHeight = windowDimensions.height * 0.4;
   const widthFromWidth = windowDimensions.width * 0.3;
 
-  // Take the smaller dimension for responsiveness
   const imageMinWidth = Math.max(
     Math.min(widthFromHeight, widthFromWidth),
     minWidth,
