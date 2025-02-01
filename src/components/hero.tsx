@@ -52,7 +52,7 @@ function splitAndMapTextWithTags(str: string, className: string) {
 const heroVideos = [
   {
     initialZIndex: 10,
-    autoPlay: false,
+    autoPlay: true,
     src: "/videos/hero-1.mp4",
   },
   {
