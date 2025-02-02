@@ -29,10 +29,6 @@ export default function Preloader() {
   );
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  useEffect(() => {
     setHiddenMaskPath(getPreloaderMaskPath(windowDimensions, true));
   }, [windowDimensions]);
 

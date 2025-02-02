@@ -15,9 +15,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      {/* <head>
+      <head>
         <script src="https://unpkg.com/react-scan/dist/auto.global.js" async />
-      </head> */}
+        <script
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html: `history.scrollRestoration = "manual"`,
+          }}
+        />
+      </head>
       <body className="overflow-hidden antialiased" suppressHydrationWarning>
         {children}
         <Preloader />
