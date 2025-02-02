@@ -907,7 +907,7 @@ export default function Hero() {
             )}
           </h1>
         </div>
-        <div className="absolute bottom-0 right-0 z-20 flex w-full items-center justify-between px-[clamp(1rem,6vw,3rem)] pb-[clamp(1rem,6vw,3rem)] md:hidden">
+        <div className="absolute inset-0 z-20 flex h-svh w-full items-end justify-between px-[clamp(1rem,6vw,3rem)] pb-[clamp(1rem,6vw,3rem)] md:hidden">
           <p className="hero-cta-enter-preloader font-robert-regular text-body-sm/[1.2] text-foreground">
             Enter the Metagame
             <br />
