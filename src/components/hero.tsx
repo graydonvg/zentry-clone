@@ -877,9 +877,9 @@ export default function Hero() {
           </Button>
         </div>
 
-        <div className="absolute inset-0 z-20 h-svh w-full md:z-10">
+        <div className="absolute inset-0 z-10 hidden h-svh w-full md:block">
           <h1
-            className="hero-heading-lrg heading-bottom-exit hero-heading-bottom-enter-preloader absolute bottom-6 right-8 hidden text-foreground md:block"
+            className="hero-heading-lrg heading-bottom-exit hero-heading-enter-preloader absolute bottom-6 right-8 text-foreground"
             style={{
               transform:
                 "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
@@ -893,7 +893,7 @@ export default function Hero() {
             )}
           </h1>
           <h1
-            className="hero-heading-lrg heading-bottom-enter absolute bottom-6 right-8 hidden text-foreground md:block"
+            className="hero-heading-lrg heading-bottom-enter absolute bottom-6 right-8 text-foreground"
             style={{
               transform:
                 "perspective(1000px) translate3d(0px, -150px, 20px) rotateZ(-20deg) rotateX(60deg)",
@@ -906,16 +906,16 @@ export default function Hero() {
               "heading-char-enter opacity-0 invisible",
             )}
           </h1>
-          <div className="absolute bottom-0 right-0 flex w-full items-center justify-between px-[clamp(1rem,6vw,3rem)] pb-[clamp(1rem,6vw,3rem)] md:hidden">
-            <p className="hero-cta-enter-preloader font-robert-regular text-body-sm/[1.2] text-foreground">
-              Enter the Metagame
-              <br />
-              Unleash the Play Economy
-            </p>
-            <Button leftIcon={leftIcon} className="hero-cta-enter-preloader">
-              Trailer
-            </Button>
-          </div>
+        </div>
+        <div className="absolute bottom-0 right-0 z-20 flex w-full items-center justify-between px-[clamp(1rem,6vw,3rem)] pb-[clamp(1rem,6vw,3rem)] md:hidden">
+          <p className="hero-cta-enter-preloader font-robert-regular text-body-sm/[1.2] text-foreground">
+            Enter the Metagame
+            <br />
+            Unleash the Play Economy
+          </p>
+          <Button leftIcon={leftIcon} className="hero-cta-enter-preloader">
+            Trailer
+          </Button>
         </div>
       </div>
 
