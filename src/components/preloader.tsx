@@ -29,6 +29,10 @@ export default function Preloader() {
   );
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     setHiddenMaskPath(getPreloaderMaskPath(windowDimensions, true));
   }, [windowDimensions]);
 
@@ -109,82 +113,157 @@ export default function Preloader() {
         .split(" ")
         .join(", ")})`;
 
-      timeline
-        .to(
-          bottomLogo,
-          {
-            ease: "power1.in",
-            scale: 100,
-            left: "-10vw",
-            translateY: "-300vh",
-            rotate: "-45deg",
-          },
-          ">+=0.3",
-        )
-        .to(
-          topLogo,
-          {
-            ease: "power1.in",
-            scale: 100,
-            left: "-10vw",
-            translateY: "-300vh",
-            rotate: "-45deg",
-          },
-          "<",
-        )
-        .set(
-          preloader,
-          {
-            backgroundColor: primaryColor,
-          },
-          ">",
-        )
-        .to(
-          topLogo,
-          {
-            autoAlpha: 0,
-          },
-          "<",
-        )
-        .to(
-          bottomLogo,
-          {
-            autoAlpha: 0,
-          },
-          "<",
-        )
-        .fromTo(
-          path,
-          { rotate: 0 },
-          {
-            duration: 1,
-            ease: "power1.out",
-            rotate: "-45deg",
-            attr: {
-              d: getPreloaderMaskPath(windowDimensions),
-            },
-          },
-          "<-=0.1",
-        )
-        .fromTo(
-          path,
-          { rotate: "-45deg" },
-          {
-            rotate: 0,
-            duration: 0.5,
-            attr: {
-              d: getFullScreenClipPath(windowDimensions),
-            },
-          },
-          ">",
-        )
-        .set(preloaderSvg, { display: "none" })
-        .to(preloader, { autoAlpha: 0 })
-        .then(() => {
-          window.scrollTo(0, 0);
-          document.body.classList.remove("overflow-hidden");
-        })
-        .then(() => toggleIsPreloaderComplete());
+      const mm = gsap.matchMedia();
+      const breakPoint = 768;
+
+      mm.add(
+        {
+          isAboveMedium: `(min-width: ${breakPoint}px) `,
+          isBelowMedium: `(max-width: ${breakPoint - 0.01}px) `,
+        },
+        (context) => {
+          if (!context.conditions) return;
+          const { isAboveMedium } = context.conditions;
+
+          const heroHeadingTarget = isAboveMedium
+            ? ".hero-heading-enter-preloader, .hero-heading-bottom-enter-preloader"
+            : ".hero-heading-enter-preloader";
+
+          timeline
+            .to(
+              bottomLogo,
+              {
+                ease: "power1.in",
+                scale: 100,
+                left: "-10vw",
+                translateY: "-300vh",
+                rotate: "-45deg",
+              },
+              ">+=0.3",
+            )
+            .to(
+              topLogo,
+              {
+                ease: "power1.in",
+                scale: 100,
+                left: "-10vw",
+                translateY: "-300vh",
+                rotate: "-45deg",
+              },
+              "<",
+            )
+            .set(
+              preloader,
+              {
+                backgroundColor: primaryColor,
+              },
+              ">",
+            )
+            .to(
+              topLogo,
+              {
+                autoAlpha: 0,
+              },
+              "<",
+            )
+            .to(
+              bottomLogo,
+              {
+                autoAlpha: 0,
+              },
+              "<",
+            )
+            .fromTo(
+              path,
+              { rotate: 0 },
+              {
+                duration: 1,
+                ease: "power1.out",
+                rotate: "-45deg",
+                attr: {
+                  d: getPreloaderMaskPath(windowDimensions),
+                },
+              },
+              "<-=0.1",
+            )
+            .fromTo(
+              path,
+              { rotate: "-45deg" },
+              {
+                rotate: 0,
+                duration: 0.5,
+                attr: {
+                  d: getFullScreenClipPath(windowDimensions),
+                },
+              },
+              ">",
+            )
+            .set(preloaderSvg, { display: "none" })
+            .to(preloader, { autoAlpha: 0 })
+            .fromTo(
+              heroHeadingTarget,
+              {
+                display: "none",
+                transform:
+                  "perspective(1000px) translate3d(0px, -100%, -20px) rotateZ(-20deg) rotateX(60deg)",
+              },
+
+              {
+                display: "block",
+                transform:
+                  "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
+              },
+              "<-=0.4",
+            )
+            .fromTo(
+              ".hero-heading-chars-enter-preloader",
+              { autoAlpha: 0 },
+              {
+                autoAlpha: 1,
+                duration: 0.01,
+                stagger: {
+                  amount: 0.3,
+                },
+              },
+              "<",
+            )
+            .fromTo(
+              ".hero-cta-enter-preloader ",
+              {
+                autoAlpha: 0,
+                translateY: 20,
+              },
+              {
+                autoAlpha: 1,
+                translateY: 0,
+                stagger: {
+                  amount: 0.3,
+                },
+              },
+              "<",
+            )
+            .fromTo(
+              "#navbar",
+              {
+                autoAlpha: 0,
+                translateY: -20,
+              },
+              {
+                autoAlpha: 1,
+                translateY: 0,
+              },
+              "<+=0.3",
+            )
+            .then(() => {
+              mm.kill();
+              timeline.kill();
+              document.body.classList.remove("overflow-hidden");
+            })
+            .then(() => {
+              toggleIsPreloaderComplete();
+            });
+        },
+      );
     },
     {
       dependencies: [heroVideoAssetsLoaded],

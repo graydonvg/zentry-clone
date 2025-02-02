@@ -235,6 +235,7 @@ export default function Navbar() {
 
   return (
     <div
+      id="navbar"
       ref={navContainerRef}
       className="fixed inset-x-2 z-50 sm:inset-x-4"
       style={{ willChange: "transform" }}

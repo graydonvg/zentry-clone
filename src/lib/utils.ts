@@ -26,7 +26,7 @@ export function getPreloaderMaskPath(
   borderRadius = 8,
 ) {
   // Set maximum dimensions for the clip path
-  const minWidth = 500;
+  const minWidth = 450;
   const maxWidth = 650;
 
   // Calculate width as a percentage of both width and height

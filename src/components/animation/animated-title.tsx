@@ -9,6 +9,7 @@ if (typeof window !== "undefined") {
 }
 
 type Props = {
+  id?: string;
   titleLrg: string;
   titleSml: string;
   caption?: string;
@@ -17,6 +18,7 @@ type Props = {
 };
 
 export default function AnimatedTitle({
+  id,
   titleLrg,
   titleSml,
   containerClassName,
@@ -150,6 +152,7 @@ export default function AnimatedTitle({
 
   return (
     <div
+      id={id}
       ref={titleContainerRef}
       className={cn(
         "flex flex-col items-center justify-center gap-4 space-y-5 sm:gap-6 md:gap-8",

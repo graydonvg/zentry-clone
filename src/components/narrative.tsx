@@ -18,7 +18,6 @@ export default function Narrative() {
     typeof window !== "undefined"
       ? document.getElementById("pinned-intro-element")
       : null;
-  const narrativeSectionRef = useRef<HTMLElement>(null);
   const imageClipPathRef = useRef<HTMLDivElement>(null);
   const imageContentRef = useRef<HTMLDivElement>(null);
   const [scrollTriggerOffset, setScrollTriggerOffset] = useState(
@@ -56,8 +55,8 @@ export default function Narrative() {
       });
 
       ScrollTrigger.create({
-        trigger: narrativeSectionRef.current,
-        start: () => `20%+=${scrollTriggerOffset} bottom`,
+        trigger: "#narrative-title",
+        start: () => `70%+=${scrollTriggerOffset} bottom`,
         end: () => `bottom+=${scrollTriggerOffset} bottom`,
         onEnter: () => {
           gsap.fromTo(
@@ -139,11 +138,9 @@ export default function Narrative() {
   );
 
   return (
-    <section
-      ref={narrativeSectionRef}
-      className="relative flex size-full h-fit flex-col items-center overflow-hidden bg-black py-16 text-foreground sm:py-24 lg:py-32"
-    >
+    <section className="relative flex size-full h-fit flex-col items-center overflow-hidden bg-black py-16 text-foreground sm:py-24 lg:py-32">
       <AnimatedTitle
+        id="narrative-title"
         caption="the open ip universe"
         titleLrg="the st<b>o</b>ry of<br />a hidden real<b>m</b>"
         titleSml="the st<b>o</b>ry of<br />a hidden real<b>m</b>"

@@ -543,7 +543,7 @@ export default function Hero() {
     },
   );
 
-  // Animated title on click
+  // Animate heading on click
   useGSAP(
     () => {
       const mm = gsap.matchMedia();
@@ -561,17 +561,17 @@ export default function Hero() {
           const { isAboveMedium } = context.conditions;
 
           const hiddenExitTarget = isAboveMedium
-            ? ".animate-tile-top-exit"
-            : ".animate-tile-bottom-exit";
+            ? ".heading-top-exit"
+            : ".heading-bottom-exit";
           const hiddenEnterTarget = isAboveMedium
-            ? ".animate-tile-top-enter"
-            : ".animate-tile-bottom-enter";
+            ? ".heading-top-enter"
+            : ".heading-bottom-enter";
           const visibleExitTarget = isAboveMedium
-            ? ".animate-tile-bottom-exit"
-            : ".animate-tile-top-exit";
+            ? ".heading-bottom-exit"
+            : ".heading-top-exit";
           const visibleEnterTarget = isAboveMedium
-            ? ".animate-tile-bottom-enter"
-            : ".animate-tile-top-enter";
+            ? ".heading-bottom-enter"
+            : ".heading-top-enter";
 
           gsap
             .timeline()
@@ -591,10 +591,10 @@ export default function Hero() {
               },
             )
             .fromTo(
-              ".animate-tile-char-exit",
-              { opacity: 1 },
+              ".heading-char-exit",
+              { autoAlpha: 1 },
               {
-                opacity: 0,
+                autoAlpha: 0,
                 duration: 0.01,
                 stagger: {
                   amount: 0.4,
@@ -618,10 +618,10 @@ export default function Hero() {
               0.4,
             )
             .fromTo(
-              ".animate-tile-char-enter",
-              { opacity: 0 },
+              ".heading-char-enter",
+              { autoAlpha: 0 },
               {
-                opacity: 1,
+                autoAlpha: 1,
                 duration: 0.01,
                 stagger: {
                   amount: 0.6,
@@ -827,11 +827,14 @@ export default function Hero() {
         })}
 
         <div className="absolute left-0 top-0 z-10 size-full px-[clamp(1rem,6vw,3rem)] md:z-20">
-          <h1 className="hero-heading-sml md:hero-heading-lrg mt-24 text-foreground">
-            redefi<b>n</b>e
+          <h1 className="hero-heading-sml md:hero-heading-lrg hero-heading-enter-preloader mt-24 text-foreground">
+            {splitAndMapTextWithTags(
+              "redefi<b>n</b>e",
+              "hero-heading-chars-enter-preloader opacity-0 invisible",
+            )}
             <span className="inline-flex md:hidden">
               <span
-                className="hero-heading-sml animate-tile-top-exit absolute right-[clamp(1rem,6vw,3rem)] text-foreground"
+                className="hero-heading-sml heading-top-exit absolute right-0 text-foreground"
                 style={{
                   transform:
                     "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
@@ -841,11 +844,11 @@ export default function Hero() {
               >
                 {splitAndMapTextWithTags(
                   animatedTitles[animatedTitleIndexRef.current.exit],
-                  "animate-tile-char-exit opacity-100",
+                  "heading-char-exit opacity-100",
                 )}
               </span>
               <span
-                className="hero-heading-sml animate-tile-top-enter absolute right-[clamp(1rem,6vw,3rem)] hidden text-foreground"
+                className="hero-heading-sml heading-top-enter absolute right-0 hidden text-foreground"
                 style={{
                   transform:
                     "perspective(1000px) translate3d(-110px, 50px, -60px) rotateY(-50deg) rotateX(-20deg)",
@@ -855,25 +858,28 @@ export default function Hero() {
               >
                 {splitAndMapTextWithTags(
                   animatedTitles[animatedTitleIndexRef.current.enter],
-                  "animate-tile-char-enter opacity-0",
+                  "heading-char-enter opacity-0 invisible",
                 )}
               </span>
             </span>
           </h1>
 
-          <p className="mb-5 hidden font-robert-regular text-body-lg/[1.2] text-foreground md:block">
+          <p className="hero-cta-enter-preloader mb-5 hidden font-robert-regular text-body-lg/[1.2] text-foreground md:block">
             Enter the Metagame
             <br />
             Unleash the Play Economy
           </p>
-          <Button leftIcon={leftIcon} className="hidden md:flex">
+          <Button
+            leftIcon={leftIcon}
+            className="hero-cta-enter-preloader hidden md:flex"
+          >
             Watch Trailer
           </Button>
         </div>
 
         <div className="absolute inset-0 z-20 h-svh w-full md:z-10">
           <h1
-            className="hero-heading-lrg animate-tile-bottom-exit absolute bottom-6 right-8 hidden text-foreground md:block"
+            className="hero-heading-lrg heading-bottom-exit hero-heading-bottom-enter-preloader absolute bottom-6 right-8 hidden text-foreground md:block"
             style={{
               transform:
                 "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
@@ -883,11 +889,11 @@ export default function Hero() {
           >
             {splitAndMapTextWithTags(
               animatedTitles[animatedTitleIndexRef.current.exit],
-              "animate-tile-char-exit opacity-100",
+              "heading-char-exit opacity-100 hero-heading-chars-enter-preloader",
             )}
           </h1>
           <h1
-            className="hero-heading-lrg animate-tile-bottom-enter absolute bottom-6 right-8 hidden text-foreground md:block"
+            className="hero-heading-lrg heading-bottom-enter absolute bottom-6 right-8 hidden text-foreground md:block"
             style={{
               transform:
                 "perspective(1000px) translate3d(0px, -150px, 20px) rotateZ(-20deg) rotateX(60deg)",
@@ -897,22 +903,24 @@ export default function Hero() {
           >
             {splitAndMapTextWithTags(
               animatedTitles[animatedTitleIndexRef.current.enter],
-              "animate-tile-char-enter opacity-0",
+              "heading-char-enter opacity-0 invisible",
             )}
           </h1>
           <div className="absolute bottom-0 right-0 flex w-full items-center justify-between px-[clamp(1rem,6vw,3rem)] pb-[clamp(1rem,6vw,3rem)] md:hidden">
-            <p className="font-robert-regular text-body-sm/[1.2] text-foreground">
+            <p className="hero-cta-enter-preloader font-robert-regular text-body-sm/[1.2] text-foreground">
               Enter the Metagame
               <br />
               Unleash the Play Economy
             </p>
-            <Button leftIcon={leftIcon}>Trailer</Button>
+            <Button leftIcon={leftIcon} className="hero-cta-enter-preloader">
+              Trailer
+            </Button>
           </div>
         </div>
       </div>
 
       <h1
-        className="hero-heading-lrg animate-tile-bottom-exit absolute bottom-6 right-8 -z-10 hidden text-black md:block"
+        className="hero-heading-lrg heading-bottom-exit absolute bottom-6 right-8 -z-10 hidden text-black md:block"
         style={{
           transform:
             "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
@@ -922,11 +930,11 @@ export default function Hero() {
       >
         {splitAndMapTextWithTags(
           animatedTitles[animatedTitleIndexRef.current.exit],
-          "animate-tile-char-exit opacity-100",
+          "heading-char-exit opacity-100",
         )}
       </h1>
       <h1
-        className="hero-heading-lrg animate-tile-bottom-enter absolute bottom-6 right-8 -z-10 hidden text-black md:block"
+        className="hero-heading-lrg heading-bottom-enter absolute bottom-6 right-8 -z-10 hidden text-black md:block"
         style={{
           transform:
             "perspective(1000px) translate3d(0px, -150px, 20px) rotateZ(-20deg) rotateX(60deg)",
@@ -936,7 +944,7 @@ export default function Hero() {
       >
         {splitAndMapTextWithTags(
           animatedTitles[animatedTitleIndexRef.current.enter],
-          "animate-tile-char-enter opacity-0",
+          "heading-char-enter opacity-0 invisible",
         )}
       </h1>
     </section>
