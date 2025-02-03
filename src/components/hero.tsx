@@ -152,7 +152,8 @@ export default function Hero() {
             hitAreaRef.current,
             {
               scale: 1.1,
-              ease: "power1.out",
+              ease: "power2.out",
+              duration: 1,
             },
             0,
           )
@@ -161,14 +162,16 @@ export default function Hero() {
             {
               clipPath: () =>
                 `path("${getNextVideoClipPath(minMaxHitAreaSideLength * 1.1, windowDimensions)}")`,
-              ease: "power1.out",
+              ease: "power2.out",
+              duration: 1,
             },
             0,
           )
           .to(
             videoItemBorderRefs.current[nextVideoNumber],
             {
-              ease: "power1.out",
+              ease: "power2.out",
+              duration: 1,
               attr: {
                 d: () =>
                   getNextVideoClipPath(
