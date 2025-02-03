@@ -8,6 +8,8 @@ import Button from "./ui/button";
 import { TiLocationArrow } from "react-icons/ti";
 import { cn } from "@/lib/utils";
 import { useIsTouchOnlyDevice } from "@/hooks/use-is-touch-only-device";
+import { defaultLinkToast } from "./ui/toast";
+import { toast } from "react-toastify";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -42,7 +44,7 @@ export default function Navbar() {
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const audioRef = useRef<HTMLAudioElement>(null);
   const navLinkBackgroundRef = useRef<HTMLDivElement>(null);
-  const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
+  // const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [isScrollYTop, setScrollYTop] = useState(true);
@@ -258,10 +260,20 @@ export default function Navbar() {
                 variant="secondary"
                 size="small"
                 rightIcon={rightIcon}
+                onClick={() => defaultLinkToast()}
               >
                 Products
               </Button>
-              {!isNavMenuOpen ? (
+              <button
+                onClick={() => toast.info("Menu coming soon!")}
+                className="size-6 md:hidden"
+              >
+                <span className="sr-only">Toggle Menu</span>
+                <svg aria-hidden="true" className="size-full fill-secondary">
+                  <use href="/icons/burger-icon.svg#burger-icon"></use>
+                </svg>
+              </button>
+              {/* {!isNavMenuOpen ? (
                 <button
                   onClick={() => setIsNavMenuOpen(true)}
                   className="size-6 md:hidden"
@@ -281,7 +293,7 @@ export default function Navbar() {
                     <use href="/icons/close-icon.svg#close-icon"></use>
                   </svg>
                 </button>
-              )}
+              )} */}
             </div>
           </div>
           <div
@@ -297,11 +309,11 @@ export default function Navbar() {
                 return (
                   <li key={index}>
                     <a
-                      href={`#${item.label.toLowerCase()}`}
+                      onClick={() => defaultLinkToast()}
                       ref={(el) => {
                         linkRefs.current[index] = el;
                       }}
-                      className="flex items-center gap-1 px-4 py-2 text-xs font-semibold uppercase text-foreground"
+                      className="flex cursor-pointer items-center gap-1 px-4 py-2 text-xs font-semibold uppercase text-foreground"
                     >
                       {item.label}
                       {Icon && <Icon />}

@@ -8,6 +8,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import gsap from "gsap";
 import RoundedCorners from "./rounded-corners";
 import Button from "./ui/button";
+import { defaultLinkToast } from "./ui/toast";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(useGSAP, ScrollTrigger);
@@ -188,7 +189,9 @@ export default function Narrative() {
             <br />
             your fate amidst infinite opportunities.
           </p>
-          <Button variant="secondary">discover prologue</Button>
+          <Button variant="secondary" onClick={() => defaultLinkToast()}>
+            discover prologue
+          </Button>
         </div>
       </div>
     </section>

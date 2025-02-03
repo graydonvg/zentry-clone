@@ -19,6 +19,7 @@ import { useIsTouchOnlyDevice } from "@/hooks/use-is-touch-only-device";
 import useAssetsStore from "@/lib/store/use-assets-store";
 import useIsClient from "@/hooks/use-is-client";
 import usePreloaderStore from "@/lib/store/use-preloader-store";
+import { defaultLinkToast } from "./ui/toast";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -972,6 +973,7 @@ export default function Hero() {
             Unleash the Play Economy
           </p>
           <Button
+            onClick={() => defaultLinkToast()}
             leftIcon={leftIcon}
             className="hero-cta-enter-preloader hidden md:flex"
           >
@@ -1015,7 +1017,11 @@ export default function Hero() {
             <br />
             Unleash the Play Economy
           </p>
-          <Button leftIcon={leftIcon} className="hero-cta-enter-preloader">
+          <Button
+            onClick={() => defaultLinkToast()}
+            leftIcon={leftIcon}
+            className="hero-cta-enter-preloader"
+          >
             Trailer
           </Button>
         </div>
