@@ -24,31 +24,6 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
 }
 
-function splitAndMapTextWithTags(str: string, className: string) {
-  const regex = /<[^>]+>[^<]*<\/[^>]+>|[^<]/g; // Matches entire tags with content or single characters
-
-  return str.match(regex)?.map((part, index) => {
-    if (part.startsWith("<")) {
-      // If the part is an HTML tag with content, return tag with content wrapped in a span
-      return (
-        <span
-          key={index}
-          className={className}
-          dangerouslySetInnerHTML={{ __html: part }}
-        />
-      );
-    }
-    // For regular characters, wrap them in spans
-    return (
-      <span
-        key={index}
-        className={className}
-        dangerouslySetInnerHTML={{ __html: part }}
-      />
-    );
-  });
-}
-
 const heroVideos = [
   {
     initialZIndex: 10,
@@ -70,9 +45,6 @@ const heroVideos = [
     src: "/videos/hero-4.mp4",
   },
 ];
-
-const MIN_HIT_AREA_SIDE_LENGTH = 100;
-const MAX_HIT_AREA_SIDE_LENGTH = 250;
 
 const animatedTitles = [
   "g<b>a</b>ming",
@@ -115,11 +87,7 @@ export default function Hero() {
   const previousVideoNumber =
     (currentVideoNumber - 1 + totalVideos) % totalVideos;
   const nextVideoNumber = (currentVideoNumber + 1) % totalVideos;
-  const minMaxHitAreaSideLength = getHitAreaSideLength(
-    MIN_HIT_AREA_SIDE_LENGTH,
-    MAX_HIT_AREA_SIDE_LENGTH,
-    windowDimensions,
-  );
+  const minMaxHitAreaSideLength = getHitAreaSideLength(windowDimensions);
   const [loadedVideos, setLoadedVideos] = useState(0);
   const toggleHeroVideoAssetsLoaded = useAssetsStore(
     (state) => state.toggleHeroVideoAssetsLoaded,
@@ -169,30 +137,85 @@ export default function Hero() {
   useGSAP(
     () => {
       gsap.set(videoItemContentRefs.current[nextVideoNumber], {
-        clipPath: `path("${hiddenVideoClipPath}")`,
+        clipPath: () => `path("${hiddenVideoClipPath}")`,
       });
       gsap.set(videoItemBorderRefs.current[nextVideoNumber], {
         attr: {
-          d: hiddenVideoClipPath,
+          d: () => hiddenVideoClipPath,
         },
       });
 
       if (isTouchOnlyDevice && isPreloaderComplete) {
-        gsap.to(hitAreaRef.current, {
-          scale: 1,
-        });
-        gsap.to(videoItemContentRefs.current[nextVideoNumber], {
-          clipPath: `path("${nextVideoClipPath}")`,
-        });
-        gsap.to(videoItemBorderRefs.current[nextVideoNumber], {
-          attr: {
-            d: nextVideoClipPath,
-          },
-        });
+        gsap
+          .timeline()
+          .to(
+            hitAreaRef.current,
+            {
+              scale: 1.1,
+              ease: "power1.out",
+            },
+            0,
+          )
+          .to(
+            videoItemContentRefs.current[nextVideoNumber],
+            {
+              clipPath: () =>
+                `path("${getNextVideoClipPath(minMaxHitAreaSideLength * 1.1, windowDimensions)}")`,
+              ease: "power1.out",
+            },
+            0,
+          )
+          .to(
+            videoItemBorderRefs.current[nextVideoNumber],
+            {
+              ease: "power1.out",
+              attr: {
+                d: () =>
+                  getNextVideoClipPath(
+                    minMaxHitAreaSideLength * 1.1,
+                    windowDimensions,
+                  ),
+              },
+            },
+            0,
+          )
+          .to(
+            hitAreaRef.current,
+            {
+              scale: 1,
+              repeat: -1,
+              yoyo: true,
+              ease: "power1.inOut",
+            },
+            ">",
+          )
+          .to(
+            videoItemContentRefs.current[nextVideoNumber],
+            {
+              clipPath: () => `path("${nextVideoClipPath}")`,
+              repeat: -1,
+              yoyo: true,
+              ease: "power1.inOut",
+            },
+            "<",
+          )
+          .to(
+            videoItemBorderRefs.current[nextVideoNumber],
+            {
+              repeat: -1,
+              yoyo: true,
+              ease: "power1.inOut",
+              attr: {
+                d: () => nextVideoClipPath,
+              },
+            },
+            "<",
+          );
       }
     },
     {
       dependencies: [
+        nextVideoNumber,
         nextVideoClipPath,
         hiddenVideoClipPath,
         isTouchOnlyDevice,
@@ -348,11 +371,12 @@ export default function Hero() {
             {
               rotateX,
               rotateY,
-              clipPath: `path("${getNextVideoClipPath(
-                minMaxHitAreaSideLength,
-                windowDimensions,
-                { x: translateClipPathX, y: translateClipPathY },
-              )}")`,
+              clipPath: () =>
+                `path("${getNextVideoClipPath(
+                  minMaxHitAreaSideLength,
+                  windowDimensions,
+                  { x: translateClipPathX, y: translateClipPathY },
+                )}")`,
             },
             0,
           )
@@ -360,14 +384,15 @@ export default function Hero() {
             nextVideoBorder,
             {
               attr: {
-                d: getNextVideoClipPath(
-                  minMaxHitAreaSideLength,
-                  windowDimensions,
-                  {
-                    x: translateClipPathX,
-                    y: translateClipPathY,
-                  },
-                ),
+                d: () =>
+                  getNextVideoClipPath(
+                    minMaxHitAreaSideLength,
+                    windowDimensions,
+                    {
+                      x: translateClipPathX,
+                      y: translateClipPathY,
+                    },
+                  ),
               },
             },
             0,
@@ -414,8 +439,6 @@ export default function Hero() {
         isPreloaderComplete,
         nextVideoNumber,
         hiddenVideoClipPath,
-        minMaxHitAreaSideLength,
-        windowDimensions,
         isTouchOnlyDevice,
       ],
       revertOnUpdate: true,
@@ -522,6 +545,7 @@ export default function Hero() {
           },
         });
 
+        if (isTouchOnlyDevice) return;
         // Reveal the next video option
         gsap.to(videoItemContentRefs.current[nextVideoNumber], {
           clipPath: `path("${nextVideoClipPath}")`,
@@ -949,4 +973,29 @@ export default function Hero() {
       </h1>
     </section>
   );
+}
+
+function splitAndMapTextWithTags(str: string, className: string) {
+  const regex = /<[^>]+>[^<]*<\/[^>]+>|[^<]/g; // Matches entire tags with content or single characters
+
+  return str.match(regex)?.map((part, index) => {
+    if (part.startsWith("<")) {
+      // If the part is an HTML tag with content, return tag with content wrapped in a span
+      return (
+        <span
+          key={index}
+          className={className}
+          dangerouslySetInnerHTML={{ __html: part }}
+        />
+      );
+    }
+    // For regular characters, wrap them in spans
+    return (
+      <span
+        key={index}
+        className={className}
+        dangerouslySetInnerHTML={{ __html: part }}
+      />
+    );
+  });
 }

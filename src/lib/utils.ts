@@ -6,12 +6,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function getHitAreaSideLength(
-  minHitAreaSideLength: number,
-  maxHitAreaSideLength: number,
-  windowDimensions: WindowDimensions,
-) {
+export function getHitAreaSideLength(windowDimensions: WindowDimensions) {
+  const minHitAreaSideLength = 100;
+  const maxHitAreaSideLength = 250;
   const scale = 0.25;
+
   const hitAreaMinSideLength = Math.max(
     Math.min(windowDimensions.width * scale, windowDimensions.height * scale),
     minHitAreaSideLength,
