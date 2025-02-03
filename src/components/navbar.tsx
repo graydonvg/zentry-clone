@@ -3,7 +3,7 @@
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import gsap from "gsap";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Button from "./ui/button";
 import { TiLocationArrow } from "react-icons/ti";
 import { cn } from "@/lib/utils";
@@ -40,28 +40,30 @@ export default function Navbar() {
   const navBackgroundRef = useRef<HTMLDivElement>(null);
   const navLinksContainerRef = useRef<HTMLDivElement>(null);
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
-  const audioElementRef = useRef<HTMLAudioElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
   const navLinkBackgroundRef = useRef<HTMLDivElement>(null);
   const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
-  const [isIndicatorActive, setIsIndicatorActive] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [isScrollYTop, setScrollYTop] = useState(true);
-  const isFirstMouseEnterRef = useRef(true);
   const rightIcon = useMemo(
     () => <TiLocationArrow className="rotate-[135deg]" />,
     [],
   );
 
-  useEffect(() => {
-    if (!audioElementRef.current) return;
+  function toggleAudio() {
+    const audio = audioRef.current;
 
-    if (isAudioPlaying) {
-      audioElementRef.current.play();
+    if (!audio) return;
+
+    if (!isAudioPlaying) {
+      audio.play();
     } else {
-      audioElementRef.current.pause();
+      audio.pause();
     }
-  }, [isAudioPlaying]);
+
+    setIsAudioPlaying((prev) => !prev);
+  }
 
   useGSAP(() => {
     ScrollTrigger.create({
@@ -107,11 +109,6 @@ export default function Navbar() {
     { dependencies: [isNavVisible, isScrollYTop] },
   );
 
-  function toggleAudio() {
-    setIsAudioPlaying((prev) => !prev);
-    setIsIndicatorActive((prev) => !prev);
-  }
-
   useGSAP((_, contextSafe) => {
     if (isTouchOnlyDevice) return;
 
@@ -130,12 +127,13 @@ export default function Navbar() {
     )
       return;
 
+    let isFirstMouseEnter = true;
+    let linkMouseEnterTl: gsap.core.Timeline;
+    let setTextBlackTime = 0;
+
     function getNavRect() {
       return nav!.getBoundingClientRect();
     }
-
-    let linkMouseEnterTl: gsap.core.Timeline;
-    let setTextBlackTime = 0;
 
     const handleMouseEnter = contextSafe((e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -146,7 +144,7 @@ export default function Navbar() {
       const linkBackgroundHeight = targetRect.height;
       const linkBackgroundWidth = targetRect.width;
 
-      if (isFirstMouseEnterRef.current) {
+      if (isFirstMouseEnter) {
         gsap.set(navLinkBackground, {
           left: linkBackgroundLeft,
           height: linkBackgroundHeight,
@@ -158,10 +156,10 @@ export default function Navbar() {
           color: "black",
         });
 
-        isFirstMouseEnterRef.current = false;
+        isFirstMouseEnter = false;
       }
 
-      if (!isFirstMouseEnterRef.current) {
+      if (!isFirstMouseEnter) {
         const tl = gsap.timeline({ defaults: { duration: 0.3 } });
         linkMouseEnterTl = tl;
 
@@ -205,7 +203,7 @@ export default function Navbar() {
     });
 
     const handleContainerMouseLeave = contextSafe(() => {
-      isFirstMouseEnterRef.current = true;
+      isFirstMouseEnter = true;
 
       gsap.set(navLinkBackground, {
         autoAlpha: 0,
@@ -318,7 +316,7 @@ export default function Navbar() {
                 className="flex items-center space-x-0.5 px-4 py-2"
               >
                 <audio
-                  ref={audioElementRef}
+                  ref={audioRef}
                   src="/audio/loop.mp3"
                   loop
                   className="hidden"
@@ -329,7 +327,7 @@ export default function Navbar() {
                     className={cn(
                       "audio-indicator-line h-1 w-px rounded-full bg-foreground transition-all duration-200 ease-in-out",
                       {
-                        active: isIndicatorActive,
+                        active: isAudioPlaying,
                       },
                     )}
                     style={{ animationDelay: `${(index + 1) * 0.1}s` }}
