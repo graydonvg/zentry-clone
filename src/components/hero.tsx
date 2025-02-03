@@ -288,6 +288,11 @@ export default function Hero() {
       )
         return;
 
+      gsap.set(hitArea, {
+        scale: 0,
+        translateX: 0,
+        translateY: 0,
+      });
       gsap.set(nextVideoItemContent, {
         clipPath: () => `path("${hiddenVideoClipPath}")`,
       });
