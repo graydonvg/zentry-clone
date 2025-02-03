@@ -83,6 +83,7 @@ export default function Hero() {
   const videoItemContentRefs = useRef<(HTMLDivElement | null)[]>([]);
   const videoItemBorderRefs = useRef<(SVGPathElement | null)[]>([]);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const isScrolledToTopRef = useRef(true);
   const totalVideos = heroVideos.length;
   const previousVideoNumber =
     (currentVideoNumber - 1 + totalVideos) % totalVideos;
@@ -122,7 +123,7 @@ export default function Hero() {
   }, [windowDimensions, minMaxHitAreaSideLength]);
 
   function handleHitAreaClicked() {
-    if (isTransitioningRef.current) return;
+    if (isTransitioningRef.current || !isScrolledToTopRef.current) return;
 
     isTransitioningRef.current = true;
     setHasClickedHitArea(true);
@@ -133,88 +134,124 @@ export default function Hero() {
     setCurrentVideoNumber((prevIndex) => (prevIndex + 1) % totalVideos);
   }
 
-  // Set next video and hit area initial clip path and scale
+  // Next video button animation for touch only device
   useGSAP(
     () => {
-      gsap.set(videoItemContentRefs.current[nextVideoNumber], {
-        clipPath: () => `path("${hiddenVideoClipPath}")`,
-      });
-      gsap.set(videoItemBorderRefs.current[nextVideoNumber], {
-        attr: {
-          d: () => hiddenVideoClipPath,
+      const nextVideoItemContent =
+        videoItemContentRefs.current[nextVideoNumber];
+      const nextVideoBorder = videoItemBorderRefs.current[nextVideoNumber];
+      const hitArea = hitAreaRef.current;
+
+      if (
+        !isTouchOnlyDevice ||
+        !isPreloaderComplete ||
+        !nextVideoItemContent ||
+        !nextVideoBorder ||
+        !hitArea
+      )
+        return;
+
+      const tl = gsap
+        .timeline()
+        .to(
+          hitArea,
+          {
+            scale: 1.1,
+            ease: "power2.out",
+            duration: 1,
+          },
+          0,
+        )
+        .to(
+          nextVideoItemContent,
+          {
+            clipPath: () =>
+              `path("${getNextVideoClipPath(minMaxHitAreaSideLength * 1.1, windowDimensions)}")`,
+            ease: "power2.out",
+            duration: 1,
+          },
+          0,
+        )
+        .to(
+          nextVideoBorder,
+          {
+            ease: "power2.out",
+            duration: 1,
+            attr: {
+              d: () =>
+                getNextVideoClipPath(
+                  minMaxHitAreaSideLength * 1.1,
+                  windowDimensions,
+                ),
+            },
+          },
+          0,
+        )
+        .to(
+          hitArea,
+          {
+            scale: 1,
+            repeat: -1,
+            yoyo: true,
+            ease: "power1.inOut",
+          },
+          ">",
+        )
+        .to(
+          nextVideoItemContent,
+          {
+            clipPath: () => `path("${nextVideoClipPath}")`,
+            repeat: -1,
+            yoyo: true,
+            ease: "power1.inOut",
+          },
+          "<",
+        )
+        .to(
+          nextVideoBorder,
+          {
+            repeat: -1,
+            yoyo: true,
+            ease: "power1.inOut",
+            attr: {
+              d: () => nextVideoClipPath,
+            },
+          },
+          "<",
+        );
+
+      ScrollTrigger.create({
+        start: "top",
+        end: "bottom top",
+        onUpdate: (self) => {
+          if (self.progress === 0) {
+            if (!isScrolledToTopRef.current) {
+              isScrolledToTopRef.current = true;
+              tl.restart();
+            }
+          } else {
+            if (isScrolledToTopRef.current) {
+              isScrolledToTopRef.current = false;
+              tl.pause();
+
+              gsap.to(hitArea, {
+                scale: 0,
+                duration: 1,
+              });
+              gsap.to(nextVideoItemContent, {
+                clipPath: `path("${hiddenVideoClipPath}")`,
+                duration: 1,
+              });
+              gsap.to(nextVideoBorder, {
+                attr: {
+                  d: hiddenVideoClipPath,
+                },
+                duration: 1,
+              });
+            }
+          }
         },
       });
-
-      if (isTouchOnlyDevice && isPreloaderComplete) {
-        gsap
-          .timeline()
-          .to(
-            hitAreaRef.current,
-            {
-              scale: 1.1,
-              ease: "power2.out",
-              duration: 1,
-            },
-            0,
-          )
-          .to(
-            videoItemContentRefs.current[nextVideoNumber],
-            {
-              clipPath: () =>
-                `path("${getNextVideoClipPath(minMaxHitAreaSideLength * 1.1, windowDimensions)}")`,
-              ease: "power2.out",
-              duration: 1,
-            },
-            0,
-          )
-          .to(
-            videoItemBorderRefs.current[nextVideoNumber],
-            {
-              ease: "power2.out",
-              duration: 1,
-              attr: {
-                d: () =>
-                  getNextVideoClipPath(
-                    minMaxHitAreaSideLength * 1.1,
-                    windowDimensions,
-                  ),
-              },
-            },
-            0,
-          )
-          .to(
-            hitAreaRef.current,
-            {
-              scale: 1,
-              repeat: -1,
-              yoyo: true,
-              ease: "power1.inOut",
-            },
-            ">",
-          )
-          .to(
-            videoItemContentRefs.current[nextVideoNumber],
-            {
-              clipPath: () => `path("${nextVideoClipPath}")`,
-              repeat: -1,
-              yoyo: true,
-              ease: "power1.inOut",
-            },
-            "<",
-          )
-          .to(
-            videoItemBorderRefs.current[nextVideoNumber],
-            {
-              repeat: -1,
-              yoyo: true,
-              ease: "power1.inOut",
-              attr: {
-                d: () => nextVideoClipPath,
-              },
-            },
-            "<",
-          );
-      }
     },
     {
       dependencies: [
@@ -228,7 +265,7 @@ export default function Hero() {
     },
   );
 
-  // Grow/shrink, parallax tilt and translate next video option on mouse move
+  // Next video button animation for pointer-based device
   useGSAP(
     (_context, contextSafe) => {
       const controller = new AbortController();
@@ -251,7 +288,15 @@ export default function Hero() {
       )
         return;
 
-      let isScrolledToTop = true;
+      gsap.set(nextVideoItemContent, {
+        clipPath: () => `path("${hiddenVideoClipPath}")`,
+      });
+      gsap.set(nextVideoBorder, {
+        attr: {
+          d: () => hiddenVideoClipPath,
+        },
+      });
+
       let isMouseOverHitArea = false;
       let timeout: NodeJS.Timeout | null = null;
 
@@ -260,30 +305,34 @@ export default function Hero() {
         end: "bottom top",
         onUpdate: (self) => {
           if (self.progress === 0) {
-            isScrolledToTop = true;
+            if (!isScrolledToTopRef.current) {
+              isScrolledToTopRef.current = true;
+            }
           } else {
-            isScrolledToTop = false;
+            if (isScrolledToTopRef.current) {
+              isScrolledToTopRef.current = false;
 
-            gsap.to(hitArea, {
-              scale: 0,
-              duration: 1,
-            });
-            gsap.to(nextVideoItemContent, {
-              clipPath: `path("${hiddenVideoClipPath}")`,
-              duration: 1,
-            });
-            gsap.to(nextVideoBorder, {
-              attr: {
-                d: hiddenVideoClipPath,
-              },
-              duration: 1,
-            });
+              gsap.to(hitArea, {
+                scale: 0,
+                duration: 1,
+              });
+              gsap.to(nextVideoItemContent, {
+                clipPath: `path("${hiddenVideoClipPath}")`,
+                duration: 1,
+              });
+              gsap.to(nextVideoBorder, {
+                attr: {
+                  d: hiddenVideoClipPath,
+                },
+                duration: 1,
+              });
+            }
           }
         },
       });
 
       const shrink = contextSafe(() => {
-        if (isScrolledToTop && isMouseOverHitArea) return;
+        if (isScrolledToTopRef.current && isMouseOverHitArea) return;
 
         gsap
           .timeline({ defaults: { duration: 1 } })
@@ -323,7 +372,7 @@ export default function Hero() {
           shrink();
         }, 300);
 
-        if (!isScrolledToTop) return;
+        if (!isScrolledToTopRef.current) return;
 
         const rotateIntensity = 20;
         const translateHitAreaIntensity = 0.25;
@@ -448,121 +497,137 @@ export default function Hero() {
     },
   );
 
-  // Cycle vids on click
+  // Cycle vids on next video button click
   useGSAP(
     () => {
-      if (hasClickedHitArea) {
-        // Ensure hit area remains at full scale
-        gsap.set(hitAreaRef.current, {
-          scale: 1,
-        });
+      const videoItemContainer = videoItemContainerRefs.current;
+      const videoItemContent = videoItemContentRefs.current;
+      const nextVideo = videoRefs.current;
+      const videoItemBorder = videoItemBorderRefs.current;
+      const video = videoRefs.current;
+      const hitArea = hitAreaRef.current;
 
-        // Keep past videos hidden
-        const hiddenVideoNumbers = getHiddenHeroVideoNumbers(
-          currentVideoNumber,
-          totalVideos,
-        );
+      if (
+        !videoItemContainer ||
+        !videoItemContent ||
+        !nextVideo ||
+        !videoItemBorder ||
+        !video ||
+        !hitArea ||
+        !hasClickedHitArea
+      )
+        return;
 
-        hiddenVideoNumbers.forEach((hiddenVideoNumber) => {
-          gsap.set(videoItemContainerRefs.current[hiddenVideoNumber], {
-            display: "none",
-            zIndex: -10,
-          });
-        });
+      // Ensure hit area remains at full scale
+      gsap.set(hitArea, {
+        scale: 1,
+      });
 
-        // Keep the previous video visible during transition
-        gsap.set(videoItemContainerRefs.current[previousVideoNumber], {
-          display: "block",
+      // Keep past videos hidden
+      const hiddenVideoNumbers = getHiddenHeroVideoNumbers(
+        currentVideoNumber,
+        totalVideos,
+      );
+
+      hiddenVideoNumbers.forEach((hiddenVideoNumber) => {
+        gsap.set(videoItemContainer[hiddenVideoNumber], {
+          display: "none",
           zIndex: -10,
         });
-        gsap.set(videoItemContentRefs.current[previousVideoNumber], {
-          clipPath: `path("${fullScreenClipPath}")`,
-        });
+      });
 
-        // Set the new current video behind the next video option before it grows
-        gsap.set(videoItemContainerRefs.current[currentVideoNumber], {
-          display: "block",
-          zIndex: 10,
-        });
-        gsap.set(videoItemContentRefs.current[currentVideoNumber], {
-          clipPath: `path("${nextVideoClipPath}")`,
-        });
-        gsap.set(videoItemBorderRefs.current[currentVideoNumber], {
-          attr: {
-            d: nextVideoClipPath,
-          },
-        });
+      // Keep the previous video visible during transition
+      gsap.set(videoItemContainer[previousVideoNumber], {
+        display: "block",
+        zIndex: -10,
+      });
+      gsap.set(videoItemContent[previousVideoNumber], {
+        clipPath: `path("${fullScreenClipPath}")`,
+      });
 
-        // Set the next video option in front of the new current video
-        gsap.set(videoItemContainerRefs.current[nextVideoNumber], {
-          display: "block",
-          zIndex: 20,
-        });
-        gsap.set(videoItemContentRefs.current[nextVideoNumber], {
-          clipPath: `path("${hiddenVideoClipPath}")`,
-        });
+      // Set the new current video behind the next video button before it grows
+      gsap.set(videoItemContainer[currentVideoNumber], {
+        display: "block",
+        zIndex: 10,
+      });
+      gsap.set(videoItemContent[currentVideoNumber], {
+        clipPath: `path("${nextVideoClipPath}")`,
+      });
+      gsap.set(videoItemBorder[currentVideoNumber], {
+        attr: {
+          d: nextVideoClipPath,
+        },
+      });
 
-        // Animate the new current video border to expand to the size of the screen
-        gsap.to(videoItemBorderRefs.current[currentVideoNumber], {
-          attr: {
-            d: fullScreenClipPath,
-          },
-          duration: 1,
-          ease: "power2.out",
-          onComplete: () => {
-            // Remove the border once the video grows to full size
-            gsap.set(videoItemBorderRefs.current[currentVideoNumber], {
-              attr: {
-                d: "",
-              },
-            });
-          },
-        });
+      // Set the next video button in front of the new current video
+      gsap.set(videoItemContainer[nextVideoNumber], {
+        display: "block",
+        zIndex: 20,
+      });
+      gsap.set(videoItemContent[nextVideoNumber], {
+        clipPath: `path("${hiddenVideoClipPath}")`,
+      });
 
-        // Animate the new current video to expand to the size of the screen
-        gsap.to(videoItemContentRefs.current[currentVideoNumber], {
-          clipPath: `path("${fullScreenClipPath}")`,
-          duration: 1,
-          ease: "power2.out",
-          onStart: () => {
-            const currentVideo = videoRefs.current[currentVideoNumber];
+      // Animate the new current video border to expand to the size of the screen
+      gsap.to(videoItemBorder[currentVideoNumber], {
+        attr: {
+          d: fullScreenClipPath,
+        },
+        duration: 1,
+        ease: "power2.out",
+        onComplete: () => {
+          // Remove the border once the video grows to full size
+          gsap.set(videoItemBorder[currentVideoNumber], {
+            attr: {
+              d: "",
+            },
+          });
+        },
+      });
 
-            if (currentVideo) {
-              currentVideo.play();
-            }
-          },
-          onComplete: () => {
-            // Hide the previous video once the new current video grows to full size
-            gsap.set(videoItemContainerRefs.current[previousVideoNumber], {
-              display: "none",
-            });
+      // Animate the new current video to expand to the size of the screen
+      gsap.to(videoItemContent[currentVideoNumber], {
+        clipPath: `path("${fullScreenClipPath}")`,
+        duration: 1,
+        ease: "power2.out",
+        onStart: () => {
+          const currentVideo = video[currentVideoNumber];
 
-            const previousVideo = videoRefs.current[previousVideoNumber];
+          if (currentVideo) {
+            currentVideo.play();
+          }
+        },
+        onComplete: () => {
+          // Hide the previous video once the new current video grows to full size
+          gsap.set(videoItemContainer[previousVideoNumber], {
+            display: "none",
+          });
 
-            if (previousVideo) {
-              previousVideo.pause();
-              previousVideo.currentTime = 0;
-            }
-            isTransitioningRef.current = false;
-            setHasClickedHitArea(false);
-          },
-        });
+          const previousVideo = video[previousVideoNumber];
 
-        if (isTouchOnlyDevice) return;
-        // Reveal the next video option
-        gsap.to(videoItemContentRefs.current[nextVideoNumber], {
-          clipPath: `path("${nextVideoClipPath}")`,
-          duration: 1,
-          ease: "power2.out",
-        });
-        gsap.to(videoItemBorderRefs.current[nextVideoNumber], {
-          attr: {
-            d: nextVideoClipPath,
-          },
-          duration: 1,
-          ease: "power2.out",
-        });
-      }
+          if (previousVideo) {
+            previousVideo.pause();
+            previousVideo.currentTime = 0;
+          }
+          isTransitioningRef.current = false;
+          setHasClickedHitArea(false);
+        },
+      });
+
+      if (isTouchOnlyDevice) return;
+      // Reveal the next video button
+      gsap.to(videoItemContent[nextVideoNumber], {
+        clipPath: `path("${nextVideoClipPath}")`,
+        duration: 1,
+        ease: "power2.out",
+      });
+      gsap.to(videoItemBorder[nextVideoNumber], {
+        attr: {
+          d: nextVideoClipPath,
+        },
+        duration: 1,
+        ease: "power2.out",
+      });
     },
     {
       dependencies: [currentVideoNumber],
@@ -570,7 +635,7 @@ export default function Hero() {
     },
   );
 
-  // Animate heading on click
+  // Animate heading on next video button click
   useGSAP(
     () => {
       const mm = gsap.matchMedia();
@@ -663,13 +728,18 @@ export default function Hero() {
     { dependencies: [hasClickedHitArea] },
   );
 
-  // Hero clip path on scroll
+  // Animate hero clip path on scroll
   useGSAP(
     () => {
+      const hero = heroRef.current;
+      const heroBorder = heroBorderRef.current;
+
+      if (!hero || !heroBorder) return;
+
       gsap
         .timeline({
           scrollTrigger: {
-            trigger: heroRef.current,
+            trigger: hero,
             start: "top top",
             end: "bottom top",
             scrub: 0.5,
@@ -687,7 +757,7 @@ export default function Hero() {
           },
         })
         .fromTo(
-          heroRef.current,
+          hero,
           {
             clipPath: `path("${fullScreenClipPath}")`,
           },
@@ -698,7 +768,7 @@ export default function Hero() {
           0,
         )
         .fromTo(
-          heroBorderRef.current,
+          heroBorder,
           {
             autoAlpha: 0,
             attr: {
@@ -714,7 +784,7 @@ export default function Hero() {
           0,
         )
         .to(
-          heroRef.current,
+          hero,
           {
             clipPath: `path("${secondTransformedHeroClipPath}")`,
             ease: "power1.inOut",
@@ -722,7 +792,7 @@ export default function Hero() {
           ">",
         )
         .to(
-          heroBorderRef.current,
+          heroBorder,
           {
             attr: {
               d: secondTransformedHeroClipPath,
