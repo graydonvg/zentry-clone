@@ -232,7 +232,7 @@ export default function Preloader() {
             autoAlpha: 1,
             translateY: 0,
           },
-          "<+=0.3",
+          "<",
         )
         .then(() => {
           document.body.classList.remove("overflow-hidden");
