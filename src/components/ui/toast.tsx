@@ -1,6 +1,6 @@
 "use client";
 
-import { Flip, toast, ToastContainer } from "react-toastify";
+import { toast, ToastContainer, Zoom } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export function Toast() {
@@ -20,7 +20,8 @@ export function Toast() {
       closeOnClick
       theme="colored"
       rtl={false}
-      transition={Flip}
+      transition={Zoom}
+      draggablePercent={40}
       toastStyle={{
         backgroundColor: primaryColor,
       }}
