@@ -66,10 +66,6 @@ export default function Hero() {
   const [hiddenVideoClipPath, setHiddenVideoClipPath] = useState("");
   const [nextVideoClipPath, setNextVideoClipPath] = useState("");
   const [fullScreenClipPath, setFullScreenClipPath] = useState("");
-  const [firstTransformedHeroClipPath, setFirstTransformedHeroClipPath] =
-    useState("");
-  const [secondTransformedHeroClipPath, setSecondTransformedHeroClipPath] =
-    useState("");
   const animatedTitleIndexRef = useRef({
     exit: 0,
     enter: 1,
@@ -115,12 +111,6 @@ export default function Hero() {
     setFullScreenClipPath(getFullScreenClipPath(windowDimensions));
     setHiddenVideoClipPath(getNextVideoClipPath(0, windowDimensions));
     setHitAreaSideLength(minMaxHitAreaSideLength);
-    setFirstTransformedHeroClipPath(
-      getFirstTransformedHeroClipPath(windowDimensions),
-    );
-    setSecondTransformedHeroClipPath(
-      getSecondTransformedHeroClipPath(windowDimensions),
-    );
   }, [windowDimensions, minMaxHitAreaSideLength]);
 
   function handleHitAreaClicked() {
@@ -746,6 +736,12 @@ export default function Hero() {
 
       if (!hero || !heroBorder) return;
 
+      const fullScreenClipPath = getFullScreenClipPath(windowDimensions);
+      const firstTransformedHeroClipPath =
+        getFirstTransformedHeroClipPath(windowDimensions);
+      const secondTransformedHeroClipPath =
+        getSecondTransformedHeroClipPath(windowDimensions);
+
       gsap
         .timeline({
           scrollTrigger: {
@@ -813,11 +809,7 @@ export default function Hero() {
         );
     },
     {
-      dependencies: [
-        fullScreenClipPath,
-        firstTransformedHeroClipPath,
-        secondTransformedHeroClipPath,
-      ],
+      dependencies: [windowDimensions],
       revertOnUpdate: true,
     },
   );
