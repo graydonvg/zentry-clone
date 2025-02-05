@@ -7,7 +7,7 @@ import Image from "next/image";
 import AnimatedTitle from "./animation/animated-title";
 import { getIntroImageClipPath, getFullScreenClipPath } from "@/lib/utils";
 import useWindowDimensions from "@/hooks/use-window-dimensions";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -15,25 +15,24 @@ if (typeof window !== "undefined") {
 
 export default function Intro() {
   const windowDimensions = useWindowDimensions();
-  const [imageClipPath, setImageClipPath] = useState("");
-  const [fullScreenClipPath, setFullScreenClipPath] = useState("");
   const pinnedElementRef = useRef<HTMLDivElement>(null);
-  const imageClipPathRef = useRef<HTMLDivElement>(null);
-  const imageBorderPathRef = useRef<SVGPathElement>(null);
-  const imageContentRef = useRef<HTMLImageElement>(null);
-  const stonesImageRef = useRef<HTMLImageElement>(null);
-
-  useEffect(() => {
-    setImageClipPath(getIntroImageClipPath(windowDimensions));
-    setFullScreenClipPath(getFullScreenClipPath(windowDimensions));
-  }, [windowDimensions]);
+  const introImageContainerRef = useRef<HTMLDivElement>(null);
+  const introImageBorderPathRef = useRef<SVGPathElement>(null);
+  const introImageContentRef = useRef<HTMLImageElement>(null);
+  const stonesImageContentRef = useRef<HTMLImageElement>(null);
 
   useGSAP(() => {
-    gsap.set(imageClipPathRef.current, {
+    const pinnedElement = pinnedElementRef.current;
+    const introImageContainer = introImageContainerRef.current;
+    const stonesImageContent = stonesImageContentRef.current;
+
+    if (!pinnedElement || !introImageContainer || !stonesImageContent) return;
+
+    gsap.set(introImageContainer, {
       y: "25%",
     });
 
-    gsap.set(stonesImageRef.current, {
+    gsap.set(stonesImageContent, {
       autoAlpha: 0,
       scale: 1.3,
     });
@@ -42,14 +41,14 @@ export default function Intro() {
       .timeline({
         defaults: { duration: 1, ease: "power1.out" },
         scrollTrigger: {
-          trigger: pinnedElementRef.current,
+          trigger: pinnedElement,
           start: "top 70%",
           end: "bottom bottom",
           toggleActions: "play none none reverse",
         },
       })
       .fromTo(
-        imageClipPathRef.current,
+        introImageContainer,
         { y: "25%" },
         {
           y: 0,
@@ -57,7 +56,7 @@ export default function Intro() {
         0,
       )
       .fromTo(
-        stonesImageRef.current,
+        stonesImageContent,
         {
           autoAlpha: 0,
           scale: 1.3,
@@ -72,34 +71,52 @@ export default function Intro() {
 
   useGSAP(
     () => {
+      const pinnedElement = pinnedElementRef.current;
+      const introImageContainer = introImageContainerRef.current;
+      const introImageContent = introImageContentRef.current;
+      const introImageBorderPath = introImageBorderPathRef.current;
+      const stonesImageContent = stonesImageContentRef.current;
+
+      if (
+        !pinnedElement ||
+        !introImageContainer ||
+        !introImageContent ||
+        !introImageBorderPath ||
+        !stonesImageContent
+      )
+        return;
+
+      const imageClipPath = getIntroImageClipPath(windowDimensions);
+      const fullScreenClipPath = getFullScreenClipPath(windowDimensions);
+
       gsap
         .timeline({
           scrollTrigger: {
-            trigger: pinnedElementRef.current,
+            trigger: pinnedElement,
             start: "top top",
             end: "bottom top",
             scrub: 0.5,
             pin: true,
             onLeave: () => {
-              gsap.set(imageBorderPathRef.current, {
+              gsap.set(introImageBorderPath, {
                 display: "none",
               });
-              gsap.set(pinnedElementRef.current, {
+              gsap.set(pinnedElement, {
                 backgroundColor: "black",
               });
             },
             onEnterBack: () => {
-              gsap.set(imageBorderPathRef.current, {
+              gsap.set(introImageBorderPath, {
                 display: "block",
               });
-              gsap.set(pinnedElementRef.current, {
+              gsap.set(pinnedElement, {
                 backgroundColor: "unset",
               });
             },
           },
         })
         .fromTo(
-          imageClipPathRef.current,
+          introImageContainer,
           {
             clipPath: `path("${imageClipPath}")`,
           },
@@ -108,7 +125,7 @@ export default function Intro() {
           },
         )
         .fromTo(
-          imageBorderPathRef.current,
+          introImageBorderPath,
           {
             attr: {
               d: imageClipPath,
@@ -121,19 +138,25 @@ export default function Intro() {
           },
           0,
         )
-        .fromTo(imageContentRef.current, { scale: 1.2 }, { scale: 1 }, 0)
-        .fromTo(stonesImageRef.current, { scale: 1.2 }, { scale: 1 }, 0);
+        .fromTo(introImageContent, { scale: 1.2 }, { scale: 1 }, 0)
+        .fromTo(stonesImageContent, { scale: 1.2 }, { scale: 1 }, 0);
     },
-    { dependencies: [imageClipPath, fullScreenClipPath], revertOnUpdate: true },
+    { dependencies: [windowDimensions], revertOnUpdate: true },
   );
 
   useGSAP((_context, contextSafe) => {
     const controller = new AbortController();
-    const imageClipPath = imageClipPathRef.current;
-    const imageContent = imageContentRef.current;
-    const stonesImage = stonesImageRef.current;
+    const introImageContainer = introImageContainerRef.current;
+    const introImageContent = introImageContentRef.current;
+    const stonesImageContent = stonesImageContentRef.current;
 
-    if (!imageClipPath || !imageContent || !stonesImage || !contextSafe) return;
+    if (
+      !introImageContainer ||
+      !introImageContent ||
+      !stonesImageContent ||
+      !contextSafe
+    )
+      return;
 
     function getElementReact(element: HTMLElement) {
       return element.getBoundingClientRect();
@@ -165,10 +188,12 @@ export default function Intro() {
     const cursor = { x: 0, y: 0 };
 
     const handleTransform = contextSafe(() => {
-      const imageContentRect = getElementReact(imageContent);
+      const introImageContentRect = getElementReact(introImageContent);
 
-      const centerX = imageContentRect.left + imageContentRect.width / 2;
-      const centerY = imageContentRect.top + imageContentRect.height / 2;
+      const centerX =
+        introImageContentRect.left + introImageContentRect.width / 2;
+      const centerY =
+        introImageContentRect.top + introImageContentRect.height / 2;
 
       const translateOffsetX = cursor.x - centerX; // Horizontal offset from element center
       const translateOffsetY = cursor.y - centerY; // Vertical offset from element center
@@ -185,19 +210,19 @@ export default function Intro() {
       const rotateX = rotateOffsetY * -rotateIntensity; // Vertical tilt
       const rotateY = rotateOffsetX * rotateIntensity; // Horizontal tilt
 
-      gsap.to(imageClipPath, {
+      gsap.to(introImageContainer, {
         rotateX,
         rotateY,
       });
 
-      gsap.to(imageContent, {
+      gsap.to(introImageContent, {
         translateX,
         translateY,
         rotateX: -rotateX,
         rotateY: -rotateY,
       });
 
-      gsap.to(stonesImage, {
+      gsap.to(stonesImageContent, {
         translateX,
         translateY,
       });
@@ -244,10 +269,10 @@ export default function Intro() {
         className="relative flex size-full min-h-screen w-full flex-col items-center gap-5 overflow-hidden"
       >
         <div
-          ref={imageClipPathRef}
+          ref={introImageContainerRef}
           className="absolute left-0 top-0 z-10 size-full"
           style={{
-            clipPath: `path("${imageClipPath}")`,
+            clipPath: 'path("")',
             transform: "perspective(100px)",
             willChange: "transform",
           }}
@@ -259,13 +284,13 @@ export default function Intro() {
             fill="none"
           >
             <path
-              ref={imageBorderPathRef}
+              ref={introImageBorderPathRef}
               className="absolute left-0 top-0 z-10 size-full fill-none"
-              d={imageClipPath}
+              d=""
             ></path>
           </svg>
           <div
-            ref={imageContentRef}
+            ref={introImageContentRef}
             className="absolute left-0 top-0 size-full"
             style={{
               scale: 1.2,
@@ -284,7 +309,10 @@ export default function Intro() {
         </div>
 
         <div className="absolute left-0 top-0 z-10 size-full">
-          <div ref={stonesImageRef} className="absolute left-0 top-0 size-full">
+          <div
+            ref={stonesImageContentRef}
+            className="absolute left-0 top-0 size-full"
+          >
             <Image
               src="/img/stones.webp"
               alt="background"
