@@ -208,7 +208,7 @@ export default function Preloader() {
           "<",
         )
         .fromTo(
-          ".hero-cta-enter-preloader ",
+          ".hero-cta-enter-preloader",
           {
             autoAlpha: 0,
             translateY: 20,

@@ -649,6 +649,8 @@ export default function Hero() {
 
       if (!hasClickedHitArea) return;
 
+      let tl: gsap.core.Timeline | null = null;
+
       mm.add(
         {
           isAboveMedium: `(min-width: ${breakPoint}px) `,
@@ -671,9 +673,11 @@ export default function Hero() {
             ? ".heading-bottom-enter"
             : ".heading-top-enter";
 
-          gsap
-            .timeline()
-            .set(hiddenExitTarget, { display: "none" }, 0)
+          if (!tl) {
+            tl = gsap.timeline();
+          }
+
+          tl.set(hiddenExitTarget, { display: "none" }, 0)
             .set(hiddenEnterTarget, { display: "none" }, 0)
             .fromTo(
               visibleExitTarget,
@@ -698,7 +702,7 @@ export default function Hero() {
                   amount: 0.4,
                 },
               },
-              0.2,
+              "<+=0.2",
             )
             .fromTo(
               visibleEnterTarget,
@@ -713,7 +717,7 @@ export default function Hero() {
                 transform:
                   "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
               },
-              0.4,
+              "<+=0.2",
             )
             .fromTo(
               ".heading-char-enter",
@@ -725,7 +729,7 @@ export default function Hero() {
                   amount: 0.6,
                 },
               },
-              0.4,
+              "<",
             );
         },
       );
