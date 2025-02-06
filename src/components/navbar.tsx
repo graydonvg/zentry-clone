@@ -3,7 +3,7 @@
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import gsap from "gsap";
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Button from "./ui/button";
 import { TiLocationArrow } from "react-icons/ti";
 import { cn } from "@/lib/utils";
@@ -18,11 +18,11 @@ if (typeof window !== "undefined") {
 const navItems = [
   {
     label: "Nexus",
-    icon: TiLocationArrow,
+    icon: true,
   },
   {
     label: "Vault",
-    icon: TiLocationArrow,
+    icon: true,
   },
   {
     label: "Prologue",
@@ -48,10 +48,6 @@ export default function Navbar() {
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [isScrollYTop, setScrollYTop] = useState(true);
-  const rightIcon = useMemo(
-    () => <TiLocationArrow className="rotate-[135deg]" />,
-    [],
-  );
 
   function toggleAudio() {
     const audio = audioRef.current;
@@ -259,10 +255,10 @@ export default function Navbar() {
                 id="product-button"
                 variant="secondary"
                 size="small"
-                rightIcon={rightIcon}
                 onClick={() => defaultLinkToast()}
               >
                 Products
+                <TiLocationArrow className="rotate-[135deg]" />
               </Button>
               <button
                 onClick={() => toast.info("Menu coming soon!")}
@@ -304,8 +300,6 @@ export default function Navbar() {
           <ul className="z-50 hidden items-center md:flex">
             <div ref={navLinksContainerRef} className="flex">
               {navItems.map((item, index) => {
-                const Icon = item.icon;
-
                 return (
                   <li key={index}>
                     <a
@@ -316,7 +310,7 @@ export default function Navbar() {
                       className="flex cursor-pointer items-center gap-1 px-4 py-2 text-xs font-semibold uppercase text-foreground"
                     >
                       {item.label}
-                      {Icon && <Icon />}
+                      {item.icon && <TiLocationArrow />}
                     </a>
                   </li>
                 );

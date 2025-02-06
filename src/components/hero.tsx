@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TiLocationArrow } from "react-icons/ti";
 import Button from "./ui/button";
 import { useGSAP } from "@gsap/react";
@@ -92,10 +92,6 @@ export default function Hero() {
   );
   const isPreloaderComplete = usePreloaderStore(
     (state) => state.isPreloaderComplete,
-  );
-  const leftIcon = useMemo(
-    () => <TiLocationArrow className="size-4 rotate-45" />,
-    [],
   );
 
   useEffect(() => {
@@ -997,9 +993,9 @@ export default function Hero() {
           </p>
           <Button
             onClick={() => defaultLinkToast()}
-            leftIcon={leftIcon}
             className="hero-cta-enter-preloader hidden md:flex"
           >
+            <TiLocationArrow className="size-4 rotate-45" />
             Watch Trailer
           </Button>
         </div>
@@ -1042,9 +1038,9 @@ export default function Hero() {
           </p>
           <Button
             onClick={() => defaultLinkToast()}
-            leftIcon={leftIcon}
             className="hero-cta-enter-preloader"
           >
+            <TiLocationArrow className="size-4 rotate-45" />
             Trailer
           </Button>
         </div>
