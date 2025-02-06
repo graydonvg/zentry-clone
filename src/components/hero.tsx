@@ -217,6 +217,8 @@ export default function Hero() {
             if (!isScrolledToTopRef.current) {
               isScrolledToTopRef.current = true;
 
+              pulseTl.pause();
+
               gsap.to(hitArea, {
                 scale: 1.1,
                 ease: "power2.out",
@@ -260,6 +262,9 @@ export default function Hero() {
                   d: hiddenVideoClipPath,
                 },
                 duration: 1,
+                onComplete: () => {
+                  pulseTl.pause();
+                },
               });
             }
           }
@@ -268,7 +273,6 @@ export default function Hero() {
     },
     {
       dependencies: [
-        windowDimensions,
         nextVideoNumber,
         nextVideoClipPath,
         hiddenVideoClipPath,
