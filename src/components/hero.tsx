@@ -142,7 +142,7 @@ export default function Hero() {
       )
         return;
 
-      const tl = gsap
+      const pulseTl = gsap
         .timeline()
         .to(
           hitArea,
@@ -156,8 +156,7 @@ export default function Hero() {
         .to(
           nextVideoItemContent,
           {
-            clipPath: () =>
-              `path("${getNextVideoClipPath(minMaxHitAreaSideLength * 1.1, windowDimensions)}")`,
+            clipPath: `path("${getNextVideoClipPath(minMaxHitAreaSideLength * 1.1, windowDimensions)}")`,
             ease: "power2.out",
             duration: 1,
           },
@@ -169,15 +168,18 @@ export default function Hero() {
             ease: "power2.out",
             duration: 1,
             attr: {
-              d: () =>
-                getNextVideoClipPath(
-                  minMaxHitAreaSideLength * 1.1,
-                  windowDimensions,
-                ),
+              d: getNextVideoClipPath(
+                minMaxHitAreaSideLength * 1.1,
+                windowDimensions,
+              ),
             },
           },
           0,
-        )
+        );
+
+      const prePulseTime = pulseTl.duration();
+
+      pulseTl
         .to(
           hitArea,
           {
@@ -191,7 +193,7 @@ export default function Hero() {
         .to(
           nextVideoItemContent,
           {
-            clipPath: () => `path("${nextVideoClipPath}")`,
+            clipPath: `path("${nextVideoClipPath}")`,
             repeat: -1,
             yoyo: true,
             ease: "power1.inOut",
@@ -205,7 +207,7 @@ export default function Hero() {
             yoyo: true,
             ease: "power1.inOut",
             attr: {
-              d: () => nextVideoClipPath,
+              d: nextVideoClipPath,
             },
           },
           "<",
@@ -218,12 +220,36 @@ export default function Hero() {
           if (self.progress === 0) {
             if (!isScrolledToTopRef.current) {
               isScrolledToTopRef.current = true;
-              tl.restart();
+
+              gsap.to(hitArea, {
+                scale: 1.1,
+                ease: "power2.out",
+                duration: 1,
+              });
+              gsap.to(nextVideoItemContent, {
+                clipPath: `path("${getNextVideoClipPath(minMaxHitAreaSideLength * 1.1, windowDimensions)}")`,
+                ease: "power2.out",
+                duration: 1,
+              });
+              gsap.to(nextVideoBorder, {
+                ease: "power2.out",
+                duration: 1,
+                attr: {
+                  d: getNextVideoClipPath(
+                    minMaxHitAreaSideLength * 1.1,
+                    windowDimensions,
+                  ),
+                },
+                onComplete: () => {
+                  pulseTl.play(prePulseTime);
+                },
+              });
             }
           } else {
             if (isScrolledToTopRef.current) {
               isScrolledToTopRef.current = false;
-              tl.pause();
+
+              pulseTl.pause();
 
               gsap.to(hitArea, {
                 scale: 0,
@@ -246,6 +272,7 @@ export default function Hero() {
     },
     {
       dependencies: [
+        windowDimensions,
         nextVideoNumber,
         nextVideoClipPath,
         hiddenVideoClipPath,

@@ -19,7 +19,7 @@ export default function Narrative() {
     typeof window !== "undefined"
       ? document.getElementById("pinned-intro-element")
       : null;
-  const imageClipPathRef = useRef<HTMLDivElement>(null);
+  const imageContainerRef = useRef<HTMLDivElement>(null);
   const imageContentRef = useRef<HTMLDivElement>(null);
   const [scrollTriggerOffset, setScrollTriggerOffset] = useState(
     pinnedIntroElement?.clientHeight ?? 0,
@@ -42,12 +42,12 @@ export default function Narrative() {
   useGSAP(
     (_context, contextSafe) => {
       const controller = new AbortController();
-      const imageClipPath = imageClipPathRef.current;
+      const imageContainer = imageContainerRef.current;
       const imageContent = imageContentRef.current;
 
-      if (!imageClipPath || !imageContent || !contextSafe) return;
+      if (!imageContainer || !imageContent || !contextSafe) return;
 
-      gsap.set(imageClipPath, {
+      gsap.set(imageContainer, {
         translateY: "30%",
       });
 
@@ -61,7 +61,7 @@ export default function Narrative() {
         end: () => `bottom+=${scrollTriggerOffset} bottom`,
         onEnter: () => {
           gsap.fromTo(
-            imageClipPath,
+            imageContainer,
             {
               translateY: "30%",
             },
@@ -83,7 +83,7 @@ export default function Narrative() {
           );
         },
         onEnterBack: () => {
-          gsap.set(imageClipPath, {
+          gsap.set(imageContainer, {
             rotateX: 0,
             rotateY: 0,
           });
@@ -94,7 +94,7 @@ export default function Narrative() {
           });
         },
         onLeaveBack: () => {
-          gsap.to(imageClipPath, {
+          gsap.to(imageContainer, {
             translateY: "30%",
           });
 
@@ -116,7 +116,7 @@ export default function Narrative() {
         const rotateX = rotateOffsetY * -rotateIntensity; // Vertical tilt
         const rotateY = rotateOffsetX * rotateIntensity; // Horizontal tilt
 
-        gsap.to(imageClipPath, {
+        gsap.to(imageContainer, {
           rotateX,
           rotateY,
         });
@@ -154,7 +154,7 @@ export default function Narrative() {
         style={{ filter: "url(#flt_tag)" }}
       >
         <div
-          ref={imageClipPathRef}
+          ref={imageContainerRef}
           className="absolute top-20 aspect-[3/2] w-[90vw] max-w-screen-xl overflow-hidden sm:top-20 md:top-28 md:w-[60vw]"
           style={{
             clipPath: "polygon(0% 0%, 83% 20%, 100% 73%, 10% 100%)",
