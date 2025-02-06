@@ -240,6 +240,30 @@ export default function Preloader() {
         .then(() => {
           toggleIsPreloaderComplete();
         });
+
+      const controller = new AbortController();
+
+      window.addEventListener(
+        "resize",
+        () => {
+          if (!timeline.isActive()) return;
+
+          // Skip to the end of the preloader animation if viewport is resized before animation is complete to avoid responsive issues with mask path.
+
+          timeline
+            .seek(timeline.duration())
+            .then(() => {
+              document.body.classList.remove("overflow-hidden");
+            })
+            .then(() => {
+              toggleIsPreloaderComplete();
+            })
+            .then(() => timeline.kill());
+        },
+        { signal: controller.signal },
+      );
+
+      return () => controller.abort();
     },
     {
       dependencies: [heroVideoAssetsLoaded],
