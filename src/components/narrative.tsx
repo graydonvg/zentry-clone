@@ -182,7 +182,7 @@ export default function Narrative() {
       </div>
       <div className="relative mx-auto mt-[clamp(10rem,50vw+6rem,40rem)] flex w-full max-w-screen-2xl justify-center md:mt-[clamp(16rem,25.5vw+6rem,40rem)] md:w-[72vw] md:justify-end">
         <div className="flex h-full w-fit flex-col items-center gap-8 text-center md:items-start md:text-start">
-          <p className="text-body-sm font-medium leading-[1.2] md:text-body-lg">
+          <p className="md:text-body-desktop text-body-mobile font-medium leading-[1.2]">
             Where realms converge, lies Zentry and the
             <br />
             boundless pillar. Discover its secrets and shape

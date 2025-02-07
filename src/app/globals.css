@@ -38,13 +38,13 @@ body {
 
   :root {
     /* Utopia: https://utopia.fyi */
-    --h1-lg: clamp(6rem, 0.3896rem + 11.6883vw, 15rem);
-    --h1-sm: clamp(4.5rem, -0.1429rem + 23.2143vw, 11rem);
-    --h2-lg: clamp(3.125rem, 1.0662rem + 5.1471vw, 7.5rem);
-    --h2-sm: clamp(2.5rem, 0rem + 12.5vw, 5rem);
+    --h1-desktop: clamp(6rem, 0.3896rem + 11.6883vw, 15rem);
+    --h1-mobile: clamp(4.5rem, -0.1429rem + 23.2143vw, 11rem);
+    --h2-desktop: clamp(3.125rem, 1.0662rem + 5.1471vw, 7.5rem);
+    --h2-mobile: clamp(2.5rem, 0rem + 12.5vw, 5rem);
     --h3: clamp(1.875rem, 1.0227rem + 4.2614vw, 3.75rem);
-    --body-lg: clamp(0.625rem, 0.4583rem + 0.8333vw, 1.5rem);
-    --body-sm: clamp(0.75rem, 0.2143rem + 2.6786vw, 1.5rem);
+    --body-desktop: clamp(0.625rem, 0.4583rem + 0.8333vw, 1.5rem);
+    --body-mobile: clamp(0.75rem, 0.2143rem + 2.6786vw, 1.5rem);
     --caption: clamp(0.625rem, 0.5074rem + 0.2941vw, 0.875rem);
 
     --foreground: 228 50% 96%;
@@ -65,7 +65,7 @@ body {
   }
 
   .absolute-center {
-    @apply absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%];
+    @apply absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2;
   }
 
   .flex-center {
@@ -76,16 +76,16 @@ body {
     @apply special-font font-zentry font-black uppercase leading-none;
   }
 
-  .hero-heading-lrg {
-    @apply hero-heading text-h1-lg;
+  .hero-heading-desktop {
+    @apply hero-heading text-h1-desktop;
   }
 
-  .hero-heading-sml {
-    @apply hero-heading text-h1-sm;
+  .hero-heading-mobile {
+    @apply hero-heading text-h1-mobile;
   }
 
   .gallery-img-container {
-    @apply size-64 overflow-hidden bg-violet-300;
+    @apply size-64 overflow-hidden bg-primary;
   }
 
   .gallery-img {

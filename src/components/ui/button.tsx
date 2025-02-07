@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { ButtonHTMLAttributes, forwardRef } from "react";
 
 const buttonVariants = cva(
-  "flex items-center justify-center group relative w-fit shrink-0 cursor-pointer overflow-hidden rounded-full",
+  "flex-center group relative w-fit shrink-0 cursor-pointer overflow-hidden rounded-full",
   {
     variants: {
       variant: {

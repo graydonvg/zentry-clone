@@ -861,7 +861,7 @@ export default function Hero() {
         </svg>
         <div
           ref={fakeHitAreaRef}
-          className="pointer-events-none invisible absolute left-1/2 top-1/2 -z-50 aspect-square -translate-x-1/2 -translate-y-1/2 select-none rounded-lg"
+          className="absolute-center pointer-events-none invisible -z-50 aspect-square select-none rounded-lg"
           style={{
             width: hitAreaSideLength,
             height: hitAreaSideLength,
@@ -873,7 +873,7 @@ export default function Hero() {
           onMouseOver={() => (isMouseOverHitAreaRef.current = true)}
           onMouseLeave={() => (isMouseOverHitAreaRef.current = false)}
           onClick={handleHitAreaClicked}
-          className="absolute left-1/2 top-1/2 z-50 aspect-square -translate-x-1/2 -translate-y-1/2 scale-0 cursor-pointer rounded-lg"
+          className="absolute-center z-50 aspect-square scale-0 cursor-pointer rounded-lg"
           style={{
             width: hitAreaSideLength,
             height: hitAreaSideLength,
@@ -953,14 +953,14 @@ export default function Hero() {
         })}
 
         <div className="absolute left-0 top-0 z-10 size-full px-[clamp(1rem,6vw,3rem)] md:z-20">
-          <h1 className="hero-heading-sml md:hero-heading-lrg hero-heading-enter-preloader mt-24 text-foreground">
+          <h1 className="hero-heading-mobile md:hero-heading-desktop hero-heading-enter-preloader mt-24 text-foreground">
             {splitAndMapTextWithTags(
               "redefi<b>n</b>e",
               "hero-heading-chars-enter-preloader opacity-0 invisible",
             )}
             <span className="inline-flex md:hidden">
               <span
-                className="hero-heading-sml heading-top-exit absolute right-0 text-foreground"
+                className="hero-heading-mobile heading-top-exit absolute right-0 text-foreground"
                 style={{
                   transform:
                     "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
@@ -974,7 +974,7 @@ export default function Hero() {
                 )}
               </span>
               <span
-                className="hero-heading-sml heading-top-enter absolute right-0 hidden text-foreground"
+                className="hero-heading-mobile heading-top-enter absolute right-0 hidden text-foreground"
                 style={{
                   transform:
                     "perspective(1000px) translate3d(-110px, 50px, -60px) rotateY(-50deg) rotateX(-20deg)",
@@ -990,7 +990,7 @@ export default function Hero() {
             </span>
           </h1>
 
-          <p className="hero-cta-enter-preloader mb-5 hidden font-robert-regular text-body-lg/[1.2] text-foreground md:block">
+          <p className="hero-cta-enter-preloader text-body-desktop/[1.2] mb-5 hidden font-robert-regular text-foreground md:block">
             Enter the Metagame
             <br />
             Unleash the Play Economy
@@ -1006,7 +1006,7 @@ export default function Hero() {
 
         <div className="absolute inset-0 z-10 hidden h-svh w-full md:block">
           <h1
-            className="hero-heading-lrg heading-bottom-exit hero-heading-enter-preloader absolute bottom-6 right-8 text-foreground"
+            className="hero-heading-desktop heading-bottom-exit hero-heading-enter-preloader absolute bottom-6 right-8 text-foreground"
             style={{
               transform:
                 "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
@@ -1020,7 +1020,7 @@ export default function Hero() {
             )}
           </h1>
           <h1
-            className="hero-heading-lrg heading-bottom-enter absolute bottom-6 right-8 text-foreground"
+            className="hero-heading-desktop heading-bottom-enter absolute bottom-6 right-8 text-foreground"
             style={{
               transform:
                 "perspective(1000px) translate3d(0px, -150px, 20px) rotateZ(-20deg) rotateX(60deg)",
@@ -1035,7 +1035,7 @@ export default function Hero() {
           </h1>
         </div>
         <div className="absolute inset-0 z-20 flex h-svh w-full items-end justify-between px-[clamp(1rem,6vw,3rem)] pb-[clamp(1rem,6vw,3rem)] md:hidden">
-          <p className="hero-cta-enter-preloader font-robert-regular text-body-sm/[1.2] text-foreground">
+          <p className="hero-cta-enter-preloader text-body-mobile/[1.2] font-robert-regular text-foreground">
             Enter the Metagame
             <br />
             Unleash the Play Economy
@@ -1051,7 +1051,7 @@ export default function Hero() {
       </div>
 
       <h1
-        className="hero-heading-lrg heading-bottom-exit absolute bottom-6 right-8 -z-10 hidden text-black md:block"
+        className="hero-heading-desktop heading-bottom-exit absolute bottom-6 right-8 -z-10 hidden text-black md:block"
         style={{
           transform:
             "perspective(1000px) translate3d(0px, 0px, 0px) rotateY(0deg) rotateX(0deg)",
@@ -1065,7 +1065,7 @@ export default function Hero() {
         )}
       </h1>
       <h1
-        className="hero-heading-lrg heading-bottom-enter absolute bottom-6 right-8 -z-10 hidden text-black md:block"
+        className="hero-heading-desktop heading-bottom-enter absolute bottom-6 right-8 -z-10 hidden text-black md:block"
         style={{
           transform:
             "perspective(1000px) translate3d(0px, -150px, 20px) rotateZ(-20deg) rotateX(60deg)",

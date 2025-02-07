@@ -275,12 +275,12 @@ export default function Preloader() {
       ref={preloaderRef}
       className="fixed inset-0 z-[60] flex size-full min-h-screen grow flex-col overflow-hidden bg-black"
       style={{
-        mask: "url(#diamond-mask)",
+        mask: "url(#mask)",
       }}
     >
       <svg ref={preloaderSvgRef} aria-hidden="true" width="100%" height="100%">
         <defs>
-          <mask id="diamond-mask">
+          <mask id="mask">
             <rect width="100%" height="100%" fill="white" />
             <path
               ref={pathRef}

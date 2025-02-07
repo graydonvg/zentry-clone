@@ -323,7 +323,7 @@ export default function Intro() {
           </div>
         </div>
 
-        <div className="absolute bottom-16 flex w-full flex-col items-center justify-end text-center font-circular-web text-body-lg/[1.2] tracking-tight">
+        <div className="text-body-desktop/[1.2] absolute bottom-16 flex w-full flex-col items-center justify-end text-center font-circular-web tracking-tight">
           <p>The Metagame begins—your life, now an epic MMORPG</p>
           <p className="text-black/50">
             Zentry is the unified play layer that bridges players, agentic AI,

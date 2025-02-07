@@ -6,7 +6,7 @@ export default function Products() {
   return (
     <section className="min-h-screen bg-black px-3 py-16 sm:px-8 sm:py-24 md:px-24 lg:py-32">
       <div className="mx-auto max-w-screen-2xl space-y-16 sm:space-y-24 lg:space-y-32">
-        <div className="font-circular-web text-body-sm leading-[1.2] md:text-body-lg">
+        <div className="md:text-body-desktop text-body-mobile font-circular-web leading-[1.2]">
           <p className="text-foreground">Explore the Zentry Universe</p>
           <p className="text-foreground/50">
             Immerse yourself in an IP-rich product universe where

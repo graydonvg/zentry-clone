@@ -250,7 +250,7 @@ export default function Navbar() {
             <svg aria-hidden="true" className="size-8 fill-secondary">
               <use href="/icons/arrows-icon.svg#arrows-icon"></use>
             </svg>
-            <div className="flex items-center justify-center gap-6">
+            <div className="flex-center gap-6">
               <Button
                 id="product-button"
                 variant="secondary"

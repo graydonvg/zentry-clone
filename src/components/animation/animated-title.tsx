@@ -155,7 +155,7 @@ export default function AnimatedTitle({
       id={id}
       ref={titleContainerRef}
       className={cn(
-        "flex flex-col items-center justify-center gap-4 space-y-5 sm:gap-6 md:gap-8",
+        "flex-center flex-col gap-4 space-y-5 sm:gap-6 md:gap-8",
         containerClassName,
       )}
     >
@@ -174,7 +174,7 @@ export default function AnimatedTitle({
       )}
 
       <h2
-        className="hidden flex-col gap-1 text-h2-lg/[0.8] uppercase sm:flex sm:px-32"
+        className="text-h2-desktop/[0.8] hidden flex-col gap-1 uppercase sm:flex sm:px-32"
         style={{
           transformOrigin: "50% 50% -150px",
           willChange: "transform, opacity",
@@ -198,7 +198,7 @@ export default function AnimatedTitle({
       </h2>
       {titleSml && (
         <h2
-          className="flex flex-col gap-1 text-h2-sm/[0.8] uppercase sm:hidden"
+          className="text-h2-mobile/[0.8] flex flex-col gap-1 uppercase sm:hidden"
           style={{
             transform:
               "perspective(1000px)  translate3d(-110px, 50px, -60px) rotateY(-50deg) rotateX(-20deg)",
