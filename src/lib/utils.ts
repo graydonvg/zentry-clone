@@ -24,7 +24,6 @@ export function getPreloaderMaskPath(
   hidden = false,
   borderRadius = 8,
 ) {
-  // Set maximum dimensions for the clip path
   const minWidth = 450;
   const maxWidth = 650;
 
@@ -47,9 +46,9 @@ export function getPreloaderMaskPath(
 
   const scalingFactor = pathMinMaxWidth / maxWidth;
 
-  let clampedRadius = 0;
+  let clampedBorderRadius = 0;
 
-  // Clip path center
+  // Path center
   const centerX = windowDimensions.width / 2;
   const centerY = windowDimensions.height / 2;
 
@@ -67,7 +66,7 @@ export function getPreloaderMaskPath(
 
   if (!hidden) {
     // Ensure the borderRadius doesn't exceed the minimum of halfWidth and halfHeight
-    clampedRadius = Math.min(
+    clampedBorderRadius = Math.min(
       borderRadius * scalingFactor,
       halfWidth,
       halfHeight,
@@ -86,20 +85,20 @@ export function getPreloaderMaskPath(
     bottomLeftY = bottomRightY - 75 * scalingFactor;
   }
 
-  const clipPath = `
-    M ${topLeftX + clampedRadius} ${topLeftY}
-    L ${topRightX - clampedRadius} ${topRightY}
-    Q ${topRightX} ${topRightY} ${topRightX} ${topRightY + clampedRadius}
-    L ${bottomRightX} ${bottomRightY - clampedRadius}
-    Q ${bottomRightX} ${bottomRightY} ${bottomRightX - clampedRadius} ${bottomRightY}
-    L ${bottomLeftX + clampedRadius} ${bottomLeftY}
-    Q ${bottomLeftX} ${bottomLeftY} ${bottomLeftX} ${bottomLeftY - clampedRadius}
-    L ${topLeftX} ${topLeftY + clampedRadius}
-    Q ${topLeftX} ${topLeftY} ${topLeftX + clampedRadius} ${topLeftY}
+  const path = `
+    M ${topLeftX + clampedBorderRadius} ${topLeftY}
+    L ${topRightX - clampedBorderRadius} ${topRightY}
+    Q ${topRightX} ${topRightY} ${topRightX} ${topRightY + clampedBorderRadius}
+    L ${bottomRightX} ${bottomRightY - clampedBorderRadius}
+    Q ${bottomRightX} ${bottomRightY} ${bottomRightX - clampedBorderRadius} ${bottomRightY}
+    L ${bottomLeftX + clampedBorderRadius} ${bottomLeftY}
+    Q ${bottomLeftX} ${bottomLeftY} ${bottomLeftX} ${bottomLeftY - clampedBorderRadius}
+    L ${topLeftX} ${topLeftY + clampedBorderRadius}
+    Q ${topLeftX} ${topLeftY} ${topLeftX + clampedBorderRadius} ${topLeftY}
     Z
   `.replace(/\s+/g, " "); // Remove extra spaces for a single-line path
 
-  return clipPath;
+  return path;
 }
 
 export function getNextVideoClipPath(
@@ -116,13 +115,13 @@ export function getNextVideoClipPath(
   const halfSideLength = hitAreaWidth / 2;
 
   // Ensure the borderRadius doesn't exceed half the side length
-  const clampedRadius = Math.min(borderRadius, halfSideLength);
+  const clampedBorderRadius = Math.min(borderRadius, halfSideLength);
 
   // Cursor influence factors
   const influenceX = cursorPosition ? cursorPosition.x * halfSideLength : 0;
   const influenceY = cursorPosition ? cursorPosition.y * halfSideLength : 0;
 
-  // Adjusted corner points based on tilt
+  // Adjusted corner points based on cursor influence
   const topLeftX = centerX - halfSideLength + influenceX;
   const topLeftY = centerY - halfSideLength + influenceY;
 
@@ -137,15 +136,15 @@ export function getNextVideoClipPath(
 
   // Generate the clip path
   const clipPath = `
-    M ${topLeftX + clampedRadius} ${topLeftY}
-    L ${topRightX - clampedRadius} ${topRightY}
-    Q ${topRightX} ${topRightY} ${topRightX} ${topRightY + clampedRadius}
-    L ${bottomRightX} ${bottomRightY - clampedRadius}
-    Q ${bottomRightX} ${bottomRightY} ${bottomRightX - clampedRadius} ${bottomRightY}
-    L ${bottomLeftX + clampedRadius} ${bottomLeftY}
-    Q ${bottomLeftX} ${bottomLeftY} ${bottomLeftX} ${bottomLeftY - clampedRadius}
-    L ${topLeftX} ${topLeftY + clampedRadius}
-    Q ${topLeftX} ${topLeftY} ${topLeftX + clampedRadius} ${topLeftY}
+    M ${topLeftX + clampedBorderRadius} ${topLeftY}
+    L ${topRightX - clampedBorderRadius} ${topRightY}
+    Q ${topRightX} ${topRightY} ${topRightX} ${topRightY + clampedBorderRadius}
+    L ${bottomRightX} ${bottomRightY - clampedBorderRadius}
+    Q ${bottomRightX} ${bottomRightY} ${bottomRightX - clampedBorderRadius} ${bottomRightY}
+    L ${bottomLeftX + clampedBorderRadius} ${bottomLeftY}
+    Q ${bottomLeftX} ${bottomLeftY} ${bottomLeftX} ${bottomLeftY - clampedBorderRadius}
+    L ${topLeftX} ${topLeftY + clampedBorderRadius}
+    Q ${topLeftX} ${topLeftY} ${topLeftX + clampedBorderRadius} ${topLeftY}
     Z
   `.replace(/\s+/g, " "); // Remove extra spaces for a single-line path
 
@@ -156,7 +155,6 @@ export function getIntroImageClipPath(
   windowDimensions: WindowDimensions,
   borderRadius = 8,
 ) {
-  // Set maximum dimensions for the clip path
   const minWidth = 200;
   const maxWidth = 450;
 
@@ -180,7 +178,7 @@ export function getIntroImageClipPath(
   const scalingFactor = imageMinMaxWidth / maxWidth;
 
   // Ensure the borderRadius doesn't exceed the minimum of halfWidth and halfHeight
-  const clampedRadius = Math.min(
+  const clampedBorderRadius = Math.min(
     borderRadius * scalingFactor,
     halfWidth,
     halfHeight,
@@ -204,29 +202,29 @@ export function getIntroImageClipPath(
   const bottomLeftY = bottomRightY + 75 * scalingFactor;
 
   const clipPath = `
-    M ${topLeftX + clampedRadius} ${topLeftY}
-    L ${topRightX - clampedRadius} ${topRightY}
-    Q ${topRightX} ${topRightY} ${topRightX} ${topRightY + clampedRadius}
-    L ${bottomRightX} ${bottomRightY - clampedRadius}
-    Q ${bottomRightX} ${bottomRightY} ${bottomRightX - clampedRadius} ${bottomRightY}
-    L ${bottomLeftX + clampedRadius} ${bottomLeftY}
-    Q ${bottomLeftX} ${bottomLeftY} ${bottomLeftX} ${bottomLeftY - clampedRadius}
-    L ${topLeftX} ${topLeftY + clampedRadius}
-    Q ${topLeftX} ${topLeftY} ${topLeftX + clampedRadius} ${topLeftY}
+    M ${topLeftX + clampedBorderRadius} ${topLeftY}
+    L ${topRightX - clampedBorderRadius} ${topRightY}
+    Q ${topRightX} ${topRightY} ${topRightX} ${topRightY + clampedBorderRadius}
+    L ${bottomRightX} ${bottomRightY - clampedBorderRadius}
+    Q ${bottomRightX} ${bottomRightY} ${bottomRightX - clampedBorderRadius} ${bottomRightY}
+    L ${bottomLeftX + clampedBorderRadius} ${bottomLeftY}
+    Q ${bottomLeftX} ${bottomLeftY} ${bottomLeftX} ${bottomLeftY - clampedBorderRadius}
+    L ${topLeftX} ${topLeftY + clampedBorderRadius}
+    Q ${topLeftX} ${topLeftY} ${topLeftX + clampedBorderRadius} ${topLeftY}
     Z
   `.replace(/\s+/g, " "); // Remove extra spaces for a single-line path
 
   return clipPath;
 }
 
-export function getFullScreenClipPath(
+export function getFullScreenPath(
   windowDimensions: WindowDimensions,
   borderRadius = 0,
 ) {
   const halfSideLength = windowDimensions.width / 2;
 
   // Ensure the borderRadius doesn't exceed half the side length
-  const clampedRadius = Math.min(borderRadius, halfSideLength);
+  const clampedBorderRadius = Math.min(borderRadius, halfSideLength);
 
   // Clip path points
   const topLeftX = 0;
@@ -242,15 +240,15 @@ export function getFullScreenClipPath(
   const bottomLeftY = bottomRightY;
 
   const clipPath = `
-    M ${topLeftX + clampedRadius} ${topLeftY}
-    L ${topRightX - clampedRadius} ${topRightY}
-    Q ${topRightX} ${topRightY} ${topRightX} ${topRightY + clampedRadius}
-    L ${bottomRightX} ${bottomRightY - clampedRadius}
-    Q ${bottomRightX} ${bottomRightY} ${bottomRightX - clampedRadius} ${bottomRightY}
-    L ${bottomLeftX + clampedRadius} ${bottomLeftY}
-    Q ${bottomLeftX} ${bottomLeftY} ${bottomLeftX} ${bottomLeftY - clampedRadius}
-    L ${topLeftX} ${topLeftY + clampedRadius}
-    Q ${topLeftX} ${topLeftY} ${topLeftX + clampedRadius} ${topLeftY}
+    M ${topLeftX + clampedBorderRadius} ${topLeftY}
+    L ${topRightX - clampedBorderRadius} ${topRightY}
+    Q ${topRightX} ${topRightY} ${topRightX} ${topRightY + clampedBorderRadius}
+    L ${bottomRightX} ${bottomRightY - clampedBorderRadius}
+    Q ${bottomRightX} ${bottomRightY} ${bottomRightX - clampedBorderRadius} ${bottomRightY}
+    L ${bottomLeftX + clampedBorderRadius} ${bottomLeftY}
+    Q ${bottomLeftX} ${bottomLeftY} ${bottomLeftX} ${bottomLeftY - clampedBorderRadius}
+    L ${topLeftX} ${topLeftY + clampedBorderRadius}
+    Q ${topLeftX} ${topLeftY} ${topLeftX + clampedBorderRadius} ${topLeftY}
     Z
   `.replace(/\s+/g, " "); // Remove extra spaces for a single-line path
 
@@ -261,11 +259,10 @@ export function getFirstTransformedHeroClipPath(
   windowDimensions: WindowDimensions,
   borderRadius = 8,
 ) {
-  // Clip path lengths
   const halfSideLength = windowDimensions.width / 2;
 
   // Ensure the borderRadius doesn't exceed half the side length
-  const clampedRadius = Math.min(borderRadius, halfSideLength);
+  const clampedBorderRadius = Math.min(borderRadius, halfSideLength);
 
   // Clip path points
   const topLeftX = windowDimensions.width * 0.14;
@@ -281,15 +278,15 @@ export function getFirstTransformedHeroClipPath(
   const bottomLeftY = windowDimensions.height * 0.95;
 
   const clipPath = `
-    M ${topLeftX + clampedRadius} ${topLeftY}
-    L ${topRightX - clampedRadius} ${topRightY}
-    Q ${topRightX} ${topRightY} ${topRightX} ${topRightY + clampedRadius}
-    L ${bottomRightX} ${bottomRightY - clampedRadius}
-    Q ${bottomRightX} ${bottomRightY} ${bottomRightX - clampedRadius} ${bottomRightY}
-    L ${bottomLeftX + clampedRadius} ${bottomLeftY}
-    Q ${bottomLeftX} ${bottomLeftY} ${bottomLeftX} ${bottomLeftY - clampedRadius}
-    L ${topLeftX} ${topLeftY + clampedRadius}
-    Q ${topLeftX} ${topLeftY} ${topLeftX + clampedRadius} ${topLeftY}
+    M ${topLeftX + clampedBorderRadius} ${topLeftY}
+    L ${topRightX - clampedBorderRadius} ${topRightY}
+    Q ${topRightX} ${topRightY} ${topRightX} ${topRightY + clampedBorderRadius}
+    L ${bottomRightX} ${bottomRightY - clampedBorderRadius}
+    Q ${bottomRightX} ${bottomRightY} ${bottomRightX - clampedBorderRadius} ${bottomRightY}
+    L ${bottomLeftX + clampedBorderRadius} ${bottomLeftY}
+    Q ${bottomLeftX} ${bottomLeftY} ${bottomLeftX} ${bottomLeftY - clampedBorderRadius}
+    L ${topLeftX} ${topLeftY + clampedBorderRadius}
+    Q ${topLeftX} ${topLeftY} ${topLeftX + clampedBorderRadius} ${topLeftY}
     Z
   `.replace(/\s+/g, " "); // Remove extra spaces for a single-line path
 
@@ -300,11 +297,10 @@ export function getSecondTransformedHeroClipPath(
   windowDimensions: WindowDimensions,
   borderRadius = 8,
 ) {
-  // Clip path lengths
   const halfSideLength = windowDimensions.width / 2;
 
   // Ensure the borderRadius doesn't exceed half the side length
-  const clampedRadius = Math.min(borderRadius, halfSideLength);
+  const clampedBorderRadius = Math.min(borderRadius, halfSideLength);
 
   // Clip path points
   const topLeftX = windowDimensions.width * 0.28;
@@ -320,15 +316,15 @@ export function getSecondTransformedHeroClipPath(
   const bottomLeftY = windowDimensions.height * 0.8;
 
   const clipPath = `
-    M ${topLeftX + clampedRadius} ${topLeftY}
-    L ${topRightX - clampedRadius} ${topRightY}
-    Q ${topRightX} ${topRightY} ${topRightX} ${topRightY + clampedRadius}
-    L ${bottomRightX} ${bottomRightY - clampedRadius}
-    Q ${bottomRightX} ${bottomRightY} ${bottomRightX - clampedRadius} ${bottomRightY}
-    L ${bottomLeftX + clampedRadius} ${bottomLeftY}
-    Q ${bottomLeftX} ${bottomLeftY} ${bottomLeftX} ${bottomLeftY - clampedRadius}
-    L ${topLeftX} ${topLeftY + clampedRadius}
-    Q ${topLeftX} ${topLeftY} ${topLeftX + clampedRadius} ${topLeftY}
+    M ${topLeftX + clampedBorderRadius} ${topLeftY}
+    L ${topRightX - clampedBorderRadius} ${topRightY}
+    Q ${topRightX} ${topRightY} ${topRightX} ${topRightY + clampedBorderRadius}
+    L ${bottomRightX} ${bottomRightY - clampedBorderRadius}
+    Q ${bottomRightX} ${bottomRightY} ${bottomRightX - clampedBorderRadius} ${bottomRightY}
+    L ${bottomLeftX + clampedBorderRadius} ${bottomLeftY}
+    Q ${bottomLeftX} ${bottomLeftY} ${bottomLeftX} ${bottomLeftY - clampedBorderRadius}
+    L ${topLeftX} ${topLeftY + clampedBorderRadius}
+    Q ${topLeftX} ${topLeftY} ${topLeftX + clampedBorderRadius} ${topLeftY}
     Z
   `.replace(/\s+/g, " "); // Remove extra spaces for a single-line path
 

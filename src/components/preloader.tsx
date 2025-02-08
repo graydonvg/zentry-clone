@@ -3,7 +3,7 @@
 import useWindowDimensions from "@/hooks/use-window-dimensions";
 import useAssetsStore from "@/lib/store/use-assets-store";
 import usePreloaderStore from "@/lib/store/use-preloader-store";
-import { getFullScreenClipPath, getPreloaderMaskPath } from "@/lib/utils";
+import { getFullScreenPath, getPreloaderMaskPath } from "@/lib/utils";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useEffect, useRef, useState } from "react";
@@ -14,22 +14,23 @@ if (typeof window !== "undefined") {
 
 export default function Preloader() {
   const windowDimensions = useWindowDimensions();
+  const [initialMaskPath, setInitialMaskPath] = useState("");
   const preloaderRef = useRef<HTMLDivElement>(null);
   const preloaderSvgRef = useRef<SVGSVGElement>(null);
   const topLogoRef = useRef<SVGSVGElement>(null);
   const bottomLogoRef = useRef<SVGSVGElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
-  const timelineRef = useRef<gsap.core.Timeline>(null);
-  const [hiddenMaskPath, setHiddenMaskPath] = useState("");
   const heroVideoAssetsLoaded = useAssetsStore(
     (state) => state.heroVideoAssetsLoaded,
   );
   const toggleIsPreloaderComplete = usePreloaderStore(
     (state) => state.toggleIsPreloaderComplete,
   );
+  const [preloaderFirstPhaseComplete, setPreloaderFirstPhaseComplete] =
+    useState(false);
 
   useEffect(() => {
-    setHiddenMaskPath(getPreloaderMaskPath(windowDimensions, true));
+    setInitialMaskPath(getPreloaderMaskPath(windowDimensions, true));
   }, [windowDimensions]);
 
   useGSAP(() => {
@@ -39,13 +40,10 @@ export default function Preloader() {
 
     if (!preloader || !topLogo || !bottomLogo) return;
 
-    if (!timelineRef.current) {
-      timelineRef.current = gsap.timeline({
+    gsap
+      .timeline({
         defaults: { ease: "power1.out" },
-      });
-    }
-
-    timelineRef.current
+      })
       .to(
         bottomLogo,
         {
@@ -79,28 +77,21 @@ export default function Preloader() {
           translateX: "-50%",
         },
         "<+=0.2",
-      );
+      )
+      .then(() => setPreloaderFirstPhaseComplete(true));
   });
 
   useGSAP(
     () => {
-      if (!heroVideoAssetsLoaded) return;
+      if (!heroVideoAssetsLoaded || !preloaderFirstPhaseComplete) return;
 
       const preloader = preloaderRef.current;
       const preloaderSvg = preloaderSvgRef.current;
       const topLogo = topLogoRef.current;
       const bottomLogo = bottomLogoRef.current;
       const path = pathRef.current;
-      const timeline = timelineRef.current;
 
-      if (
-        !preloader ||
-        !preloaderSvg ||
-        !topLogo ||
-        !bottomLogo ||
-        !path ||
-        !timeline
-      )
+      if (!preloader || !preloaderSvg || !topLogo || !bottomLogo || !path)
         return;
 
       const primaryColor = `hsl(${getComputedStyle(document.documentElement)
@@ -109,7 +100,10 @@ export default function Preloader() {
         .split(" ")
         .join(", ")})`;
 
-      timeline
+      const tl = gsap
+        .timeline({
+          defaults: { ease: "power1.out" },
+        })
         .to(
           bottomLogo,
           {
@@ -173,7 +167,7 @@ export default function Preloader() {
             rotate: 0,
             duration: 0.5,
             attr: {
-              d: getFullScreenClipPath(windowDimensions),
+              d: getFullScreenPath(windowDimensions),
             },
           },
           ">",
@@ -233,12 +227,17 @@ export default function Preloader() {
             translateY: 0,
           },
           "<",
-        )
-        .then(() => {
-          document.body.classList.remove("overflow-hidden");
-        })
+        );
+
+      tl.then(() => {
+        document.body.classList.remove("overflow-hidden");
+      })
         .then(() => {
           toggleIsPreloaderComplete();
+        })
+        .then(() => {
+          // tl.kill();
+          // controller.abort();
         });
 
       const controller = new AbortController();
@@ -246,19 +245,21 @@ export default function Preloader() {
       window.addEventListener(
         "resize",
         () => {
-          if (!timeline.isActive()) return;
+          if (!tl.isActive()) return;
 
           // Skip to the end of the preloader animation if viewport is resized before animation is complete to avoid responsive issues with mask path.
 
-          timeline
-            .seek(timeline.duration())
+          tl.seek(tl.duration())
             .then(() => {
               document.body.classList.remove("overflow-hidden");
             })
             .then(() => {
               toggleIsPreloaderComplete();
             })
-            .then(() => timeline.kill());
+            .then(() => {
+              // tl.kill();
+              // controller.abort();
+            });
         },
         { signal: controller.signal },
       );
@@ -266,34 +267,35 @@ export default function Preloader() {
       return () => controller.abort();
     },
     {
-      dependencies: [heroVideoAssetsLoaded],
+      dependencies: [heroVideoAssetsLoaded, preloaderFirstPhaseComplete],
     },
   );
 
   return (
     <div
       ref={preloaderRef}
-      className="fixed inset-0 z-[60] flex size-full min-h-screen grow flex-col overflow-hidden bg-black"
+      className="fixed inset-0 z-[60] size-full min-h-screen bg-black"
       style={{
         mask: "url(#mask)",
       }}
     >
-      <svg ref={preloaderSvgRef} aria-hidden="true" width="100%" height="100%">
+      <svg
+        ref={preloaderSvgRef}
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        width="100%"
+        height="100%"
+      >
         <defs>
           <mask id="mask">
             <rect width="100%" height="100%" fill="white" />
-            <path
-              ref={pathRef}
-              d={hiddenMaskPath}
-              width="100%"
-              height="100%"
-              fill="black"
-            />
+            <path ref={pathRef} d={initialMaskPath} fill="black" />
           </mask>
         </defs>
       </svg>
       <svg
         ref={topLogoRef}
+        xmlns="http://www.w3.org/2000/svg"
         aria-hidden="true"
         viewBox="0 0 661 660"
         className="absolute -left-[30vw] top-1/2 size-1/5 -translate-y-1/2 fill-primary"
@@ -302,6 +304,7 @@ export default function Preloader() {
       </svg>
       <svg
         ref={bottomLogoRef}
+        xmlns="http://www.w3.org/2000/svg"
         aria-hidden="true"
         viewBox="0 0 661 660"
         className="absolute -right-[30vw] top-1/2 size-1/5 translate-y-[-50%] fill-primary"

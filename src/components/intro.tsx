@@ -5,7 +5,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import gsap from "gsap";
 import Image from "next/image";
 import AnimatedTitle from "./animation/animated-title";
-import { getIntroImageClipPath, getFullScreenClipPath } from "@/lib/utils";
+import { getIntroImageClipPath, getFullScreenPath } from "@/lib/utils";
 import useWindowDimensions from "@/hooks/use-window-dimensions";
 import { useRef } from "react";
 
@@ -87,7 +87,7 @@ export default function Intro() {
         return;
 
       const imageClipPath = getIntroImageClipPath(windowDimensions);
-      const fullScreenClipPath = getFullScreenClipPath(windowDimensions);
+      const fullScreenClipPath = getFullScreenPath(windowDimensions);
 
       gsap
         .timeline({
@@ -278,10 +278,11 @@ export default function Intro() {
           }}
         >
           <svg
-            className="absolute left-0 top-0 z-10 size-full fill-none"
-            stroke={"#000000"}
+            xmlns="http://www.w3.org/2000/svg"
+            stroke="#000000"
             strokeWidth="2"
             fill="none"
+            className="absolute left-0 top-0 z-10 size-full fill-none"
           >
             <path
               ref={introImageBorderPathRef}
@@ -323,7 +324,7 @@ export default function Intro() {
           </div>
         </div>
 
-        <div className="text-body-desktop/[1.2] absolute bottom-16 flex w-full flex-col items-center justify-end text-center font-circular-web tracking-tight">
+        <div className="absolute bottom-16 flex w-full flex-col items-center justify-end text-center font-circular-web text-body-desktop/[1.2] tracking-tight">
           <p>The Metagame begins—your life, now an epic MMORPG</p>
           <p className="text-black/50">
             Zentry is the unified play layer that bridges players, agentic AI,

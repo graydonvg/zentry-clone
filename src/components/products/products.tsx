@@ -6,7 +6,7 @@ export default function Products() {
   return (
     <section className="min-h-screen bg-black px-3 py-16 sm:px-8 sm:py-24 md:px-24 lg:py-32">
       <div className="mx-auto max-w-screen-2xl space-y-16 sm:space-y-24 lg:space-y-32">
-        <div className="md:text-body-desktop text-body-mobile font-circular-web leading-[1.2]">
+        <div className="font-circular-web text-body-mobile leading-[1.2] md:text-body-desktop">
           <p className="text-foreground">Explore the Zentry Universe</p>
           <p className="text-foreground/50">
             Immerse yourself in an IP-rich product universe where
@@ -75,6 +75,7 @@ export default function Products() {
               </div>
               <div className="bottom-0 right-0 mt-auto">
                 <svg
+                  xmlns="http://www.w3.org/2000/svg"
                   aria-hidden="true"
                   className="size-[10vw] fill-black md:size-[3.5vw]"
                 >

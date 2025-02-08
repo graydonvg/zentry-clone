@@ -8,7 +8,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import gsap from "gsap";
 import useWindowDimensions from "@/hooks/use-window-dimensions";
 import {
-  getFullScreenClipPath,
+  getFullScreenPath,
   getHiddenHeroVideoNumbers,
   getHitAreaSideLength,
   getNextVideoClipPath,
@@ -104,7 +104,7 @@ export default function Hero() {
     setNextVideoClipPath(
       getNextVideoClipPath(minMaxHitAreaSideLength, windowDimensions),
     );
-    setFullScreenClipPath(getFullScreenClipPath(windowDimensions));
+    setFullScreenClipPath(getFullScreenPath(windowDimensions));
     setHiddenVideoClipPath(getNextVideoClipPath(0, windowDimensions));
     setHitAreaSideLength(minMaxHitAreaSideLength);
   }, [windowDimensions, minMaxHitAreaSideLength]);
@@ -763,7 +763,7 @@ export default function Hero() {
 
       if (!hero || !heroBorder) return;
 
-      const fullScreenClipPath = getFullScreenClipPath(windowDimensions);
+      const fullScreenClipPath = getFullScreenPath(windowDimensions);
       const firstTransformedHeroClipPath =
         getFirstTransformedHeroClipPath(windowDimensions);
       const secondTransformedHeroClipPath =
@@ -848,10 +848,11 @@ export default function Hero() {
         className="absolute left-0 top-0 size-full overflow-hidden"
       >
         <svg
-          className="pointer-events-none absolute left-0 top-0 z-30 size-full fill-none"
+          xmlns="http://www.w3.org/2000/svg"
           stroke="#000000"
           strokeWidth="2"
           fill="none"
+          className="pointer-events-none absolute left-0 top-0 z-30 size-full fill-none"
         >
           <path
             ref={heroBorderRef}
@@ -913,10 +914,11 @@ export default function Hero() {
                 }}
               >
                 <svg
-                  className="absolute left-0 top-0 z-30 size-full fill-none"
-                  stroke={"#000000"}
+                  xmlns="http://www.w3.org/2000/svg"
+                  stroke="#000000"
                   strokeWidth="2"
                   fill="none"
+                  className="absolute left-0 top-0 z-30 size-full fill-none"
                 >
                   <path
                     ref={(el) => {
@@ -990,7 +992,7 @@ export default function Hero() {
             </span>
           </h1>
 
-          <p className="hero-cta-enter-preloader text-body-desktop/[1.2] mb-5 hidden font-robert-regular text-foreground md:block">
+          <p className="hero-cta-enter-preloader mb-5 hidden font-robert-regular text-body-desktop/[1.2] text-foreground md:block">
             Enter the Metagame
             <br />
             Unleash the Play Economy
@@ -1035,7 +1037,7 @@ export default function Hero() {
           </h1>
         </div>
         <div className="absolute inset-0 z-20 flex h-svh w-full items-end justify-between px-[clamp(1rem,6vw,3rem)] pb-[clamp(1rem,6vw,3rem)] md:hidden">
-          <p className="hero-cta-enter-preloader text-body-mobile/[1.2] font-robert-regular text-foreground">
+          <p className="hero-cta-enter-preloader font-robert-regular text-body-mobile/[1.2] text-foreground">
             Enter the Metagame
             <br />
             Unleash the Play Economy

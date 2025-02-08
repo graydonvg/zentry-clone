@@ -247,7 +247,11 @@ export default function Navbar() {
           className="relative flex size-full items-center justify-between p-4"
         >
           <div className="flex w-full items-center justify-between md:justify-start md:gap-8">
-            <svg aria-hidden="true" className="size-8 fill-secondary">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              className="size-8 fill-secondary"
+            >
               <use href="/icons/arrows-icon.svg#arrows-icon"></use>
             </svg>
             <div className="flex-center gap-6">
@@ -265,7 +269,11 @@ export default function Navbar() {
                 className="size-6 md:hidden"
               >
                 <span className="sr-only">Toggle Menu</span>
-                <svg aria-hidden="true" className="size-full fill-secondary">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                  className="size-full fill-secondary"
+                >
                   <use href="/icons/burger-icon.svg#burger-icon"></use>
                 </svg>
               </button>
@@ -275,7 +283,7 @@ export default function Navbar() {
                   className="size-6 md:hidden"
                 >
                   <span className="sr-only">Toggle Menu</span>
-                  <svg aria-hidden="true" className="size-full fill-secondary">
+                  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="size-full fill-secondary">
                     <use href="/icons/burger-icon.svg#burger-icon"></use>
                   </svg>
                 </button>
@@ -285,7 +293,7 @@ export default function Navbar() {
                   className="size-6 md:hidden"
                 >
                   <span className="sr-only">Toggle Menu</span>
-                  <svg aria-hidden="true" className="size-full">
+                  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="size-full">
                     <use href="/icons/close-icon.svg#close-icon"></use>
                   </svg>
                 </button>
