@@ -5,7 +5,7 @@ import Products from "@/components/products/products";
 import Narrative from "@/components/narrative";
 import { Toast } from "@/components/ui/toast";
 import MobileMenu from "@/components/mobile-menu";
-// import Preloader from "@/components/preloader";
+import Preloader from "@/components/preloader";
 import MeasurementElement from "@/components/measurement-element";
 
 export default async function Home() {
@@ -22,7 +22,7 @@ export default async function Home() {
       </main>
       <Toast />
       <MobileMenu />
-      {/* <Preloader /> */}
+      <Preloader />
       <MeasurementElement />
     </>
   );
