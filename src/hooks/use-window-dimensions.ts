@@ -15,9 +15,7 @@ export default function useWindowDimensions() {
     width: viewportWidth,
     height: viewportHeight,
   });
-  const isPreloaderComplete = usePreloaderStore(
-    (state) => state.isPreloaderComplete,
-  );
+  const { isPreloaderComplete } = usePreloaderStore();
 
   useEffect(() => {
     const controller = new AbortController();

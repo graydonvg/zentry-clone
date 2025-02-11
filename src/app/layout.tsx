@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import MeasurementElement from "@/components/measurement-element";
-import Preloader from "@/components/preloader";
 
 export const metadata: Metadata = {
   title: "Zentry clone",
@@ -26,8 +24,6 @@ export default function RootLayout({
       </head>
       <body className="overflow-hidden antialiased" suppressHydrationWarning>
         {children}
-        <Preloader />
-        <MeasurementElement />
       </body>
     </html>
   );

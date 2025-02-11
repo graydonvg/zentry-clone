@@ -20,12 +20,8 @@ export default function Preloader() {
   const topLogoRef = useRef<SVGSVGElement>(null);
   const bottomLogoRef = useRef<SVGSVGElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
-  const heroVideoAssetsLoaded = useAssetsStore(
-    (state) => state.heroVideoAssetsLoaded,
-  );
-  const toggleIsPreloaderComplete = usePreloaderStore(
-    (state) => state.toggleIsPreloaderComplete,
-  );
+  const { heroVideoAssetsLoaded } = useAssetsStore();
+  const { toggleIsPreloaderComplete } = usePreloaderStore();
   const [preloaderFirstPhaseComplete, setPreloaderFirstPhaseComplete] =
     useState(false);
 

@@ -9,7 +9,9 @@ import { TiLocationArrow } from "react-icons/ti";
 import { cn } from "@/lib/utils";
 import { useIsTouchOnlyDevice } from "@/hooks/use-is-touch-only-device";
 import { defaultLinkToast } from "./ui/toast";
-import { toast } from "react-toastify";
+import useMobileMenuStore from "@/lib/store/use-mobile-menu-store";
+import AudioButton from "./audio-button";
+import Link from "next/link";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -39,29 +41,12 @@ export default function Navbar() {
   const isTouchOnlyDevice = useIsTouchOnlyDevice();
   const navContainerRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLElement>(null);
-  const navBackgroundRef = useRef<HTMLDivElement>(null);
   const navLinksContainerRef = useRef<HTMLDivElement>(null);
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
-  const audioRef = useRef<HTMLAudioElement>(null);
   const navLinkBackgroundRef = useRef<HTMLDivElement>(null);
-  // const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
-  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [isScrollYTop, setScrollYTop] = useState(true);
-
-  function toggleAudio() {
-    const audio = audioRef.current;
-
-    if (!audio) return;
-
-    if (!isAudioPlaying) {
-      audio.play();
-    } else {
-      audio.pause();
-    }
-
-    setIsAudioPlaying((prev) => !prev);
-  }
+  const { isMobileMenuOpen, toggleIsMobileMenuOpen } = useMobileMenuStore();
 
   useGSAP(() => {
     ScrollTrigger.create({
@@ -87,6 +72,8 @@ export default function Navbar() {
 
   useGSAP(
     () => {
+      if (isMobileMenuOpen) return;
+
       const tl = gsap.timeline();
 
       tl.to(navContainerRef.current, {
@@ -96,7 +83,7 @@ export default function Navbar() {
       });
 
       tl.to(
-        navBackgroundRef.current,
+        "#navbar-background",
         {
           autoAlpha: isScrollYTop ? 0 : 1,
           duration: 0.2,
@@ -233,12 +220,12 @@ export default function Navbar() {
     <div
       id="navbar"
       ref={navContainerRef}
-      className="fixed inset-x-2 z-50 sm:inset-x-4"
+      className="fixed inset-x-2 top-2 z-50 sm:inset-x-4"
       style={{ willChange: "transform" }}
     >
-      <div className="relative mt-2 overflow-hidden rounded-lg">
+      <div className="relative overflow-hidden rounded-lg">
         <div
-          ref={navBackgroundRef}
+          id="navbar-background"
           className="absolute inset-0 rounded-lg border border-border bg-black opacity-0"
           style={{ willChange: "opacity" }}
         />
@@ -246,8 +233,13 @@ export default function Navbar() {
           ref={navRef}
           className="relative flex size-full items-center justify-between p-4"
         >
-          <div className="flex w-full items-center justify-between md:justify-start md:gap-8">
+          <div
+            className={cn("flex w-full items-center justify-between", {
+              "md:justify-start md:gap-8": !isMobileMenuOpen,
+            })}
+          >
             <svg
+              id="navbar-logo-svg"
               xmlns="http://www.w3.org/2000/svg"
               aria-hidden="true"
               className="size-8 fill-secondary"
@@ -256,7 +248,7 @@ export default function Navbar() {
             </svg>
             <div className="flex-center gap-6">
               <Button
-                id="product-button"
+                id="navbar-products-button"
                 variant="secondary"
                 size="small"
                 onClick={() => defaultLinkToast()}
@@ -265,89 +257,63 @@ export default function Navbar() {
                 <TiLocationArrow className="rotate-[135deg]" />
               </Button>
               <button
-                onClick={() => toast.info("Menu coming soon!")}
-                className="size-6 md:hidden"
+                onClick={() => toggleIsMobileMenuOpen()}
+                className={cn("size-6", {
+                  "md:hidden": !isMobileMenuOpen,
+                })}
               >
-                <span className="sr-only">Toggle Menu</span>
+                <span className="sr-only">Toggle menu</span>
                 <svg
+                  id="mobile-menu-icon"
                   xmlns="http://www.w3.org/2000/svg"
                   aria-hidden="true"
                   className="size-full fill-secondary"
                 >
-                  <use href="/icons/burger-icon.svg#burger-icon"></use>
+                  {!isMobileMenuOpen ? (
+                    <use href="/icons/burger-icon.svg#burger-icon"></use>
+                  ) : (
+                    <use href="/icons/close-icon.svg#close-icon"></use>
+                  )}
                 </svg>
               </button>
-              {/* {!isNavMenuOpen ? (
-                <button
-                  onClick={() => setIsNavMenuOpen(true)}
-                  className="size-6 md:hidden"
-                >
-                  <span className="sr-only">Toggle Menu</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="size-full fill-secondary">
-                    <use href="/icons/burger-icon.svg#burger-icon"></use>
-                  </svg>
-                </button>
-              ) : (
-                <button
-                  onClick={() => setIsNavMenuOpen(false)}
-                  className="size-6 md:hidden"
-                >
-                  <span className="sr-only">Toggle Menu</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="size-full">
-                    <use href="/icons/close-icon.svg#close-icon"></use>
-                  </svg>
-                </button>
-              )} */}
             </div>
           </div>
           <div
             ref={navLinkBackgroundRef}
-            className="pointer-events-none absolute z-40 hidden rounded-3xl bg-secondary md:block"
+            className={cn(
+              "pointer-events-none absolute z-40 hidden rounded-3xl bg-secondary",
+              {
+                "md:block": !isMobileMenuOpen,
+              },
+            )}
             style={{ willChange: "opacity, transform" }}
           />
-          <ul className="z-50 hidden items-center md:flex">
+          <ul
+            className={cn("z-50 hidden items-center", {
+              "md:flex": !isMobileMenuOpen,
+            })}
+          >
             <div ref={navLinksContainerRef} className="flex">
               {navItems.map((item, index) => {
                 return (
                   <li key={index}>
-                    <a
+                    <Link
+                      href=""
                       onClick={() => defaultLinkToast()}
                       ref={(el) => {
                         linkRefs.current[index] = el;
                       }}
-                      className="flex cursor-pointer items-center gap-1 px-4 py-2 text-xs font-semibold uppercase text-foreground"
+                      className="navbar-link flex items-center gap-1 px-4 py-2 text-xs font-semibold uppercase text-foreground"
                     >
                       {item.label}
                       {item.icon && <TiLocationArrow />}
-                    </a>
+                    </Link>
                   </li>
                 );
               })}
             </div>
             <li>
-              <button
-                onClick={toggleAudio}
-                className="flex items-center space-x-0.5 px-4 py-2"
-              >
-                <audio
-                  ref={audioRef}
-                  src="/audio/loop.mp3"
-                  loop
-                  className="hidden"
-                />
-                {Array.from(Array(5)).map((_, index) => (
-                  <div
-                    key={index}
-                    className={cn(
-                      "audio-indicator-line h-1 w-px rounded-full bg-foreground transition-all duration-200 ease-in-out",
-                      {
-                        active: isAudioPlaying,
-                      },
-                    )}
-                    style={{ animationDelay: `${(index + 1) * 0.1}s` }}
-                  />
-                ))}
-              </button>
+              <AudioButton />
             </li>
           </ul>
         </nav>

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
   <symbol viewBox="0 0 21.6 21.59" id="close-icon">
-	<polygon points="20.18 0 10.8 9.38 1.41 0 0 1.41 9.38 10.8 0 20.18 1.42 21.59 21.6 1.41 20.18 0"></polygon>
-	<polygon points="12.75 14.16 20.18 21.59 21.59 20.18 14.86 13.45 12.75 14.16"></polygon>
+		<polygon points="20.18 0 10.8 9.38 1.41 0 0 1.41 9.38 10.8 0 20.18 1.42 21.59 21.6 1.41 20.18 0"></polygon>
+		<polygon points="12.75 14.16 20.18 21.59 21.59 20.18 14.86 13.45 12.75 14.16"></polygon>
 	</symbol>
 </svg>

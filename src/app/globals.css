@@ -116,11 +116,9 @@ body {
 @keyframes audio-indicator-line {
   0%,
   100% {
-    height: 4px;
-    transform: translateY(-0px);
+    height: var(--base-height);
   }
   50% {
-    height: 16px;
-    transform: translateY(-4px);
+    height: calc(var(--base-height) * 4);
   }
 }

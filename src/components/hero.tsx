@@ -28,7 +28,7 @@ if (typeof window !== "undefined") {
 const heroVideos = [
   {
     initialZIndex: 10,
-    autoPlay: true,
+    autoPlay: false,
     src: "/videos/hero-1.mp4",
   },
   {
@@ -87,12 +87,8 @@ export default function Hero() {
   const nextVideoNumber = (currentVideoNumber + 1) % totalVideos;
   const minMaxHitAreaSideLength = getHitAreaSideLength(windowDimensions);
   const [loadedVideos, setLoadedVideos] = useState(0);
-  const toggleHeroVideoAssetsLoaded = useAssetsStore(
-    (state) => state.toggleHeroVideoAssetsLoaded,
-  );
-  const isPreloaderComplete = usePreloaderStore(
-    (state) => state.isPreloaderComplete,
-  );
+  const { toggleHeroVideoAssetsLoaded } = useAssetsStore();
+  const { isPreloaderComplete } = usePreloaderStore();
 
   useEffect(() => {
     if (loadedVideos === totalVideos) {
