@@ -68,7 +68,7 @@ export default function ProductCard({
             {title}
           </h3>
           {description && (
-            <p className="mt-3 max-w-44 text-pretty text-caption/[1.2] font-medium">
+            <p className="font-roobert mt-3 max-w-44 text-pretty text-caption/[1.2]">
               {description}
             </p>
           )}

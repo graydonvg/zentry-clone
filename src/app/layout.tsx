@@ -1,5 +1,26 @@
 import type { Metadata } from "next";
+import localFont from "next/font/local";
 import "./globals.css";
+import { cn } from "@/lib/utils";
+
+const general = localFont({
+  src: "../../public/fonts/general.woff2",
+  variable: "--general",
+  display: "swap",
+  fallback: ["sans-serif"],
+});
+const roobert = localFont({
+  src: "../../public/fonts/roobert.woff2",
+  variable: "--roobert",
+  display: "swap",
+  fallback: ["sans-serif"],
+});
+const zentry = localFont({
+  src: "../../public/fonts/zentry.woff2",
+  variable: "--zentry",
+  display: "swap",
+  fallback: ["sans-serif"],
+});
 
 export const metadata: Metadata = {
   title: "Zentry clone",
@@ -22,7 +43,15 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="overflow-hidden antialiased" suppressHydrationWarning>
+      <body
+        className={cn(
+          "overflow-hidden overflow-x-hidden bg-secondary font-general antialiased",
+          general.variable,
+          roobert.variable,
+          zentry.variable,
+        )}
+        suppressHydrationWarning
+      >
         {children}
       </body>
     </html>

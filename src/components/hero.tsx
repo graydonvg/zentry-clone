@@ -988,7 +988,7 @@ export default function Hero() {
             </span>
           </h1>
 
-          <p className="hero-cta-enter-preloader mb-5 hidden font-robert-regular text-body-desktop/[1.2] text-foreground md:block">
+          <p className="hero-cta-enter-preloader font-roobert mb-5 hidden text-body-desktop/[1.2] text-foreground md:block">
             Enter the Metagame
             <br />
             Unleash the Play Economy
@@ -1033,7 +1033,7 @@ export default function Hero() {
           </h1>
         </div>
         <div className="absolute inset-0 z-20 flex h-svh w-full items-end justify-between px-[clamp(1rem,6vw,3rem)] pb-[clamp(1rem,6vw,3rem)] md:hidden">
-          <p className="hero-cta-enter-preloader font-robert-regular text-body-mobile/[1.2] text-foreground">
+          <p className="hero-cta-enter-preloader font-roobert text-body-mobile/[1.2] text-foreground">
             Enter the Metagame
             <br />
             Unleash the Play Economy

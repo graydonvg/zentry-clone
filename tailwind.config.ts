@@ -9,11 +9,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        "circular-web": ["circular-web", "sans-serif"],
-        general: ["general", "sans-serif"],
-        "robert-medium": ["robert-medium", "sans-serif"],
-        "robert-regular": ["robert-regular", "sans-serif"],
-        zentry: ["zentry", "sans-serif"],
+        general: ["var(--general)"],
+        roobert: ["var(--roobert)"],
+        zentry: ["var(--zentry)"],
       },
       fontSize: {
         "h1-desktop": "var(--h1-desktop)",

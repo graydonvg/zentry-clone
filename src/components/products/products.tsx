@@ -6,14 +6,14 @@ export default function Products() {
   return (
     <section className="min-h-screen bg-black px-3 py-16 sm:px-8 sm:py-24 md:px-24 lg:py-32">
       <div className="mx-auto max-w-screen-2xl space-y-16 sm:space-y-24 lg:space-y-32">
-        <div className="font-circular-web text-body-mobile leading-[1.2] md:text-body-desktop">
+        <div className="font-roobert text-body-mobile leading-[1.2] md:text-body-desktop">
           <p className="text-foreground">Explore the Zentry Universe</p>
           <p className="text-foreground/50">
             Immerse yourself in an IP-rich product universe where
             <br />
             AI-driven gamification and hyper-personalization lead
             <br />
-            humans & AI into a global play economy.
+            the human-agentic economy.
           </p>
         </div>
 

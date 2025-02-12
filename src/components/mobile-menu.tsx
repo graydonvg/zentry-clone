@@ -1,7 +1,5 @@
 "use client";
 
-import { Roboto_Mono } from "next/font/google";
-import { cn } from "@/lib/utils";
 import { defaultLinkToast } from "./ui/toast";
 import { useEffect, useRef, useState } from "react";
 import useMobileMenuStore from "@/lib/store/use-mobile-menu-store";
@@ -9,10 +7,6 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import AudioButton from "./audio-button";
 import Link from "next/link";
-
-const roboto_mono = Roboto_Mono({
-  subsets: ["latin"],
-});
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(useGSAP);
@@ -345,10 +339,7 @@ export default function MobileMenu() {
                     ? lastMenuItemNumberRef
                     : null
                 }
-                className={cn(
-                  "menu-item-number self-start pr-8 text-body-mobile font-bold",
-                  roboto_mono.className,
-                )}
+                className="menu-item-number self-start pr-8 font-general text-body-mobile font-bold"
               >
                 {String(index + 1).padStart(2, "0")}
               </span>
@@ -381,7 +372,7 @@ export default function MobileMenu() {
         className="flex items-center justify-between"
       >
         <ul>
-          <li className="whitespace-nowrap font-circular-web text-[clamp(1rem,0.197rem+4.2827vw,2.25rem)] font-medium tracking-tighter">
+          <li className="font-roobert whitespace-nowrap text-[clamp(1rem,0.197rem+4.2827vw,2.25rem)]">
             <Link
               href=""
               ref={mobileMenuBottomLinkRef}
@@ -392,33 +383,6 @@ export default function MobileMenu() {
           </li>
         </ul>
         <AudioButton isMobileMenuButton />
-        {/* <button
-          // onClick={toggleAudio}
-          className="flex items-center gap-0.5 px-4 py-2 font-general font-bold uppercase"
-        >
-          <span className="sr-only">Toggle sound</span>
-          <span className="mr-2 whitespace-nowrap text-[clamp(0.75rem,0.2682rem+2.5696vw,1.5rem)]">
-            sound off
-          </span>
-          <audio
-            // ref={audioRef}
-            src="/audio/loop.mp3"
-            loop
-            className="hidden"
-          />
-          {Array.from(Array(5)).map((_, index) => (
-            <div
-              key={index}
-              className={cn(
-                "audio-indicator-line h-1 w-px rounded-full bg-black transition-all duration-200 ease-in-out",
-                // {
-                //   active: isAudioPlaying,
-                // },
-              )}
-              style={{ animationDelay: `${(index + 1) * 0.1}s` }}
-            />
-          ))}
-        </button> */}
       </div>
     </div>
   );
