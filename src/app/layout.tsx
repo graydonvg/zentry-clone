@@ -15,6 +15,12 @@ const roobert = localFont({
   display: "swap",
   fallback: ["sans-serif"],
 });
+const roobertMedium = localFont({
+  src: "../../public/fonts/roobert-medium.woff2",
+  variable: "--roobert-medium",
+  display: "swap",
+  fallback: ["sans-serif"],
+});
 const zentry = localFont({
   src: "../../public/fonts/zentry.woff2",
   variable: "--zentry",
@@ -48,6 +54,7 @@ export default function RootLayout({
           "overflow-hidden overflow-x-hidden bg-secondary font-general antialiased",
           general.variable,
           roobert.variable,
+          roobertMedium.variable,
           zentry.variable,
         )}
         suppressHydrationWarning

@@ -11,6 +11,7 @@ export default {
       fontFamily: {
         general: ["var(--general)"],
         roobert: ["var(--roobert)"],
+        "roobert-medium": ["var(--roobert-medium)"],
         zentry: ["var(--zentry)"],
       },
       fontSize: {

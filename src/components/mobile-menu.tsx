@@ -372,7 +372,7 @@ export default function MobileMenu() {
         className="flex items-center justify-between"
       >
         <ul>
-          <li className="font-roobert whitespace-nowrap text-[clamp(1rem,0.197rem+4.2827vw,2.25rem)]">
+          <li className="whitespace-nowrap font-roobert-medium text-[clamp(1rem,0.197rem+4.2827vw,2.25rem)]">
             <Link
               href=""
               ref={mobileMenuBottomLinkRef}
