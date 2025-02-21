@@ -28,7 +28,7 @@ if (typeof window !== "undefined") {
 const heroVideos = [
   {
     initialZIndex: 10,
-    autoPlay: false,
+    autoPlay: true,
     src: "/videos/hero-1.mp4",
   },
   {
