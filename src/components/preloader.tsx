@@ -227,14 +227,9 @@ export default function Preloader() {
 
       tl.then(() => {
         document.body.classList.remove("overflow-hidden");
-      })
-        .then(() => {
-          toggleIsPreloaderComplete();
-        })
-        .then(() => {
-          // tl.kill();
-          // controller.abort();
-        });
+      }).then(() => {
+        toggleIsPreloaderComplete();
+      });
 
       const controller = new AbortController();
 
@@ -251,10 +246,6 @@ export default function Preloader() {
             })
             .then(() => {
               toggleIsPreloaderComplete();
-            })
-            .then(() => {
-              // tl.kill();
-              // controller.abort();
             });
         },
         { signal: controller.signal },

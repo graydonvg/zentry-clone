@@ -43,14 +43,6 @@ export default function MobileMenu() {
   const [updatePadding, setUpdatePadding] = useState(false);
 
   useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.classList.add("overflow-hidden");
-    } else {
-      document.body.classList.remove("overflow-hidden");
-    }
-  }, [isMobileMenuOpen]);
-
-  useEffect(() => {
     const lastMenuItemNumber = lastMenuItemNumberRef.current;
     const mobileMenuBottom = mobileMenuBottomRef.current;
 

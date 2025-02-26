@@ -257,7 +257,16 @@ export default function Navbar() {
                 <TiLocationArrow className="rotate-[135deg]" />
               </Button>
               <button
-                onClick={() => toggleIsMobileMenuOpen()}
+                onClick={() => {
+                  toggleIsMobileMenuOpen();
+                  const isOverflowHidden =
+                    document.body.classList.contains("overflow-hidden");
+                  if (isOverflowHidden) {
+                    document.body.classList.remove("overflow-hidden");
+                  } else {
+                    document.body.classList.add("overflow-hidden");
+                  }
+                }}
                 className={cn("size-6", {
                   "md:hidden": !isMobileMenuOpen,
                 })}

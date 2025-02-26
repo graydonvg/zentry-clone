@@ -24,6 +24,7 @@ export function Toast() {
       draggablePercent={40}
       toastStyle={{
         backgroundColor: primaryColor,
+        fontFamily: "var(--roobert)",
       }}
     />
   );
